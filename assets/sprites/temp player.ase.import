@@ -1,0 +1,18 @@
+[remap]
+
+importer="aseprite_wizard.plugin"
+type="SpriteFrames"
+uid="uid://c6pj0hipvw6wp"
+path="res://.godot/imported/temp player.ase-249e1e79555f0dc40950c03baf9eff4a.res"
+
+[deps]
+
+source_file="res://assets/sprites/temp player.ase"
+dest_files=["res://.godot/imported/temp player.ase-249e1e79555f0dc40950c03baf9eff4a.res"]
+
+[params]
+
+split_layers=false
+exclude_layers_pattern=""
+only_visible_layers=false
+sheet_type="Packed"

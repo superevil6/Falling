@@ -1,0 +1,32 @@
+[gd_scene load_steps=3 format=3 uid="uid://cf1pg2x8l8lpf"]
+
+[ext_resource type="SpriteFrames" uid="uid://bakdl7gvgr36" path="res://assets/sprites/bullet.ase" id="1_pbirf"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_g3sq0"]
+radius = 4.67723
+
+[node name="Bullet" type="Area2D"]
+scale = Vector2(0.641406, 0.608498)
+metadata/_edit_group_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+scale = Vector2(-1.08813, 2.29038)
+shape = SubResource("CircleShape2D_g3sq0")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+scale = Vector2(0.262141, 0.260984)
+sprite_frames = ExtResource("1_pbirf")
+metadata/_aseprite_wizard_config_ = {
+"layer": "",
+"o_ex_p": "",
+"o_folder": "",
+"o_name": "",
+"only_visible": false,
+"slice": "",
+"source": "res://assets/sprites/bullet.ase"
+}
+metadata/_aseprite_wizard_interface_config_ = {
+"layer_section": false,
+"output_section": false,
+"slice_section": false
+}

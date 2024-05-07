@@ -1,0 +1,105 @@
+[gd_scene load_steps=12 format=3 uid="uid://cfanc3brtl3ux"]
+
+[ext_resource type="Script" path="res://Player.cs" id="1_l4bou"]
+[ext_resource type="Texture2D" uid="uid://cpqv48tfj64yo" path="res://temp player.png" id="2_ih0rn"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_eevfn"]
+size = Vector2(133, 187)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1dh8p"]
+atlas = ExtResource("2_ih0rn")
+region = Rect2(0, 0, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6r0lj"]
+atlas = ExtResource("2_ih0rn")
+region = Rect2(256, 0, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_vvee7"]
+atlas = ExtResource("2_ih0rn")
+region = Rect2(512, 0, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6g6n6"]
+atlas = ExtResource("2_ih0rn")
+region = Rect2(0, 256, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wgsau"]
+atlas = ExtResource("2_ih0rn")
+region = Rect2(256, 256, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_88w27"]
+atlas = ExtResource("2_ih0rn")
+region = Rect2(512, 256, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_liq0r"]
+atlas = ExtResource("2_ih0rn")
+region = Rect2(0, 512, 256, 256)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_ie70u"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1dh8p")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6r0lj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_vvee7")
+}],
+"loop": true,
+"name": &"Falling",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6g6n6")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wgsau")
+}],
+"loop": true,
+"name": &"Shooting",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_88w27")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_liq0r")
+}],
+"loop": true,
+"name": &"Swording",
+"speed": 10.0
+}]
+
+[node name="Player" type="Area2D"]
+position = Vector2(412, 307)
+scale = Vector2(0.405625, 0.4)
+script = ExtResource("1_l4bou")
+metadata/_edit_group_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(7.5, -10.5)
+shape = SubResource("RectangleShape2D_eevfn")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+texture_filter = 1
+sprite_frames = SubResource("SpriteFrames_ie70u")
+animation = &"Falling"
+frame_progress = 0.58345
+metadata/_aseprite_wizard_config_ = {
+"layer": "",
+"o_ex_p": "",
+"o_folder": "",
+"o_name": "",
+"only_visible": false,
+"slice": "",
+"source": "res://assets/sprites/temp player.ase"
+}
+metadata/_aseprite_wizard_interface_config_ = {
+"layer_section": true,
+"output_section": true,
+"slice_section": true
+}
+metadata/_aseprite_wizard_source_file_hash_ = "8ec8c1d577a51456f697d5231e2d25c2"
