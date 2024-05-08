@@ -1,6 +1,6 @@
 using Godot;
 
-public partial class Weapon : Resource
+public partial class Gun : Resource
 {
 	[Export]
 	public float FireRate {get;set;}
@@ -12,6 +12,8 @@ public partial class Weapon : Resource
 	public float BulletSpread {get;set;}
 	[Export]
 	public PackedScene BulletType {get;set;}
+	[Export]
+	public float BulletLifetime {get;set;} 
 	[Export]
 	public DamageType DamageType {get;set;}
 

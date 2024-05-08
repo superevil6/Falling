@@ -1,8 +1,10 @@
-[gd_scene load_steps=8 format=3 uid="uid://3wov1sd2nxg5"]
+[gd_scene load_steps=10 format=3 uid="uid://3wov1sd2nxg5"]
 
 [ext_resource type="Script" path="res://assets/scripts/Main.cs" id="1_yeolr"]
 [ext_resource type="PackedScene" uid="uid://cfanc3brtl3ux" path="res://assets/objects/player.tscn" id="2_s1fia"]
+[ext_resource type="Resource" uid="uid://cc5s5y6gpiagm" path="res://assets/weapons/Pistol.tres" id="3_pvlqt"]
 [ext_resource type="Texture2D" uid="uid://bf0cc77bwoikv" path="res://assets/sprites/test enemy.png" id="4_0y4a8"]
+[ext_resource type="Resource" uid="uid://t4f5lqyn51u2" path="res://assets/weapons/Simple Sword.tres" id="4_hdwyf"]
 [ext_resource type="Script" path="res://assets/scripts/Enemy.cs" id="4_wg081"]
 [ext_resource type="Texture2D" uid="uid://eisdiyx6ekv4" path="res://assets/sprites/test wall.png" id="6_34aom"]
 
@@ -19,6 +21,8 @@ script = ExtResource("1_yeolr")
 [node name="Player" parent="." instance=ExtResource("2_s1fia")]
 platform_floor_layers = 4278190081
 platform_wall_layers = 1
+Gun = ExtResource("3_pvlqt")
+Melee = ExtResource("4_hdwyf")
 
 [node name="Enemy" type="Area2D" parent="."]
 position = Vector2(288, 196)

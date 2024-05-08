@@ -1,0 +1,15 @@
+[gd_resource type="Resource" load_steps=3 format=3 uid="uid://t4f5lqyn51u2"]
+
+[ext_resource type="PackedScene" uid="uid://so1k2v2p5aov" path="res://assets/objects/Attack.tscn" id="1_lv6e3"]
+[ext_resource type="Script" path="res://assets/scripts/Melee.cs" id="1_t2nmt"]
+
+[resource]
+script = ExtResource("1_t2nmt")
+StartLocation = Vector2(0, 0)
+EndLocation = Vector2(0, 0)
+Damage = 2
+SwingDuration = 1.0
+DamageType = 0
+WidthMultiplier = 0.0
+HeightMultiplier = 0.0
+Attack = ExtResource("1_lv6e3")

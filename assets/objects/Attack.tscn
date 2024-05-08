@@ -1,0 +1,67 @@
+[gd_scene load_steps=9 format=3 uid="uid://so1k2v2p5aov"]
+
+[ext_resource type="Script" path="res://assets/scripts/Attack.cs" id="1_5ng11"]
+[ext_resource type="Texture2D" uid="uid://b4u63p7k4vl71" path="res://assets/sprites/Sword Slash Test.png" id="1_ys6hh"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_srm7h"]
+atlas = ExtResource("1_ys6hh")
+region = Rect2(0, 0, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_vvbtb"]
+atlas = ExtResource("1_ys6hh")
+region = Rect2(256, 0, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3n4gq"]
+atlas = ExtResource("1_ys6hh")
+region = Rect2(0, 256, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rix4t"]
+atlas = ExtResource("1_ys6hh")
+region = Rect2(256, 256, 256, 256)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_qe1qc"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_srm7h")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_vvbtb")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3n4gq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rix4t")
+}],
+"loop": true,
+"name": &"Slash",
+"speed": 10.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1v41p"]
+size = Vector2(31, 6)
+
+[node name="Attack" type="Area2D"]
+scale = Vector2(2.08, 2.08)
+script = ExtResource("1_5ng11")
+metadata/_edit_group_ = true
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+texture_filter = 1
+scale = Vector2(0.402344, 0.402344)
+sprite_frames = SubResource("SpriteFrames_qe1qc")
+animation = &"Slash"
+metadata/_aseprite_wizard_config_ = {
+"layer": "",
+"o_ex_p": "",
+"o_folder": "",
+"o_name": "",
+"only_visible": false,
+"slice": "",
+"source": "res://assets/sprites/Sword Slash Test.aseprite"
+}
+metadata/_aseprite_wizard_source_file_hash_ = "000261de9f5e3104f0d03fe44843b501"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_1v41p")

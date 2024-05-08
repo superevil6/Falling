@@ -1,0 +1,18 @@
+[remap]
+
+importer="aseprite_wizard.plugin"
+type="SpriteFrames"
+uid="uid://bl35ujnmuta28"
+path="res://.godot/imported/Sword Slash Test.aseprite-1f8892f79b972df0c555dd01e0b8ffed.res"
+
+[deps]
+
+source_file="res://assets/sprites/Sword Slash Test.aseprite"
+dest_files=["res://.godot/imported/Sword Slash Test.aseprite-1f8892f79b972df0c555dd01e0b8ffed.res"]
+
+[params]
+
+split_layers=false
+exclude_layers_pattern=""
+only_visible_layers=false
+sheet_type="Packed"

@@ -1,11 +1,17 @@
 using Godot;
-using System;
 
 public partial class Enemy : Area2D
 {
 	[Export]
 	public int MaxHealth {get;set;}
 	public int CurrentHealth {get;set;}
+	[Export]
+	public Gun Gun {get;set;}
+	[Export]
+	public DamageType DamageTypeStrength {get;set;}
+	[Export]
+	public DamageType DamageTypeWeakness {get;set;}
+
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
