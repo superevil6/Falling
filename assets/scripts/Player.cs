@@ -13,7 +13,7 @@ public partial class Player : CharacterBody2D
 	[Export]
 	public Gun Gun {get;set;}
 	[Export]
-	public Melee Melee {get;set;}
+	public MeleeWeapon Melee {get;set;}
 	// public List<Area2D> Bullets = new List<Area2D>();
 	public Vector2 ScreenSize;
 	public AnimatedSprite2D animatedSprite2D;
@@ -70,7 +70,7 @@ public partial class Player : CharacterBody2D
 
 	private void Shoot(Vector2 aimDirection) {
 		animatedSprite2D.Animation = "Shooting";
-		for (int i = 0; i <= Gun.BulletCount; i++) {
+		for (int i = 0; i < Gun.BulletCount; i++) {
 			Bullet b = Gun.BulletType.Instantiate<Bullet>();
 			var randomX = rng.RandfRange(-Gun.BulletSpread, Gun.BulletSpread);
 			var randomY = rng.RandfRange(-Gun.BulletSpread, Gun.BulletSpread);
@@ -79,6 +79,7 @@ public partial class Player : CharacterBody2D
 			b.Set("BulletLifetime", Gun.BulletLifetime);
 			b.Position = Position;
 			b.Rotation = aimDirection.Angle();
+			b.SetCollisionLayerValue(4, true);
 			GetParent().AddChild(b);
 		}
 		animatedSprite2D.Play();
@@ -88,7 +89,7 @@ public partial class Player : CharacterBody2D
 	private void MeleeAttack(Vector2 aimDirection) {
 		animatedSprite2D.Animation = "Swording";
 		animatedSprite2D.Play();
-		Attack a = Melee.Attack.Instantiate<Attack>();
+		MeleeAttack a = Melee.Attack.Instantiate<MeleeAttack>();
 		a.Set("Direction", aimDirection);
 		a.Set("SwingDuration", Melee.SwingDuration);
 		a.Position = new Vector2(aimDirection.X + 100, aimDirection.Y + 100);

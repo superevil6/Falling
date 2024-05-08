@@ -1,6 +1,6 @@
 using Godot;
 
-public partial class Melee : Resource
+public partial class MeleeWeapon : Resource
 {
     [Export]
     public Vector2 StartLocation {get;set;}

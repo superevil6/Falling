@@ -1,11 +1,10 @@
 using Godot;
 
-public partial class Bullet : Area2D
+public partial class Bullet : Attack
 {
 	[Export]
 	public float BulletSpeed {get;set;}= 100;
 	public float BulletLifetime {get;set;}
-	public int Damage {get;set;}
 	public Vector2 Direction {get;set;}
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -20,12 +19,12 @@ public partial class Bullet : Area2D
 		if (BulletLifetime > 0) {
 			BulletLifetime -= (float)delta;
 		} else {
-			Hide();
+			QueueFree();
 		}
 
 	}
 
 	private void _on_area_entered(Node2D node){
-		Hide();
+		QueueFree();
 	}
 }

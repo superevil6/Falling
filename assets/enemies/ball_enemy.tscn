@@ -1,0 +1,112 @@
+[gd_scene load_steps=14 format=3 uid="uid://tng40x5blnrr"]
+
+[ext_resource type="Script" path="res://assets/scripts/Enemy.cs" id="1_bhc83"]
+[ext_resource type="Resource" uid="uid://mmnuqarbyxa5" path="res://assets/enemies/test enemy.tres" id="2_jlrhh"]
+[ext_resource type="Texture2D" uid="uid://cum2gpblsuglx" path="res://assets/enemies/Ball Enemy.png" id="3_m04ux"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_kihfr"]
+radius = 6.50781
+height = 23.0873
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_l7xsj"]
+atlas = ExtResource("3_m04ux")
+region = Rect2(256, 256, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cmcl0"]
+atlas = ExtResource("3_m04ux")
+region = Rect2(512, 256, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_j7b6y"]
+atlas = ExtResource("3_m04ux")
+region = Rect2(0, 512, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3kii4"]
+atlas = ExtResource("3_m04ux")
+region = Rect2(256, 512, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5a7n2"]
+atlas = ExtResource("3_m04ux")
+region = Rect2(0, 0, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_h2ri5"]
+atlas = ExtResource("3_m04ux")
+region = Rect2(256, 0, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_iaagf"]
+atlas = ExtResource("3_m04ux")
+region = Rect2(512, 0, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gmwq0"]
+atlas = ExtResource("3_m04ux")
+region = Rect2(0, 256, 256, 256)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_6mbo2"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_l7xsj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_cmcl0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_j7b6y")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3kii4")
+}],
+"loop": false,
+"name": &"Death",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5a7n2")
+}],
+"loop": true,
+"name": &"Idle",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_h2ri5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_iaagf")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gmwq0")
+}],
+"loop": false,
+"name": &"Shoot",
+"speed": 10.0
+}]
+
+[node name="Ball Enemy" type="Area2D"]
+position = Vector2(2, -1)
+scale = Vector2(0.284348, 0.288126)
+collision_layer = 4
+collision_mask = 8
+script = ExtResource("1_bhc83")
+Stats = ExtResource("2_jlrhh")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+scale = Vector2(11.2173, 8.11782)
+shape = SubResource("CapsuleShape2D_kihfr")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+texture_filter = 1
+sprite_frames = SubResource("SpriteFrames_6mbo2")
+animation = &"Shoot"
+metadata/_aseprite_wizard_config_ = {
+"layer": "",
+"o_ex_p": "",
+"o_folder": "",
+"o_name": "",
+"only_visible": false,
+"slice": "",
+"source": "res://assets/sprites/Ball Enemy.aseprite"
+}
+metadata/_aseprite_wizard_source_file_hash_ = "50dde8af9d7688233b8f7db3e27ef890"
+
+[connection signal="area_entered" from="." to="." method="_on_area_entered"]

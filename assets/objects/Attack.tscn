@@ -1,6 +1,6 @@
 [gd_scene load_steps=9 format=3 uid="uid://so1k2v2p5aov"]
 
-[ext_resource type="Script" path="res://assets/scripts/Attack.cs" id="1_5ng11"]
+[ext_resource type="Script" path="res://assets/scripts/MeleeAttack.cs" id="1_5ng11"]
 [ext_resource type="Texture2D" uid="uid://b4u63p7k4vl71" path="res://assets/sprites/Sword Slash Test.png" id="1_ys6hh"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_srm7h"]

@@ -1,0 +1,18 @@
+[remap]
+
+importer="aseprite_wizard.plugin"
+type="SpriteFrames"
+uid="uid://b6cptk12014rw"
+path="res://.godot/imported/Ball Enemy.aseprite-784fd2fa90f0c10bab24b59de745e6bd.res"
+
+[deps]
+
+source_file="res://assets/sprites/Ball Enemy.aseprite"
+dest_files=["res://.godot/imported/Ball Enemy.aseprite-784fd2fa90f0c10bab24b59de745e6bd.res"]
+
+[params]
+
+split_layers=false
+exclude_layers_pattern=""
+only_visible_layers=false
+sheet_type="Packed"

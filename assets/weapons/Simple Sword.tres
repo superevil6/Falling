@@ -1,7 +1,7 @@
 [gd_resource type="Resource" load_steps=3 format=3 uid="uid://t4f5lqyn51u2"]
 
 [ext_resource type="PackedScene" uid="uid://so1k2v2p5aov" path="res://assets/objects/Attack.tscn" id="1_lv6e3"]
-[ext_resource type="Script" path="res://assets/scripts/Melee.cs" id="1_t2nmt"]
+[ext_resource type="Script" path="res://assets/scripts/MeleeWeapon.cs" id="1_t2nmt"]
 
 [resource]
 script = ExtResource("1_t2nmt")

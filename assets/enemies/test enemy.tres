@@ -1,0 +1,17 @@
+[gd_resource type="Resource" load_steps=5 format=3 uid="uid://mmnuqarbyxa5"]
+
+[ext_resource type="Texture2D" uid="uid://bf0cc77bwoikv" path="res://assets/sprites/test enemy.png" id="1_1m2y0"]
+[ext_resource type="Resource" uid="uid://dpbu2nab2atvi" path="res://assets/weapons/Basic Slow Enemy Shot.tres" id="2_uvv66"]
+[ext_resource type="Resource" uid="uid://t4f5lqyn51u2" path="res://assets/weapons/Simple Sword.tres" id="3_hiw2o"]
+[ext_resource type="Script" path="res://assets/scripts/EnemyStatBlock.cs" id="4_onxjb"]
+
+[resource]
+script = ExtResource("4_onxjb")
+MaxHealth = 2
+Gun = ExtResource("2_uvv66")
+Melee = ExtResource("3_hiw2o")
+MovementSpeed = 20.0
+Size = 1.0
+EnemySprite = ExtResource("1_1m2y0")
+DamageTypeStrength = 0
+DamageTypeWeakness = 0
