@@ -1,0 +1,18 @@
+[remap]
+
+importer="aseprite_wizard.plugin"
+type="SpriteFrames"
+uid="uid://b6gqanwhpn1i0"
+path="res://.godot/imported/test enemy.ase-a12cd0b5dd5562ef660e09a87a411a77.res"
+
+[deps]
+
+source_file="res://assets/sprites/test enemy.ase"
+dest_files=["res://.godot/imported/test enemy.ase-a12cd0b5dd5562ef660e09a87a411a77.res"]
+
+[params]
+
+split_layers=false
+exclude_layers_pattern=""
+only_visible_layers=false
+sheet_type="Packed"

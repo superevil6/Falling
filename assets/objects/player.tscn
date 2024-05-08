@@ -1,7 +1,8 @@
-[gd_scene load_steps=12 format=3 uid="uid://cfanc3brtl3ux"]
+[gd_scene load_steps=13 format=3 uid="uid://cfanc3brtl3ux"]
 
-[ext_resource type="Script" path="res://Player.cs" id="1_l4bou"]
+[ext_resource type="Script" path="res://assets/scripts/Player.cs" id="1_l4bou"]
 [ext_resource type="Texture2D" uid="uid://cpqv48tfj64yo" path="res://temp player.png" id="2_ih0rn"]
+[ext_resource type="PackedScene" uid="uid://cf1pg2x8l8lpf" path="res://assets/objects/bullet.tscn" id="2_okwh7"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_eevfn"]
 size = Vector2(133, 187)
@@ -73,10 +74,14 @@ animations = [{
 "speed": 10.0
 }]
 
-[node name="Player" type="Area2D"]
+[node name="Player" type="CharacterBody2D"]
 position = Vector2(412, 307)
 scale = Vector2(0.405625, 0.4)
+collision_layer = 2
+collision_mask = 13
 script = ExtResource("1_l4bou")
+MaxHealth = 5
+BulletObject = ExtResource("2_okwh7")
 metadata/_edit_group_ = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

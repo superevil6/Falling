@@ -1,19 +1,24 @@
 using Godot;
 using System;
 
-public partial class bullet : Area2D
+public partial class Enemy : Area2D
 {
 	[Export]
-	public int BulletSpeed {get;set;}= 100;
+	public int MaxHealth {get;set;}
+	public int CurrentHealth {get;set;}
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		CurrentHealth = MaxHealth;
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
-    	Position += Transform.X * BulletSpeed * delta
 
+	}
+
+	private void _on_area_entered(Node2D node2D){
+		Hide();
 	}
 }

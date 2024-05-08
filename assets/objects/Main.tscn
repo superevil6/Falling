@@ -1,0 +1,80 @@
+[gd_scene load_steps=8 format=3 uid="uid://3wov1sd2nxg5"]
+
+[ext_resource type="Script" path="res://assets/scripts/Main.cs" id="1_yeolr"]
+[ext_resource type="PackedScene" uid="uid://cfanc3brtl3ux" path="res://assets/objects/player.tscn" id="2_s1fia"]
+[ext_resource type="Texture2D" uid="uid://bf0cc77bwoikv" path="res://assets/sprites/test enemy.png" id="4_0y4a8"]
+[ext_resource type="Script" path="res://assets/scripts/Enemy.cs" id="4_wg081"]
+[ext_resource type="Texture2D" uid="uid://eisdiyx6ekv4" path="res://assets/sprites/test wall.png" id="6_34aom"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_kihfr"]
+radius = 6.50781
+height = 23.0873
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_j0sub"]
+size = Vector2(61.3636, 254)
+
+[node name="Node2D" type="Node2D"]
+script = ExtResource("1_yeolr")
+
+[node name="Player" parent="." instance=ExtResource("2_s1fia")]
+platform_floor_layers = 4278190081
+platform_wall_layers = 1
+
+[node name="Enemy" type="Area2D" parent="."]
+position = Vector2(288, 196)
+scale = Vector2(0.284348, 0.288126)
+collision_layer = 4
+collision_mask = 8
+script = ExtResource("4_wg081")
+metadata/_edit_group_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Enemy"]
+scale = Vector2(11.2173, 8.11782)
+shape = SubResource("CapsuleShape2D_kihfr")
+
+[node name="Sprite2D" type="Sprite2D" parent="Enemy"]
+texture = ExtResource("4_0y4a8")
+metadata/_aseprite_wizard_config_ = {
+"i_mode": -1,
+"keep_anim_length": false,
+"layer": "",
+"o_ex_p": "",
+"o_folder": "",
+"o_name": "",
+"only_visible": false,
+"player": "",
+"slice": "",
+"source": "res://assets/sprites/test enemy.ase"
+}
+
+[node name="Left Wall" type="StaticBody2D" parent="."]
+position = Vector2(122, 331)
+scale = Vector2(1.02654, 2.71541)
+collision_mask = 14
+metadata/_edit_group_ = true
+
+[node name="Sprite2D" type="Sprite2D" parent="Left Wall"]
+scale = Vector2(1.00278, 1)
+texture = ExtResource("6_34aom")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Left Wall"]
+position = Vector2(-43.3457, 0)
+shape = SubResource("RectangleShape2D_j0sub")
+
+[node name="Left Wall2" type="StaticBody2D" parent="."]
+texture_repeat = 2
+position = Vector2(1020, 325)
+rotation = 3.14159
+scale = Vector2(1.07923, 2.57407)
+metadata/_edit_group_ = true
+
+[node name="Sprite2D" type="Sprite2D" parent="Left Wall2"]
+position = Vector2(-13.8988, 1.58011e-12)
+scale = Vector2(0.746488, 1)
+texture = ExtResource("6_34aom")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Left Wall2"]
+position = Vector2(-52.9725, -0.999992)
+shape = SubResource("RectangleShape2D_j0sub")
+
+[connection signal="area_entered" from="Enemy" to="Enemy" method="_on_area_entered"]
