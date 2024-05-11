@@ -89,6 +89,7 @@ collision_layer = 4
 collision_mask = 8
 script = ExtResource("1_bhc83")
 Stats = ExtResource("2_jlrhh")
+metadata/Enemy = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 scale = Vector2(11.2173, 8.11782)
@@ -110,3 +111,4 @@ metadata/_aseprite_wizard_config_ = {
 metadata/_aseprite_wizard_source_file_hash_ = "50dde8af9d7688233b8f7db3e27ef890"
 
 [connection signal="area_entered" from="." to="." method="_on_area_entered"]
+[connection signal="animation_finished" from="AnimatedSprite2D" to="." method="_on_animated_sprite_2d_animation_finished"]

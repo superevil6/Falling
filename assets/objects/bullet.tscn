@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=3 uid="uid://cf1pg2x8l8lpf"]
+[gd_scene load_steps=5 format=3 uid="uid://cf1pg2x8l8lpf"]
 
 [ext_resource type="Script" path="res://assets/scripts/Bullet.cs" id="1_m371v"]
 [ext_resource type="SpriteFrames" uid="uid://bakdl7gvgr36" path="res://assets/sprites/bullet.ase" id="1_pbirf"]
+[ext_resource type="Resource" uid="uid://j6tfnrl1amep" path="res://assets/bulletmods/Wave.tres" id="2_74h3w"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_g3sq0"]
 radius = 4.67723
@@ -11,6 +12,7 @@ scale = Vector2(3.10442, 2.66238)
 collision_layer = 0
 script = ExtResource("1_m371v")
 BulletSpeed = 1000.0
+BulletMods = Array[Resource]([ExtResource("2_74h3w")])
 metadata/_edit_group_ = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

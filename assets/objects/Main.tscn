@@ -1,23 +1,17 @@
-[gd_scene load_steps=8 format=3 uid="uid://3wov1sd2nxg5"]
+[gd_scene load_steps=6 format=3 uid="uid://3wov1sd2nxg5"]
 
 [ext_resource type="Script" path="res://assets/scripts/Main.cs" id="1_yeolr"]
+[ext_resource type="Resource" uid="uid://drxdwiakxfced" path="res://assets/stages/Test Stage.tres" id="2_0q0aj"]
 [ext_resource type="PackedScene" uid="uid://cfanc3brtl3ux" path="res://assets/objects/player.tscn" id="2_s1fia"]
-[ext_resource type="Resource" uid="uid://cc5s5y6gpiagm" path="res://assets/weapons/Pistol.tres" id="3_pvlqt"]
-[ext_resource type="Resource" uid="uid://t4f5lqyn51u2" path="res://assets/weapons/Simple Sword.tres" id="4_hdwyf"]
 [ext_resource type="Texture2D" uid="uid://eisdiyx6ekv4" path="res://assets/sprites/test wall.png" id="6_34aom"]
-[ext_resource type="PackedScene" uid="uid://tng40x5blnrr" path="res://assets/enemies/ball_enemy.tscn" id="6_p0uw6"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_j0sub"]
 size = Vector2(61.3636, 254)
 
 [node name="Node2D" type="Node2D"]
 script = ExtResource("1_yeolr")
-
-[node name="Player" parent="." instance=ExtResource("2_s1fia")]
-platform_floor_layers = 4278190081
-platform_wall_layers = 1
-Gun = ExtResource("3_pvlqt")
-Melee = ExtResource("4_hdwyf")
+Stages = Array[Resource]([ExtResource("2_0q0aj")])
+Player = ExtResource("2_s1fia")
 
 [node name="Left Wall" type="StaticBody2D" parent="."]
 position = Vector2(122, 331)
@@ -48,6 +42,3 @@ texture = ExtResource("6_34aom")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Left Wall2"]
 position = Vector2(-52.9725, -0.999992)
 shape = SubResource("RectangleShape2D_j0sub")
-
-[node name="Ball Enemy" parent="." instance=ExtResource("6_p0uw6")]
-position = Vector2(821, 131)

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://j6tfnrl1amep"]
+
+[ext_resource type="Script" path="res://assets/scripts/BulletMod.cs" id="1_2m2k2"]
+
+[resource]
+script = ExtResource("1_2m2k2")
+Pierce = false
+Explode = false
+Split = 0
+Ricochet = false
+Wave = 3.0
+SizeMultiplier = 0.0
+DamageType = 0
+HeatSeaking = 0.0
+Slowing = 0.0
+DamageModifier = 0

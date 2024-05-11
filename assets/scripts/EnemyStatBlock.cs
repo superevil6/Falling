@@ -9,7 +9,11 @@ public partial class EnemyStatBlock : Resource
 	[Export]
 	public MeleeWeapon Melee {get;set;}
 	[Export]
+	public MovementType MovementType {get;set;}
+	[Export]
 	public float MovementSpeed {get;set;}
+	[Export]
+	public float MovementLimit {get;set;}
 	[Export]
 	public float Size {get;set;}
 	[Export]
@@ -18,4 +22,6 @@ public partial class EnemyStatBlock : Resource
 	public DamageType DamageTypeStrength {get;set;}
 	[Export]
 	public DamageType DamageTypeWeakness {get;set;}
+	[Export]
+	public AttackDirection AttackDirection {get; set;}
 }
