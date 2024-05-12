@@ -1,0 +1,76 @@
+[gd_scene load_steps=9 format=3 uid="uid://dq5bq4jsc66se"]
+
+[ext_resource type="Script" path="res://assets/scripts/Explosion.cs" id="1_4ls75"]
+[ext_resource type="Texture2D" uid="uid://cieip1ta7fmp2" path="res://assets/objects/Explosion.png" id="2_thphd"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_w3guw"]
+radius = 3.0
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ognkn"]
+atlas = ExtResource("2_thphd")
+region = Rect2(0, 0, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_avqog"]
+atlas = ExtResource("2_thphd")
+region = Rect2(256, 0, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_deaw2"]
+atlas = ExtResource("2_thphd")
+region = Rect2(0, 256, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_iifdx"]
+atlas = ExtResource("2_thphd")
+region = Rect2(256, 256, 256, 256)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_lcl0r"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ognkn")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_avqog")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_deaw2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_iifdx")
+}],
+"loop": false,
+"name": &"Explode",
+"speed": 10.0
+}]
+
+[node name="Explosion" type="Area2D"]
+scale = Vector2(12.16, 12.16)
+script = ExtResource("1_4ls75")
+metadata/_edit_group_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_w3guw")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+texture_filter = 1
+position = Vector2(-1.90735e-06, 1.90735e-06)
+scale = Vector2(0.0244141, 0.0261759)
+sprite_frames = SubResource("SpriteFrames_lcl0r")
+animation = &"Explode"
+metadata/_aseprite_wizard_config_ = {
+"layer": "",
+"o_ex_p": "",
+"o_folder": "",
+"o_name": "",
+"only_visible": false,
+"slice": "",
+"source": "res://assets/sprites/Explosion.aseprite"
+}
+metadata/_aseprite_wizard_interface_config_ = {
+"layer_section": false,
+"output_section": false,
+"slice_section": false
+}
+metadata/_aseprite_wizard_source_file_hash_ = "c8458833cea8d2b5d45c855e3815ce56"
+
+[connection signal="area_entered" from="." to="." method="_on_area_entered"]
+[connection signal="animation_finished" from="AnimatedSprite2D" to="." method="_on_animated_sprite_2d_animation_finished"]

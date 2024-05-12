@@ -10,13 +10,23 @@ public partial class Bullet : Attack
 	public Vector2 Direction {get;set;}
     [Export]
 	public BulletMod[] BulletMods {get;set;}
+	[Export]
+	public PackedScene Explosion {get;set;}
+	private int ExplosionDamage;
 
 	//for wave movement
 	private double time;
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		
+		if (BulletMods.Any(mod => mod.Explode)) {
+			// ExplosionDamage = Damage;
+			// Damage = 0;
+		}
+		if (BulletMods.Any(mod => mod.SizeMultiplier > 0)) {
+			float scale = BulletMods.Sum(mod => mod.SizeMultiplier);
+			Scale = new Vector2(Scale.X + scale, Scale.Y + scale);
+		}
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -26,20 +36,10 @@ public partial class Bullet : Attack
 			if (BulletMods.Any(mod => mod.Wave > 0)) {
 				float wave = BulletMods.Sum(mod => mod.Wave);
 				time += delta;
-				Position = 
-				Position + new Vector2(
+				Position += new Vector2(
 				((float)Mathf.Cos(time * (wave * 1.5))) * Direction.Y, 
 				((float)Mathf.Cos(time * (wave * 1))) * Direction.X).Normalized() * BulletSpeed * (float)delta;
-				// var movement = Math.Cos(time * wave)
-				// GlobalPosition = GlobalPosition + BulletSpeed * Direction.Normalized() * (float)delta;
-				// var perpendicular = new Vector2(Direction.Y, -Direction.X);
-				// GlobalPosition += (0.5f * Direction + BulletMods.Sum(mod => mod.Wave) * perpendicular * Math.Sin(0)) * BulletSpeed * delta;
-				// float movement = (float)Math.Cos(time*1)*BulletMods.Sum(mod => mod.Wave);
-				// GlobalPosition = GlobalPosition + BulletSpeed * new Vector2(Direction.X * movement, Direction.Y * movement) * (float)delta;
-				// Vector2 pos = GlobalPosition;
-				// pos.Y = Mathf.Sin((float) time * 5) * wave + Direction.Y;
-				// pos.X = Mathf.Sin((float) time * 5) * wave + Direction.X;
-				// GlobalPosition += pos;
+
 			}
 		}
 		GlobalPosition = GlobalPosition + BulletSpeed * Direction.Normalized() * (float)delta;
@@ -52,10 +52,15 @@ public partial class Bullet : Attack
 	}
 
 	private void _on_area_entered(Node2D node){
-		GD.Print("Bullet entered collider");
 		if (BulletMods != null) {
 			if (!BulletMods.Any(mod => mod.Pierce == true)) {
 				QueueFree();
+			}
+			if (BulletMods.Any(mod => mod.Explode == true)) { //TODO Explosion Has Error
+				Explosion e = Explosion.Instantiate<Explosion>();
+				e.Position = Position;
+				e.Damage = Damage;
+				GetParent().AddChild(e);
 			}
 		}
 		 else {

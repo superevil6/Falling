@@ -72,9 +72,7 @@ public partial class Enemy : Area2D
 		switch (animatedSprite2D.Animation) {
 			case "Death": 
 			var children = GetParent().GetChildren().Where(child => child.HasMeta("Enemy")).Count();
-			GD.Print(children);
 			if (children <= 1) {
-				GD.Print("No more enemies");
 				GetParent<Main>().SpawnEnemyGroup();
 			}
 			QueueFree();

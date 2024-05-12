@@ -1,8 +1,10 @@
-[gd_scene load_steps=6 format=3 uid="uid://3wov1sd2nxg5"]
+[gd_scene load_steps=8 format=3 uid="uid://3wov1sd2nxg5"]
 
 [ext_resource type="Script" path="res://assets/scripts/Main.cs" id="1_yeolr"]
 [ext_resource type="Resource" uid="uid://drxdwiakxfced" path="res://assets/stages/Test Stage.tres" id="2_0q0aj"]
 [ext_resource type="PackedScene" uid="uid://cfanc3brtl3ux" path="res://assets/objects/player.tscn" id="2_s1fia"]
+[ext_resource type="Texture2D" uid="uid://cgofm01usxv4y" path="res://assets/sprites/Health Bar 1.png" id="5_hutc6"]
+[ext_resource type="Texture2D" uid="uid://bivtwitglgmte" path="res://assets/sprites/Health Bar 2.png" id="6_7tnf3"]
 [ext_resource type="Texture2D" uid="uid://eisdiyx6ekv4" path="res://assets/sprites/test wall.png" id="6_34aom"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_j0sub"]
@@ -42,3 +44,13 @@ texture = ExtResource("6_34aom")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Left Wall2"]
 position = Vector2(-52.9725, -0.999992)
 shape = SubResource("RectangleShape2D_j0sub")
+
+[node name="Health Bar" type="TextureProgressBar" parent="."]
+offset_left = 120.0
+offset_top = 4.0
+offset_right = 160.0
+offset_bottom = 44.0
+scale = Vector2(0.185404, 0.0871818)
+max_value = 5.0
+texture_under = ExtResource("5_hutc6")
+texture_progress = ExtResource("6_7tnf3")

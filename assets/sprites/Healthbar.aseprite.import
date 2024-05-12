@@ -1,0 +1,16 @@
+[remap]
+
+importer="aseprite_wizard.plugin.static-texture"
+type="AtlasTexture"
+uid="uid://dlg37cktskunu"
+path="res://.godot/imported/Healthbar.aseprite-f02bf9dcda1dc19c72b63db30422a3ab.res"
+
+[deps]
+
+source_file="res://assets/sprites/Healthbar.aseprite"
+dest_files=["res://.godot/imported/Healthbar.aseprite-f02bf9dcda1dc19c72b63db30422a3ab.res"]
+
+[params]
+
+exclude_layers_pattern=""
+only_visible_layers=false

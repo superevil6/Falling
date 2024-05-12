@@ -25,6 +25,8 @@ public partial class Player : CharacterBody2D
 		ScreenSize = GetViewportRect().Size;
 		CurrentHealth = MaxHealth;
 		animatedSprite2D = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
+		GetParent().GetNode<TextureProgressBar>("Health Bar").MaxValue = MaxHealth;
+		GetParent().GetNode<TextureProgressBar>("Health Bar").Value = CurrentHealth;
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -65,6 +67,8 @@ public partial class Player : CharacterBody2D
 
 	private void _on_area_2d_area_entered(Node2D node2D){
 		CurrentHealth -= (node2D as Attack).Damage;
+		GetParent().GetNode<TextureProgressBar>("Health Bar").Value = CurrentHealth;
+		GD.Print(CurrentHealth);
 	}
 
     public override void _PhysicsProcess(double delta)
