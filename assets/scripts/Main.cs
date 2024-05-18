@@ -15,8 +15,8 @@ public partial class Main : Node2D
 	{
 		SpawnEnemyGroup();
 		Player player = Player.Instantiate<Player>();
-		player.Position = new Vector2(500,500).Normalized();
 		AddChild(player);
+		player.Position = new Vector2(500,500);
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -27,7 +27,6 @@ public partial class Main : Node2D
 	}
 
 	public async void SpawnEnemyGroup () {
-		GD.Print("Spawn");
 		for (int i = 0; i < Stages[CurrentStage].EnemyGroup[CurrentEnemyGroupWave].Enemies.Count(); i++) {
 			Enemy e = Stages[CurrentStage].EnemyGroup[CurrentEnemyGroupWave].Enemies[i].Instantiate<Enemy>();
 			e.Position = Stages[CurrentStage].EnemyGroup[CurrentEnemyGroupWave].SpawnLocations[i];
@@ -37,3 +36,5 @@ public partial class Main : Node2D
 		}
 	}
 }
+//TODO Walls need to destroy bullets on impact
+//TODO Explosion are blocking bullets for some reason

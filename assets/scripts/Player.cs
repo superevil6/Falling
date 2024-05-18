@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Reflection.PortableExecutable;
 
 public partial class Player : CharacterBody2D
 {
@@ -18,7 +19,15 @@ public partial class Player : CharacterBody2D
 	public Vector2 ScreenSize;
 	public AnimatedSprite2D animatedSprite2D;
 	private RandomNumberGenerator rng = new RandomNumberGenerator();
-
+	private bool CanWallKick = false;
+	[Export]
+	public float WallKickPriorityTime {get;set;} //This is the amount of time before the player will leave the while if pointing away from it.
+	private float RemainingWallKickPriorityTime;
+	private bool IsDashing = false;
+	[Export]
+	public float DashDuration {get;set;} = 1;
+	private float RemainingDashTime;
+	private Vector2 DashDirection;
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
@@ -33,19 +42,7 @@ public partial class Player : CharacterBody2D
 	public override void _Process(double delta)
 	{
 		#region Shooting
-		Vector2 aimDirection = Vector2.Zero;
-		if (Input.IsActionPressed("aim_up")) {
-			aimDirection.Y -= Input.GetActionStrength("aim_up");
-		}
-		if (Input.IsActionPressed("aim_down")) {
-			aimDirection.Y += Input.GetActionStrength("aim_down");
-		}
-		if (Input.IsActionPressed("aim_left")) {
-			aimDirection.X -= Input.GetActionStrength("aim_left");
-		}
-		if (Input.IsActionPressed("aim_right")) {
-			aimDirection.X += Input.GetActionStrength("aim_right");
-		}
+		Vector2 aimDirection = Input.GetVector("aim_left", "aim_right", "aim_up", "aim_down");
 		if (Input.IsActionPressed("gun") && aimDirection != Vector2.Zero && gunCoolDown <= 0) {
 			Shoot(aimDirection);
 		}
@@ -58,24 +55,71 @@ public partial class Player : CharacterBody2D
 			MeleeAttack(aimDirection);
 		}
 		#endregion
+		Position = new Vector2(
+			x: Mathf.Clamp(Position.X, 0, ScreenSize.X),
+			y: Mathf.Clamp(Position.Y, 0, ScreenSize.Y)
+		);
 	}
  	public void GetInput()
     {
-        Vector2 inputDirection = Input.GetVector("move_left", "move_right", "move_up", "move_down");
-        Velocity = inputDirection * Speed;
+		Vector2 inputDirection = Input.GetVector("move_left", "move_right", "move_up", "move_down");
+		if (!CanWallKick) {
+			Velocity = inputDirection * Speed;
+		}
+		if (CanWallKick) {
+			inputDirection.X = 0;
+			Velocity = inputDirection * Speed;
+		}
     }
 
 	private void _on_area_2d_area_entered(Node2D node2D){
-		CurrentHealth -= (node2D as Attack).Damage;
-		GetParent().GetNode<TextureProgressBar>("Health Bar").Value = CurrentHealth;
-		GD.Print(CurrentHealth);
+		GD.Print(node2D);
+		if (node2D.Name == "Bullet") {
+			CurrentHealth -= (node2D as Attack).Damage;
+			GetParent().GetNode<TextureProgressBar>("Health Bar").Value = CurrentHealth;
+		}
 	}
 
-    public override void _PhysicsProcess(double delta)
+    public override void _PhysicsProcess(double delta) //TODO Wall kicking variables can probably be removed in favor of checking float time remaining
     {
-        GetInput();
-        MoveAndSlide();
+		if (!IsDashing) {
+			GetInput();
+			MoveAndSlide();
+		}
+		if (Input.IsActionJustReleased("Dash")) {
+			IsDashing = false;
+			CanWallKick = false;
+			RemainingDashTime = 0;
+			RemainingWallKickPriorityTime = 0;
+		}
+		if (GetSlideCollisionCount() > 0) {
+			if (((Node2D)GetSlideCollision(0).GetCollider()).IsInGroup("Wall")) {
+				if (Input.GetVector("move_left", "move_right", "move_up", "move_down").Normalized().X >= 0.5f 
+				|| Input.GetVector("move_left", "move_right", "move_up", "move_down").Normalized().X <= -0.5f){
+					RemainingWallKickPriorityTime -= (float)delta;
+					if (RemainingWallKickPriorityTime <= 0) {
+						GetInput();
+						MoveAndSlide();
+						CanWallKick = false;
+					}
+				} else {
+					RemainingWallKickPriorityTime = WallKickPriorityTime;
+					CanWallKick = true;
+				}
+				if (Input.IsActionJustPressed("Dash")) {
+					RemainingDashTime = DashDuration;
+					DashDirection= Input.GetVector("move_left", "move_right", "move_up", "move_down").Normalized();
+				}
+			}
+
+		}
+		if (RemainingDashTime > 0) {
+			Velocity = DashDirection.Normalized() * (Speed * 400) * (float)delta;
+			MoveAndSlide();
+			RemainingDashTime -= (float)delta;
+		}
     }
+
 
 	private void Shoot(Vector2 aimDirection) {
 		animatedSprite2D.Animation = "Shooting";

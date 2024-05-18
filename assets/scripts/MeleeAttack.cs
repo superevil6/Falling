@@ -12,7 +12,6 @@ public partial class MeleeAttack : Attack
 		animatedSprite2D = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
 		animatedSprite2D.Animation = "Slash";
 		animatedSprite2D.Play();
-		GD.Print(SwingDuration);
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.

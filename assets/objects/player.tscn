@@ -87,6 +87,8 @@ script = ExtResource("1_l4bou")
 MaxHealth = 5
 Gun = ExtResource("2_cc1jr")
 Melee = ExtResource("3_idqgg")
+WallKickPriorityTime = 0.5
+DashDuration = 0.5
 metadata/_edit_group_ = true
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
@@ -108,8 +110,6 @@ metadata/_aseprite_wizard_interface_config_ = {
 "slice_section": true
 }
 metadata/_aseprite_wizard_source_file_hash_ = "8ec8c1d577a51456f697d5231e2d25c2"
-
-[node name="Camera2D" type="Camera2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(3.80202, -10.5)

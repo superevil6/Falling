@@ -15,7 +15,7 @@ script = ExtResource("1_yeolr")
 Stages = Array[Resource]([ExtResource("2_0q0aj")])
 Player = ExtResource("2_s1fia")
 
-[node name="Left Wall" type="StaticBody2D" parent="."]
+[node name="Left Wall" type="StaticBody2D" parent="." groups=["Wall"]]
 position = Vector2(122, 331)
 scale = Vector2(1.02654, 2.71541)
 collision_mask = 14
@@ -29,7 +29,7 @@ texture = ExtResource("6_34aom")
 position = Vector2(-43.3457, 0)
 shape = SubResource("RectangleShape2D_j0sub")
 
-[node name="Left Wall2" type="StaticBody2D" parent="."]
+[node name="Left Wall2" type="StaticBody2D" parent="." groups=["Wall"]]
 texture_repeat = 2
 position = Vector2(1020, 325)
 rotation = 3.14159

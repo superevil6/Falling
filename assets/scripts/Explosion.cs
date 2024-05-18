@@ -12,7 +12,6 @@ public partial class Explosion : Area2D
 	{
 		animatedSprite2D = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
 		animatedSprite2D.Animation = "Explode";
-		
 		animatedSprite2D.Play();
 	}
 
@@ -26,7 +25,8 @@ public partial class Explosion : Area2D
 		if (node2D.Name == "Player") {
 			(node2D as Player).CurrentHealth -= Damage;
 		} 
-		if (node2D.HasMeta("Enemey")) {
+		if (node2D.IsInGroup("Enemey")) {
+			GD.Print("IS IN GROUP WOW");
 			(node2D as Enemy).CurrentHealth -= Damage;
 		} 
 	}

@@ -56,15 +56,20 @@ public partial class Bullet : Attack
 			if (!BulletMods.Any(mod => mod.Pierce == true)) {
 				QueueFree();
 			}
-			if (BulletMods.Any(mod => mod.Explode == true)) { //TODO Explosion Has Error
-				Explosion e = Explosion.Instantiate<Explosion>();
-				e.Position = Position;
-				e.Damage = Damage;
-				GetParent().AddChild(e);
+			if (BulletMods.Any(mod => mod.Explode == true)) {
+				CallDeferred("GenerateExplosion");
 			}
 		}
 		 else {
 			QueueFree();
 		}
+	}
+
+	private void GenerateExplosion() {
+		Explosion e = Explosion.Instantiate<Explosion>();
+		e.Position = Position;
+		e.Damage = Damage;
+		GetParent().AddChild(e);
+		QueueFree();	
 	}
 }

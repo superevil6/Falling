@@ -21,7 +21,7 @@ public partial class Enemy : Area2D
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
-		if (GunCoolDown <= 0) {
+		if (GunCoolDown <= 0 && CurrentHealth > 0) {
 			Shoot();
 		}
 		if (GunCoolDown > 0) {
@@ -35,31 +35,32 @@ public partial class Enemy : Area2D
 
 	public override void _PhysicsProcess(double delta)
     {
-		if (ReachedPostSpawnDestination) {
-			var playerLocation = ((GetParent().GetNode("Player") as Node2D).GlobalPosition - GlobalPosition).Normalized();
-			switch (Stats.MovementType)
-			{
-				case MovementType.Stationary:
-				break;
-				case MovementType.TowardsPlayer:
-				var towards = playerLocation * Stats.MovementSpeed * (float)delta;
-				Position += towards;
-				break;
-				case MovementType.AwayFromPlayer:
-				var away = -Position.DirectionTo(playerLocation) * Stats.MovementSpeed * (float)delta;
-				Position += away;
-				break;
-				case MovementType.Random:
-				
-				break;
+		if (CurrentHealth > 0) {
+			if (ReachedPostSpawnDestination) {
+				var playerLocation = ((GetParent().GetNode("Player") as Node2D).GlobalPosition - GlobalPosition).Normalized();
+				switch (Stats.MovementType)
+				{
+					case MovementType.Stationary:
+					break;
+					case MovementType.TowardsPlayer:
+					var towards = playerLocation * Stats.MovementSpeed * (float)delta;
+					Position += towards;
+					break;
+					case MovementType.AwayFromPlayer:
+					var away = -Position.DirectionTo(playerLocation) * Stats.MovementSpeed * (float)delta;
+					Position += away;
+					break;
+					case MovementType.Random:
+					
+					break;
+				}
 			}
-		}
-		else {
-			var motion = (PostSpawnDestination - GlobalPosition) * Stats.MovementSpeed * (float)delta;
-			Position += motion.Normalized();
-			if (GlobalPosition == PostSpawnDestination) {
-				GD.Print("destination");
-				ReachedPostSpawnDestination = true;
+			else {
+				var motion = (PostSpawnDestination - GlobalPosition) * Stats.MovementSpeed * (float)delta;
+				Position += motion.Normalized();
+				if (GlobalPosition == PostSpawnDestination) {
+					ReachedPostSpawnDestination = true;
+				}
 			}
 		}
     }
@@ -71,7 +72,8 @@ public partial class Enemy : Area2D
 	private void _on_animated_sprite_2d_animation_finished() {
 		switch (animatedSprite2D.Animation) {
 			case "Death": 
-			var children = GetParent().GetChildren().Where(child => child.HasMeta("Enemy")).Count();
+			var children = GetParent().GetChildren().Where(child => child.IsInGroup("Enemy")).Count();
+			GD.Print(GetParent().GetChildren().Where(child => child.IsInGroup("Enemy")).Count());
 			if (children <= 1) {
 				GetParent<Main>().SpawnEnemyGroup();
 			}

@@ -82,7 +82,7 @@ animations = [{
 "speed": 10.0
 }]
 
-[node name="Ball Enemy" type="Area2D"]
+[node name="Ball Enemy" type="Area2D" groups=["Enemy"]]
 position = Vector2(2, -1)
 scale = Vector2(0.284348, 0.288126)
 collision_layer = 4
