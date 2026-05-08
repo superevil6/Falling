@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://3wov1sd2nxg5"]
+[gd_scene load_steps=13 format=3 uid="uid://3wov1sd2nxg5"]
 
 [ext_resource type="Script" uid="uid://hfchjcen7ado" path="res://assets/scripts/Main.cs" id="1_yeolr"]
 [ext_resource type="Resource" uid="uid://drxdwiakxfced" path="res://assets/stages/Test Stage.tres" id="2_0q0aj"]
@@ -8,23 +8,9 @@
 [ext_resource type="PackedScene" uid="uid://csjly81x8qvxe" path="res://assets/objects/upgrade_menu.tscn" id="4_uq32a"]
 [ext_resource type="Texture2D" uid="uid://cgofm01usxv4y" path="res://assets/sprites/Health Bar 1.png" id="5_hutc6"]
 [ext_resource type="Texture2D" uid="uid://bivtwitglgmte" path="res://assets/sprites/Health Bar 2.png" id="6_7tnf3"]
-[ext_resource type="Texture2D" uid="uid://eisdiyx6ekv4" path="res://assets/sprites/test wall.png" id="6_34aom"]
+[ext_resource type="PackedScene" uid="uid://cl8qfm2t0ht11" path="res://assets/stages/Walls/Test Wall.tscn" id="7_2iqqg"]
 [ext_resource type="Texture2D" uid="uid://csakvxsgokdoj" path="res://assets/sprites/Test Background 2.png" id="8_8o7ni"]
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_2seb5"]
-shader = ExtResource("4_crcnl")
-shader_parameter/time_scale = 1.0
-shader_parameter/xspeed = 0.0
-shader_parameter/yspeed = 3.0
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_j0sub"]
-size = Vector2(61.3636, 254)
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_ieq87"]
-shader = ExtResource("4_crcnl")
-shader_parameter/time_scale = 1.0
-shader_parameter/xspeed = 0.0
-shader_parameter/yspeed = -3.0
+[ext_resource type="Script" uid="uid://c1pb4r2d0t4rx" path="res://assets/scripts/WallQueue.cs" id="9_wallqueue"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_3nds7"]
 shader = ExtResource("4_crcnl")
@@ -44,48 +30,33 @@ visible = false
 visible = false
 position = Vector2(-100, 66)
 
-[node name="Left Wall" type="StaticBody2D" parent="." groups=["Wall"]]
-position = Vector2(122, 331)
-scale = Vector2(1.02654, 2.71541)
-collision_mask = 14
-metadata/_edit_group_ = true
+[node name="Left Wall Queue" type="Node2D" parent="."]
+position = Vector2(122, 0)
+script = ExtResource("9_wallqueue")
+chunks = Array[PackedScene]([ExtResource("7_2iqqg")])
 
-[node name="Sprite2D" type="Sprite2D" parent="Left Wall"]
-texture_repeat = 2
-material = SubResource("ShaderMaterial_2seb5")
-scale = Vector2(1.00278, 1)
-texture = ExtResource("6_34aom")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Left Wall"]
-position = Vector2(-43.3457, 0)
-shape = SubResource("RectangleShape2D_j0sub")
-
-[node name="Right Wall" type="StaticBody2D" parent="." groups=["Wall"]]
-texture_repeat = 2
-position = Vector2(1020, 325)
-rotation = 3.14159
-scale = Vector2(1.07923, 2.57407)
-metadata/_edit_group_ = true
-
-[node name="Sprite2D" type="Sprite2D" parent="Right Wall"]
-material = SubResource("ShaderMaterial_ieq87")
-position = Vector2(-13.8988, 1.58011e-12)
-scale = Vector2(0.746488, 1)
-texture = ExtResource("6_34aom")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Right Wall"]
-position = Vector2(-52.9725, -0.999992)
-shape = SubResource("RectangleShape2D_j0sub")
+[node name="Right Wall Queue" type="Node2D" parent="."]
+position = Vector2(1020, 0)
+script = ExtResource("9_wallqueue")
+IsRightSide = true
+chunks = Array[PackedScene]([ExtResource("7_2iqqg")])
 
 [node name="Health Bar" type="TextureProgressBar" parent="."]
-offset_left = 120.0
-offset_top = 4.0
-offset_right = 160.0
-offset_bottom = 44.0
-scale = Vector2(0.185404, 0.0871818)
+offset_left = 15.0
+offset_top = 3.0
+offset_right = 527.0
+offset_bottom = 131.0
+scale = Vector2(0.42907783, 0.20718181)
 max_value = 5.0
 texture_under = ExtResource("5_hutc6")
 texture_progress = ExtResource("6_7tnf3")
+
+[node name="Experience Counter" type="Label" parent="."]
+offset_left = 254.0
+offset_top = 17.0
+offset_right = 394.0
+offset_bottom = 41.0
+text = "XP: 0"
 
 [node name="ParallaxBackground" type="ParallaxBackground" parent="."]
 

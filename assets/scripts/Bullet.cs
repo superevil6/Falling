@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using Godot;
 
 public partial class Bullet : Attack
@@ -8,38 +6,42 @@ public partial class Bullet : Attack
 	public float BulletSpeed {get;set;}= 100;
 	public float BulletLifetime {get;set;}
 	public Vector2 Direction {get;set;}
-    [Export]
-	public BulletMod[] BulletMods {get;set;}
+	public Gun Gun {get;set;}
 	[Export]
 	public PackedScene Explosion {get;set;}
+	[Export]
+	public ElementType Element { get; set; }
 	private int ExplosionDamage;
+	private int RemainingRicochets;
 
 	//for wave movement
 	private double time;
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		if (BulletMods.Any(mod => mod.Explode)) {
-			// ExplosionDamage = Damage;
-			// Damage = 0;
+		if (Gun == null) return;
+		if (Gun.SizeMultiplier > 0) {
+			Scale = new Vector2(Scale.X + Gun.SizeMultiplier, Scale.Y + Gun.SizeMultiplier);
 		}
-		if (BulletMods.Any(mod => mod.SizeMultiplier > 0)) {
-			float scale = BulletMods.Sum(mod => mod.SizeMultiplier);
-			Scale = new Vector2(Scale.X + scale, Scale.Y + scale);
-		}
+		RemainingRicochets = Gun.Ricochet;
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
-		if (BulletMods !=null) {
-			if (BulletMods.Any(mod => mod.Wave > 0)) {
-				float wave = BulletMods.Sum(mod => mod.Wave);
+		if (Gun != null) {
+			if (Gun.Wave > 0) {
 				time += delta;
 				Position += new Vector2(
-				((float)Mathf.Cos(time * (wave * 1.5))) * Direction.Y, 
-				((float)Mathf.Cos(time * (wave * 1))) * Direction.X).Normalized() * BulletSpeed * (float)delta;
-
+				((float)Mathf.Cos(time * (Gun.Wave * 1.5))) * Direction.Y,
+				((float)Mathf.Cos(time * (Gun.Wave * 1))) * Direction.X).Normalized() * BulletSpeed * (float)delta;
+			}
+			if (Gun.HeatSeeking > 0) {
+				var targetDir = ClosestEnemyDirection();
+				if (targetDir.HasValue) {
+					float weight = Mathf.Clamp(Gun.HeatSeeking * (float)delta, 0, 1);
+					Direction = Direction.Normalized().Slerp(targetDir.Value, weight);
+				}
 			}
 		}
 		GlobalPosition = GlobalPosition + BulletSpeed * Direction.Normalized() * (float)delta;
@@ -48,21 +50,43 @@ public partial class Bullet : Attack
 		} else {
 			QueueFree();
 		}
-
 	}
 
-	private void _on_area_entered(Node2D node){
-		if (BulletMods != null) {
-			if (!BulletMods.Any(mod => mod.Pierce == true)) {
-				QueueFree();
-			}
-			if (BulletMods.Any(mod => mod.Explode == true)) {
-				CallDeferred("GenerateExplosion");
-			}
-		}
-		 else {
+	private void _on_area_entered(Node2D node) => HandleHit();
+	private void _on_body_entered(Node2D node) => HandleHit();
+
+	private void HandleHit() {
+		if (Gun == null) {
 			QueueFree();
+			return;
 		}
+		if (Gun.Explode) {
+			CallDeferred("GenerateExplosion");
+		}
+		if (Gun.Pierce) return;
+		if (RemainingRicochets > 0) {
+			RemainingRicochets--;
+			Direction = -Direction;
+			Rotation = Direction.Angle();
+			return;
+		}
+		QueueFree();
+	}
+
+	private Vector2? ClosestEnemyDirection() {
+		Enemy closest = null;
+		float closestDistSq = float.MaxValue;
+		foreach (var n in GetTree().GetNodesInGroup("Enemy")) {
+			if (n is Enemy e && e.CurrentHealth > 0) {
+				float d = GlobalPosition.DistanceSquaredTo(e.GlobalPosition);
+				if (d < closestDistSq) {
+					closestDistSq = d;
+					closest = e;
+				}
+			}
+		}
+		if (closest == null) return null;
+		return (closest.GlobalPosition - GlobalPosition).Normalized();
 	}
 
 	private void GenerateExplosion() {
@@ -70,6 +94,5 @@ public partial class Bullet : Attack
 		e.Position = Position;
 		e.Damage = Damage;
 		GetParent().AddChild(e);
-		QueueFree();	
 	}
 }

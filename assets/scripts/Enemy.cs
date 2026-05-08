@@ -6,11 +6,21 @@ public partial class Enemy : Area2D
 {
 	[Export]
 	public EnemyStatBlock Stats {get;set;}
+	[Export]
+	public float InputDriftSpeed {get;set;} = 50f;
+	[Export]
+	public float WallContactDriftSpeed {get;set;} = 300f;
+	[Export]
+	public ElementType ElementalDefense { get; set; }
+	[Export]
+	public ElementType ElementalWeakness { get; set; }
+	[Export]
 	public int CurrentHealth {get;set;}
 	private float GunCoolDown;
 	public AnimatedSprite2D animatedSprite2D;
 	public Vector2 PostSpawnDestination {get;set;}
 	private bool ReachedPostSpawnDestination = false;
+	private Player player;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -52,8 +62,19 @@ public partial class Enemy : Area2D
 					Position += away;
 					break;
 					case MovementType.Random:
-					
+
 					break;
+				}
+				if (player == null) player = GetParent()?.GetNodeOrNull<Player>("Player");
+				if (player != null) {
+					float driftY;
+					if (player.IsTouchingWall) {
+						driftY = WallContactDriftSpeed;
+					} else {
+						float inputY = Input.GetActionStrength("move_down") - Input.GetActionStrength("move_up");
+						driftY = -inputY * InputDriftSpeed;
+					}
+					Position += new Vector2(0, driftY * (float)delta);
 				}
 			}
 			else {
@@ -73,12 +94,20 @@ public partial class Enemy : Area2D
     }
 
 	private void _on_area_entered(Node2D node2D){
-		CurrentHealth -= (node2D as Attack).Damage;
+		var attack = node2D as Attack;
+		if (attack == null) return;
+		float damage = attack.Damage;
+		if (node2D is Bullet bullet && bullet.Element != ElementType.NonElemental) {
+			if (bullet.Element == ElementalWeakness) damage *= 2f;
+			else if (bullet.Element == ElementalDefense) damage *= 0.5f;
+		}
+		CurrentHealth -= Mathf.RoundToInt(damage);
 	}
 
 	private void _on_animated_sprite_2d_animation_finished() {
 		switch (animatedSprite2D.Animation) {
-			case "Death": 
+			case "Death":
+			DropItems();
 			var children = GetParent().GetChildren().Where(child => child.IsInGroup("Enemy")).Count();
 			GD.Print(GetParent().GetChildren().Where(child => child.IsInGroup("Enemy")).Count());
 			if (children <= 1) {
@@ -93,6 +122,18 @@ public partial class Enemy : Area2D
 			
 		}
 	}
+	private void DropItems() {
+		if (Stats?.ItemDrops == null) return;
+		foreach (var drop in Stats.ItemDrops) {
+			if (drop?.Item == null) continue;
+			if (GD.Randf() < drop.Chance) {
+				var item = drop.Item.Instantiate<Node2D>();
+				item.GlobalPosition = GlobalPosition;
+				GetParent().AddChild(item);
+			}
+		}
+	}
+
 	private void Shoot() {
 		for (int i = 0; i < Stats.Gun.BulletCount; i++) {
 			var playerLocation = ((GetParent().GetNode("Player") as Node2D).GlobalPosition - GlobalPosition).Normalized();
@@ -103,6 +144,7 @@ public partial class Enemy : Area2D
 			b.Set("Direction", playerLocation);
 			b.Set("Damage", Stats.Gun.Damage);
 			b.Set("BulletLifetime", Stats.Gun.BulletLifetime);
+			b.Gun = Stats.Gun;
 			b.Position = Position;
 			b.Rotation = Position.Angle();
 			b.SetCollisionLayerValue(5, true);

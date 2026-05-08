@@ -1,6 +1,6 @@
 [gd_scene load_steps=14 format=3 uid="uid://tng40x5blnrr"]
 
-[ext_resource type="Script" path="res://assets/scripts/Enemy.cs" id="1_bhc83"]
+[ext_resource type="Script" uid="uid://b3od7f8efylhu" path="res://assets/scripts/Enemy.cs" id="1_bhc83"]
 [ext_resource type="Resource" uid="uid://mmnuqarbyxa5" path="res://assets/enemies/test enemy.tres" id="2_jlrhh"]
 [ext_resource type="Texture2D" uid="uid://cum2gpblsuglx" path="res://assets/enemies/Ball Enemy.png" id="3_m04ux"]
 

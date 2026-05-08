@@ -1,0 +1,17 @@
+[gd_scene load_steps=4 format=3 uid="uid://kvxtmd0oovc4"]
+
+[ext_resource type="Script" uid="uid://b5d4tgtdsiwou" path="res://assets/scripts/HealthPickup.cs" id="1_86ael"]
+[ext_resource type="Texture2D" uid="uid://u0pxq71pxt4n" path="res://assets/sprites/bullet.png" id="2_cbtb1"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_xqkwk"]
+radius = 36.013885
+
+[node name="Area2D" type="Area2D"]
+collision_mask = 3
+script = ExtResource("1_86ael")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_xqkwk")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_cbtb1")

@@ -1,19 +1,26 @@
-[gd_scene load_steps=6 format=3 uid="uid://cf1pg2x8l8lpf"]
+[gd_scene load_steps=7 format=3 uid="uid://cf1pg2x8l8lpf"]
 
-[ext_resource type="Script" path="res://assets/scripts/Bullet.cs" id="1_m371v"]
+[ext_resource type="Script" uid="uid://bhtqccqgyabd2" path="res://assets/scripts/Bullet.cs" id="1_m371v"]
 [ext_resource type="SpriteFrames" uid="uid://bakdl7gvgr36" path="res://assets/sprites/bullet.ase" id="1_pbirf"]
-[ext_resource type="Resource" uid="uid://bsp7xqwfwap7k" path="res://assets/bulletmods/Explosion.tres" id="2_4104q"]
 [ext_resource type="PackedScene" uid="uid://dq5bq4jsc66se" path="res://assets/objects/Explosion.tscn" id="3_iiand"]
+[ext_resource type="Shader" path="res://assets/objects/Fire.gdshader" id="4_fire"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_g3sq0"]
 radius = 4.67723
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_fire"]
+shader = ExtResource("4_fire")
+shader_parameter/speed = 3.0
+shader_parameter/noise_scale = 3.0
+shader_parameter/color_hot = Color(1, 1, 0.7, 1)
+shader_parameter/color_warm = Color(1, 0.45, 0, 1)
+shader_parameter/color_cool = Color(0.7, 0, 0, 1)
 
 [node name="Bullet" type="Area2D"]
 scale = Vector2(3.10442, 2.66238)
 collision_layer = 0
 script = ExtResource("1_m371v")
-BulletSpeed = 1000.0
-BulletMods = Array[Resource]([ExtResource("2_4104q")])
+BulletSpeed = 2000.0
 Explosion = ExtResource("3_iiand")
 metadata/_edit_group_ = true
 
@@ -23,6 +30,7 @@ scale = Vector2(-0.498523, 1.04933)
 shape = SubResource("CircleShape2D_g3sq0")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+material = SubResource("ShaderMaterial_fire")
 scale = Vector2(0.130725, 0.130149)
 sprite_frames = ExtResource("1_pbirf")
 metadata/_aseprite_wizard_config_ = {
@@ -43,3 +51,4 @@ metadata/_aseprite_wizard_interface_config_ = {
 [node name="Timer" type="Timer" parent="."]
 
 [connection signal="area_entered" from="." to="." method="_on_area_entered"]
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

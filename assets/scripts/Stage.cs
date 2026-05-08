@@ -9,9 +9,13 @@ public partial class Stage : Resource
 	[Export]
 	public PackedScene[] Hazards {get;set;}
 	[Export]
-	public AnimatedSprite2D[] WallChunks {get;set;}
+	public PackedScene[] LeftWallChunks {get;set;}
 	[Export]
-	public AnimatedSprite2D[] BackgroundImages {get;set;}
+	public PackedScene[] RightWallChunks {get;set;}
+	[Export]
+	public float ScrollSpeed {get;set;} = 200f;
+	[Export]
+	public PackedScene[] BackgroundImages {get;set;}
 	[Export]
 	public AudioStream BGM {get;set;}
 

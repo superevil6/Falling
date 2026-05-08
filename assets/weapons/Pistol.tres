@@ -1,14 +1,15 @@
 [gd_resource type="Resource" load_steps=3 format=3 uid="uid://cc5s5y6gpiagm"]
 
 [ext_resource type="PackedScene" uid="uid://cf1pg2x8l8lpf" path="res://assets/objects/bullet.tscn" id="1_h32k7"]
-[ext_resource type="Script" path="res://assets/scripts/Gun.cs" id="2_hnubu"]
+[ext_resource type="Script" uid="uid://cvu57cdie1j01" path="res://assets/scripts/Gun.cs" id="2_hnubu"]
 
 [resource]
 script = ExtResource("2_hnubu")
-FireRate = 0.8
+FireRate = 0.7
 Damage = 1
-BulletCount = 1
-BulletSpread = 0.01
+BulletCount = 3
+BulletSpread = 0.3
 BulletType = ExtResource("1_h32k7")
 BulletLifetime = 1.0
-DamageType = 0
+Ricochet = 2
+HeatSeeking = 3.0

@@ -7,6 +7,7 @@ public partial class Player : CharacterBody2D
 	[Export]
 	public int MaxHealth {get;set;}
 	public int CurrentHealth;
+	public int CurrentExperience;
 	public List<GunMod> GunMods = new List<GunMod>();
 	public List<SwordMod> SwordMods = new List<SwordMod>();
 	public List<BodyMod> BodyMods = new List<BodyMod>();
@@ -30,6 +31,16 @@ public partial class Player : CharacterBody2D
 	public float DashDuration {get;set;} = 1;
 	private float RemainingDashTime;
 	private Vector2 DashDirection;
+	private float CurrentSpeedMultiplier = 1.0f;
+	public bool IsTouchingWall;
+	[Export]
+	public float AfterImageInterval {get;set;} = 0.05f;
+	[Export]
+	public float AfterImageLifetime {get;set;} = 0.4f;
+	[Export]
+	public float AfterImageStartAlpha {get;set;} = 0.6f;
+	private float TimeSinceLastAfterImage = 0f;
+	private Shader afterImageShader;
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
@@ -40,6 +51,8 @@ public partial class Player : CharacterBody2D
 		animatedSprite2D = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
 		GetParent().GetNode<TextureProgressBar>("Health Bar").MaxValue = MaxHealth;
 		GetParent().GetNode<TextureProgressBar>("Health Bar").Value = CurrentHealth;
+		GetParent().GetNode<Label>("Experience Counter").Text = $"XP: {CurrentExperience}";
+		afterImageShader = GD.Load<Shader>("res://assets/objects/AfterImage.gdshader");
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -63,17 +76,47 @@ public partial class Player : CharacterBody2D
 			x: Mathf.Clamp(Position.X, 0, ScreenSize.X),
 			y: Mathf.Clamp(Position.Y, 0, ScreenSize.Y)
 		);
+		TimeSinceLastAfterImage += (float)delta;
+		bool shouldTrail = (Input.IsActionPressed("move_down") || RemainingDashTime > 0) && !IsTouchingWall;
+		if (shouldTrail && TimeSinceLastAfterImage >= AfterImageInterval) {
+			SpawnAfterImage();
+			TimeSinceLastAfterImage = 0f;
+		}
+	}
+
+	private void SpawnAfterImage()
+	{
+		var frames = animatedSprite2D.SpriteFrames;
+		if (frames == null) return;
+		var ghost = new Sprite2D();
+		ghost.Texture = frames.GetFrameTexture(animatedSprite2D.Animation, animatedSprite2D.Frame);
+		ghost.GlobalPosition = animatedSprite2D.GlobalPosition;
+		ghost.Rotation = animatedSprite2D.GlobalRotation;
+		ghost.Scale = animatedSprite2D.GlobalScale;
+		ghost.FlipH = animatedSprite2D.FlipH;
+		ghost.FlipV = animatedSprite2D.FlipV;
+		ghost.TextureFilter = animatedSprite2D.TextureFilter;
+		ghost.Modulate = new Color(1, 1, 1, AfterImageStartAlpha);
+		var mat = new ShaderMaterial();
+		mat.Shader = afterImageShader;
+		ghost.Material = mat;
+		GetParent().AddChild(ghost);
+		ghost.ZIndex = ZIndex - 1;
+		var tween = ghost.CreateTween();
+		tween.TweenProperty(ghost, "modulate:a", 0.0f, AfterImageLifetime);
+		tween.TweenCallback(Callable.From(ghost.QueueFree));
 	}
  	public void GetInput()
     {
 		Vector2 inputDirection = Input.GetVector("move_left", "move_right", "move_up", "move_down");
-		if (!CanWallKick) {
-			Velocity = inputDirection * Speed;
+		float effectiveSpeed = Speed * CurrentSpeedMultiplier;
+		Vector2 velocity = inputDirection * effectiveSpeed;
+		if (!IsTouchingWall) {
+			if (velocity.Y > 0) velocity.Y *= 1.5f;
+			else if (velocity.Y < 0) velocity.Y *= 0.75f;
 		}
-		if (CanWallKick) {
-			inputDirection.X = 0;
-			Velocity = inputDirection * Speed;
-		}
+		if (CanWallKick) velocity.X = 0;
+		Velocity = velocity;
     }
 
 	private void _on_area_2d_area_entered(Node2D node2D){
@@ -96,8 +139,14 @@ public partial class Player : CharacterBody2D
 			RemainingDashTime = 0;
 			RemainingWallKickPriorityTime = 0;
 		}
+		CurrentSpeedMultiplier = 1.0f;
+		IsTouchingWall = false;
 		if (GetSlideCollisionCount() > 0) {
 			if (((Node2D)GetSlideCollision(0).GetCollider()).IsInGroup("Wall")) {
+				IsTouchingWall = true;
+				if (GetSlideCollision(0).GetCollider() is WallBody wb && wb.WallData != null) {
+					CurrentSpeedMultiplier = wb.WallData.SpeedReduction;
+				}
 				if (Input.GetVector("move_left", "move_right", "move_up", "move_down").Normalized().X >= 0.5f 
 				|| Input.GetVector("move_left", "move_right", "move_up", "move_down").Normalized().X <= -0.5f){
 					RemainingWallKickPriorityTime -= (float)delta;
@@ -127,17 +176,20 @@ public partial class Player : CharacterBody2D
 
 	private void Shoot(Vector2 aimDirection) {
 		animatedSprite2D.Animation = "Shooting";
+		float angleStep = Gun.BulletCount > 1 ? Gun.BulletSpread / (Gun.BulletCount - 1) : 0f;
+		float startAngle = -Gun.BulletSpread / 2f;
 		for (int i = 0; i < Gun.BulletCount; i++) {
 			Bullet b = Gun.BulletType.Instantiate<Bullet>();
-			var randomX = rng.RandfRange(-Gun.BulletSpread, Gun.BulletSpread);
-			var randomY = rng.RandfRange(-Gun.BulletSpread, Gun.BulletSpread);
-			b.Set("Direction", new Vector2(aimDirection.X + randomX, aimDirection.Y + randomY));
+			Vector2 direction = aimDirection.Rotated(startAngle + i * angleStep);
+			b.Set("Direction", direction);
 			b.Set("Damage", Gun.Damage);
 			b.Set("BulletLifetime", Gun.BulletLifetime);
+			b.Gun = Gun;
 			b.Position = Position;
-			b.Rotation = aimDirection.Angle();
+			b.Rotation = direction.Angle();
 			b.SetCollisionLayerValue(4, true);
 			b.SetCollisionMaskValue(3, true);
+			b.SetCollisionMaskValue(1, true);
 			GetParent().AddChild(b);
 		}
 		animatedSprite2D.Play();
