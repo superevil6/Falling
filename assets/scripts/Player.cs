@@ -1,13 +1,15 @@
-using Godot;
-using System;
 using System.Collections.Generic;
-using System.Reflection.PortableExecutable;
+using System.Linq;
+using Godot;
 
 public partial class Player : CharacterBody2D
 {
 	[Export]
 	public int MaxHealth {get;set;}
 	public int CurrentHealth;
+	public List<GunMod> GunMods = new List<GunMod>();
+	public List<SwordMod> SwordMods = new List<SwordMod>();
+	public List<BodyMod> BodyMods = new List<BodyMod>();
 	private float gunCoolDown;
 	[Export]
 	public int Speed { get;set;} = 400;
@@ -31,6 +33,8 @@ public partial class Player : CharacterBody2D
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		GunMods.Add(TestData.testMod);
+		GD.Print(GunMods.FirstOrDefault().Name);
 		ScreenSize = GetViewportRect().Size;
 		CurrentHealth = MaxHealth;
 		animatedSprite2D = GetNode<AnimatedSprite2D>("AnimatedSprite2D");

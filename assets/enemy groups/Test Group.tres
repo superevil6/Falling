@@ -7,6 +7,6 @@
 script = ExtResource("2_4a67g")
 Enemies = Array[PackedScene]([ExtResource("1_gmp5d"), ExtResource("1_gmp5d")])
 SpawnLocations = PackedVector2Array(500, 0, 0, 900)
-PostSpawnDestination = PackedVector2Array(500, 500, 900, 500)
+PostSpawnDestination = PackedVector2Array(300, 600, 400, 500)
 TimeBetweenSpawns = 1.0
 TimeBeforeNextGroup = 0.0

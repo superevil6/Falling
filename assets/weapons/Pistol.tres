@@ -5,7 +5,7 @@
 
 [resource]
 script = ExtResource("2_hnubu")
-FireRate = 0.5
+FireRate = 0.8
 Damage = 1
 BulletCount = 1
 BulletSpread = 0.01

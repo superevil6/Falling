@@ -1,0 +1,21 @@
+[gd_scene load_steps=2 format=3 uid="uid://cp27yp2mfvhsw"]
+
+[ext_resource type="Script" path="res://assets/scripts/PauseMenu.cs" id="1_e7mqj"]
+
+[node name="Pause Menu" type="Node2D"]
+process_mode = 3
+script = ExtResource("1_e7mqj")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+offset_left = 551.0
+offset_top = 249.0
+offset_right = 799.0
+offset_bottom = 379.0
+
+[node name="Unpause" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Unpause"
+
+[node name="Quit" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Quit"

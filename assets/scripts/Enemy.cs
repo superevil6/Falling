@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Godot;
 
@@ -56,9 +57,15 @@ public partial class Enemy : Area2D
 				}
 			}
 			else {
-				var motion = (PostSpawnDestination - GlobalPosition) * Stats.MovementSpeed * (float)delta;
-				Position += motion.Normalized();
-				if (GlobalPosition == PostSpawnDestination) {
+				if (Stats.InstantSpawn)
+				{
+					Position = PostSpawnDestination;
+					ReachedPostSpawnDestination = true;
+				}
+				var motion = (PostSpawnDestination - Position) * Stats.MovementSpeed * (float)delta;
+				Position += motion.Normalized() * Stats.SpawnMovementSpeed;
+				if (Math.Abs(GlobalPosition.X - PostSpawnDestination.X) > 0.000005 && Math.Abs(GlobalPosition.Y - PostSpawnDestination.Y) > 0.000005) {
+					GD.Print("arrived");
 					ReachedPostSpawnDestination = true;
 				}
 			}

@@ -11,6 +11,10 @@ public partial class EnemyStatBlock : Resource
 	[Export]
 	public MovementType MovementType {get;set;}
 	[Export]
+	public int SpawnMovementSpeed { get; set; } = 5;
+	[Export]
+	public bool InstantSpawn { get; set; } = false;
+	[Export]
 	public float MovementSpeed {get;set;}
 	[Export]
 	public float MovementLimit {get;set;}

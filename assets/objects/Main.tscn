@@ -1,19 +1,48 @@
-[gd_scene load_steps=8 format=3 uid="uid://3wov1sd2nxg5"]
+[gd_scene load_steps=15 format=3 uid="uid://3wov1sd2nxg5"]
 
-[ext_resource type="Script" path="res://assets/scripts/Main.cs" id="1_yeolr"]
+[ext_resource type="Script" uid="uid://hfchjcen7ado" path="res://assets/scripts/Main.cs" id="1_yeolr"]
 [ext_resource type="Resource" uid="uid://drxdwiakxfced" path="res://assets/stages/Test Stage.tres" id="2_0q0aj"]
 [ext_resource type="PackedScene" uid="uid://cfanc3brtl3ux" path="res://assets/objects/player.tscn" id="2_s1fia"]
+[ext_resource type="PackedScene" uid="uid://cp27yp2mfvhsw" path="res://assets/objects/pause_menu.tscn" id="4_11s3y"]
+[ext_resource type="Shader" uid="uid://bw1438ajms6al" path="res://assets/objects/Scroll.gdshader" id="4_crcnl"]
+[ext_resource type="PackedScene" uid="uid://csjly81x8qvxe" path="res://assets/objects/upgrade_menu.tscn" id="4_uq32a"]
 [ext_resource type="Texture2D" uid="uid://cgofm01usxv4y" path="res://assets/sprites/Health Bar 1.png" id="5_hutc6"]
 [ext_resource type="Texture2D" uid="uid://bivtwitglgmte" path="res://assets/sprites/Health Bar 2.png" id="6_7tnf3"]
 [ext_resource type="Texture2D" uid="uid://eisdiyx6ekv4" path="res://assets/sprites/test wall.png" id="6_34aom"]
+[ext_resource type="Texture2D" uid="uid://csakvxsgokdoj" path="res://assets/sprites/Test Background 2.png" id="8_8o7ni"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_2seb5"]
+shader = ExtResource("4_crcnl")
+shader_parameter/time_scale = 1.0
+shader_parameter/xspeed = 0.0
+shader_parameter/yspeed = 3.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_j0sub"]
 size = Vector2(61.3636, 254)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ieq87"]
+shader = ExtResource("4_crcnl")
+shader_parameter/time_scale = 1.0
+shader_parameter/xspeed = 0.0
+shader_parameter/yspeed = -3.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_3nds7"]
+shader = ExtResource("4_crcnl")
+shader_parameter/time_scale = 1.0
+shader_parameter/xspeed = 0.0
+shader_parameter/yspeed = 3.0
 
 [node name="Node2D" type="Node2D"]
 script = ExtResource("1_yeolr")
 Stages = Array[Resource]([ExtResource("2_0q0aj")])
 Player = ExtResource("2_s1fia")
+
+[node name="Upgrade Menu" parent="." instance=ExtResource("4_uq32a")]
+visible = false
+
+[node name="Pause Menu" parent="." instance=ExtResource("4_11s3y")]
+visible = false
+position = Vector2(-100, 66)
 
 [node name="Left Wall" type="StaticBody2D" parent="." groups=["Wall"]]
 position = Vector2(122, 331)
@@ -22,6 +51,8 @@ collision_mask = 14
 metadata/_edit_group_ = true
 
 [node name="Sprite2D" type="Sprite2D" parent="Left Wall"]
+texture_repeat = 2
+material = SubResource("ShaderMaterial_2seb5")
 scale = Vector2(1.00278, 1)
 texture = ExtResource("6_34aom")
 
@@ -29,19 +60,20 @@ texture = ExtResource("6_34aom")
 position = Vector2(-43.3457, 0)
 shape = SubResource("RectangleShape2D_j0sub")
 
-[node name="Left Wall2" type="StaticBody2D" parent="." groups=["Wall"]]
+[node name="Right Wall" type="StaticBody2D" parent="." groups=["Wall"]]
 texture_repeat = 2
 position = Vector2(1020, 325)
 rotation = 3.14159
 scale = Vector2(1.07923, 2.57407)
 metadata/_edit_group_ = true
 
-[node name="Sprite2D" type="Sprite2D" parent="Left Wall2"]
+[node name="Sprite2D" type="Sprite2D" parent="Right Wall"]
+material = SubResource("ShaderMaterial_ieq87")
 position = Vector2(-13.8988, 1.58011e-12)
 scale = Vector2(0.746488, 1)
 texture = ExtResource("6_34aom")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Left Wall2"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Right Wall"]
 position = Vector2(-52.9725, -0.999992)
 shape = SubResource("RectangleShape2D_j0sub")
 
@@ -54,3 +86,26 @@ scale = Vector2(0.185404, 0.0871818)
 max_value = 5.0
 texture_under = ExtResource("5_hutc6")
 texture_progress = ExtResource("6_7tnf3")
+
+[node name="ParallaxBackground" type="ParallaxBackground" parent="."]
+
+[node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground"]
+texture_filter = 1
+texture_repeat = 2
+
+[node name="Sprite2D" type="TextureRect" parent="ParallaxBackground/ParallaxLayer"]
+self_modulate = Color(0.364706, 0.364706, 0.364706, 1)
+texture_filter = 1
+texture_repeat = 2
+material = SubResource("ShaderMaterial_3nds7")
+offset_left = 6.0
+offset_top = -6.000002
+offset_right = 1054.0
+offset_bottom = 1041.0
+scale = Vector2(1.09919, 0.764461)
+texture = ExtResource("8_8o7ni")
+stretch_mode = 1
+metadata/_aseprite_wizard_interface_config_ = {
+"layer_section": false,
+"slice_section": false
+}
