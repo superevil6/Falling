@@ -89,10 +89,11 @@ public partial class WallQueue : Node2D
 
 	private float GetChunkHeight(Node2D chunk)
 	{
-		if (chunk is WallBody wb && wb.WallData != null && wb.WallData.Height > 0) {
-			return wb.WallData.Height;
+		var sprite = chunk.GetNodeOrNull<Sprite2D>("Sprite2D");
+		if (sprite != null && sprite.Texture != null) {
+			return sprite.GetRect().Size.Y * sprite.GlobalScale.Y;
 		}
-		GD.PrintErr($"WallQueue: chunk '{chunk.Name}' is missing WallBody/Wall.Height — using fallback 100");
+		GD.PrintErr($"WallQueue: chunk '{chunk.Name}' has no Sprite2D with texture — using fallback 100");
 		return 100f;
 	}
 }

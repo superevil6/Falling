@@ -10,12 +10,15 @@ public partial class Player : CharacterBody2D
 	public int CurrentExperience;
 	public List<GunMod> GunMods = new List<GunMod>();
 	public List<SwordMod> SwordMods = new List<SwordMod>();
-	public List<BodyMod> BodyMods = new List<BodyMod>();
 	private float gunCoolDown;
 	[Export]
 	public int Speed { get;set;} = 400;
 	[Export]
-	public Gun Gun {get;set;}
+	public Gun[] Guns {get;set;} = new Gun[4];
+	[Export]
+	public BodyMod[] BodyMods {get;set;} = new BodyMod[4];
+	private int currentGunIndex = 0;
+	public Gun Gun => (Guns != null && Guns.Length > 0 && currentGunIndex >= 0 && currentGunIndex < Guns.Length) ? Guns[currentGunIndex] : null;
 	[Export]
 	public MeleeWeapon Melee {get;set;}
 	// public List<Area2D> Bullets = new List<Area2D>();
@@ -41,6 +44,7 @@ public partial class Player : CharacterBody2D
 	public float AfterImageStartAlpha {get;set;} = 0.6f;
 	private float TimeSinceLastAfterImage = 0f;
 	private Shader afterImageShader;
+	private Line2D activeLaser;
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
@@ -52,16 +56,29 @@ public partial class Player : CharacterBody2D
 		GetParent().GetNode<TextureProgressBar>("Health Bar").MaxValue = MaxHealth;
 		GetParent().GetNode<TextureProgressBar>("Health Bar").Value = CurrentHealth;
 		GetParent().GetNode<Label>("Experience Counter").Text = $"XP: {CurrentExperience}";
+		UpdateGunLabel();
 		afterImageShader = GD.Load<Shader>("res://assets/objects/AfterImage.gdshader");
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
+		bool gunSwitched = false;
+		if (Input.IsActionJustPressed("gun_1")) { currentGunIndex = 0; gunSwitched = true; }
+		else if (Input.IsActionJustPressed("gun_2")) { currentGunIndex = 1; gunSwitched = true; }
+		else if (Input.IsActionJustPressed("gun_3")) { currentGunIndex = 2; gunSwitched = true; }
+		else if (Input.IsActionJustPressed("gun_4")) { currentGunIndex = 3; gunSwitched = true; }
+		if (gunSwitched) UpdateGunLabel();
 		#region Shooting
 		Vector2 aimDirection = Input.GetVector("aim_left", "aim_right", "aim_up", "aim_down");
-		if (Input.IsActionPressed("gun") && aimDirection != Vector2.Zero && gunCoolDown <= 0) {
-			Shoot(aimDirection);
+		bool wantsToFire = Input.IsActionPressed("gun") && aimDirection != Vector2.Zero && Gun != null;
+		if (Gun != null && Gun.IsLaser && wantsToFire) {
+			UpdateLaserBeam(aimDirection);
+		} else {
+			ClearLaser();
+			if (wantsToFire && gunCoolDown <= 0) {
+				Shoot(aimDirection);
+			}
 		}
 		if (gunCoolDown > 0) {
 			gunCoolDown -= (float)delta;
@@ -82,6 +99,19 @@ public partial class Player : CharacterBody2D
 			SpawnAfterImage();
 			TimeSinceLastAfterImage = 0f;
 		}
+	}
+
+	public void UpdateGunLabel()
+	{
+		if (Gun == null) {
+			GetParent().GetNode<Label>("Gun Label").Text = "Gun: -";
+			return;
+		}
+		string gunName = !string.IsNullOrEmpty(Gun.ResourcePath)
+			? System.IO.Path.GetFileNameWithoutExtension(Gun.ResourcePath)
+			: "-";
+		GetParent().GetNode<Label>("Gun Label").Text =
+			$"Gun: {gunName}  Lv{Gun.CurrentLevel}  XP {Gun.CurrentExperience}/{Gun.ExperiencePerLevel}  SP {Gun.SkillPoints}";
 	}
 
 	private void SpawnAfterImage()
@@ -107,7 +137,7 @@ public partial class Player : CharacterBody2D
 		tween.TweenCallback(Callable.From(ghost.QueueFree));
 	}
  	public void GetInput()
-    {
+	{
 		Vector2 inputDirection = Input.GetVector("move_left", "move_right", "move_up", "move_down");
 		float effectiveSpeed = Speed * CurrentSpeedMultiplier;
 		Vector2 velocity = inputDirection * effectiveSpeed;
@@ -117,18 +147,30 @@ public partial class Player : CharacterBody2D
 		}
 		if (CanWallKick) velocity.X = 0;
 		Velocity = velocity;
-    }
+	}
 
 	private void _on_area_2d_area_entered(Node2D node2D){
 		GD.Print(node2D);
 		if (node2D.Name == "Bullet") {
 			CurrentHealth -= (node2D as Attack).Damage;
 			GetParent().GetNode<TextureProgressBar>("Health Bar").Value = CurrentHealth;
+			FlashRed();
 		}
 	}
 
-    public override void _PhysicsProcess(double delta) //TODO Wall kicking variables can probably be removed in favor of checking float time remaining
-    {
+	private Tween flashTween;
+
+	private void FlashRed()
+	{
+		if (animatedSprite2D == null) return;
+		flashTween?.Kill();
+		animatedSprite2D.Modulate = new Color(1f, 0.3f, 0.3f);
+		flashTween = CreateTween();
+		flashTween.TweenProperty(animatedSprite2D, "modulate", Colors.White, 0.2f);
+	}
+
+	public override void _PhysicsProcess(double delta) //TODO Wall kicking variables can probably be removed in favor of checking float time remaining
+	{
 		if (!IsDashing) {
 			GetInput();
 			MoveAndSlide();
@@ -171,13 +213,16 @@ public partial class Player : CharacterBody2D
 			MoveAndSlide();
 			RemainingDashTime -= (float)delta;
 		}
-    }
+	}
 
 
 	private void Shoot(Vector2 aimDirection) {
 		animatedSprite2D.Animation = "Shooting";
 		float angleStep = Gun.BulletCount > 1 ? Gun.BulletSpread / (Gun.BulletCount - 1) : 0f;
 		float startAngle = -Gun.BulletSpread / 2f;
+		Vector2 perp = aimDirection.Normalized().Rotated(Mathf.Pi / 2f);
+		float center = (Gun.BulletCount - 1) / 2f;
+		float perBulletSeparation = Gun.BulletSpread * 60f;
 		for (int i = 0; i < Gun.BulletCount; i++) {
 			Bullet b = Gun.BulletType.Instantiate<Bullet>();
 			Vector2 direction = aimDirection.Rotated(startAngle + i * angleStep);
@@ -185,7 +230,7 @@ public partial class Player : CharacterBody2D
 			b.Set("Damage", Gun.Damage);
 			b.Set("BulletLifetime", Gun.BulletLifetime);
 			b.Gun = Gun;
-			b.Position = Position;
+			b.Position = Position + perp * (i - center) * perBulletSeparation;
 			b.Rotation = direction.Angle();
 			b.SetCollisionLayerValue(4, true);
 			b.SetCollisionMaskValue(3, true);
@@ -194,6 +239,58 @@ public partial class Player : CharacterBody2D
 		}
 		animatedSprite2D.Play();
 		gunCoolDown = Gun.FireRate;
+	}
+
+	private void UpdateLaserBeam(Vector2 aimDirection)
+	{
+		var spaceState = GetWorld2D().DirectSpaceState;
+		Vector2 from = GlobalPosition;
+		Vector2 to = from + aimDirection.Normalized() * ScreenSize.Length();
+		var query = PhysicsRayQueryParameters2D.Create(from, to);
+		query.CollideWithAreas = true;
+		query.CollideWithBodies = true;
+		query.CollisionMask = 5;
+		var excluded = new Godot.Collections.Array<Rid>();
+		Vector2 endPoint = to;
+		Enemy hitEnemy = null;
+		int safety = 32;
+		while (safety-- > 0) {
+			query.Exclude = excluded;
+			var result = spaceState.IntersectRay(query);
+			if (result.Count == 0) break;
+			var collider = result["collider"].As<Node>();
+			if (collider is Pickup pickup) {
+				excluded.Add(pickup.GetRid());
+				continue;
+			}
+			endPoint = (Vector2)result["position"];
+			if (collider is Enemy e) hitEnemy = e;
+			break;
+		}
+		if (activeLaser == null) {
+			activeLaser = new Line2D();
+			activeLaser.Width = 4f;
+			activeLaser.DefaultColor = new Color(1f, 0.3f, 0.3f);
+			activeLaser.ZIndex = 10;
+			activeLaser.AddPoint(from);
+			activeLaser.AddPoint(endPoint);
+			GetParent().AddChild(activeLaser);
+		} else {
+			activeLaser.SetPointPosition(0, from);
+			activeLaser.SetPointPosition(1, endPoint);
+		}
+		if (hitEnemy != null && gunCoolDown <= 0) {
+			hitEnemy.TakeDamage(Gun.Damage, ElementType.NonElemental);
+			gunCoolDown = Gun.FireRate;
+		}
+	}
+
+	private void ClearLaser()
+	{
+		if (activeLaser != null) {
+			activeLaser.QueueFree();
+			activeLaser = null;
+		}
 	}
 
 	private void MeleeAttack(Vector2 aimDirection) {

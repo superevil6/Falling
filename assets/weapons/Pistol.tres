@@ -13,3 +13,4 @@ BulletType = ExtResource("1_h32k7")
 BulletLifetime = 1.0
 Ricochet = 2
 HeatSeeking = 3.0
+IsLaser = true

@@ -1,0 +1,8 @@
+[gd_resource type="Resource" load_steps=3 format=3 uid="uid://bpi2u85b8oi7t"]
+
+[ext_resource type="PackedScene" uid="uid://bo6exbho5e01u" path="res://assets/pickups/Experience Small.tscn" id="1_hb8xr"]
+[ext_resource type="Script" uid="uid://b4jyrbyhgktpr" path="res://assets/scripts/ItemDrop.cs" id="2_ytk6c"]
+
+[resource]
+script = ExtResource("2_ytk6c")
+Item = ExtResource("1_hb8xr")

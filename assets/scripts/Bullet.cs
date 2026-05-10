@@ -19,6 +19,21 @@ public partial class Bullet : Attack
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		string shaderPath = Element switch {
+			ElementType.Fire => "res://assets/objects/Fire.gdshader",
+			ElementType.Ice => "res://assets/objects/Ice.gdshader",
+			ElementType.Electric => "res://assets/objects/Lightning.gdshader",
+			ElementType.Poison => "res://assets/objects/Poison.gdshader",
+			_ => null
+		};
+		if (shaderPath != null) {
+			var sprite = GetNodeOrNull<AnimatedSprite2D>("AnimatedSprite2D");
+			if (sprite != null) {
+				var mat = new ShaderMaterial();
+				mat.Shader = GD.Load<Shader>(shaderPath);
+				sprite.Material = mat;
+			}
+		}
 		if (Gun == null) return;
 		if (Gun.SizeMultiplier > 0) {
 			Scale = new Vector2(Scale.X + Gun.SizeMultiplier, Scale.Y + Gun.SizeMultiplier);
@@ -52,7 +67,10 @@ public partial class Bullet : Attack
 		}
 	}
 
-	private void _on_area_entered(Node2D node) => HandleHit();
+	private void _on_area_entered(Node2D node) {
+		if (node is Pickup) return;
+		HandleHit();
+	}
 	private void _on_body_entered(Node2D node) => HandleHit();
 
 	private void HandleHit() {

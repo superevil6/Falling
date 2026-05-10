@@ -3,6 +3,8 @@ using Godot;
 public partial class Gun : Resource
 {
 	[Export]
+	public GunType GunType {get; set;}
+	[Export]
 	public float FireRate {get;set;}
 	[Export]
 	public int Damage {get;set;}
@@ -34,4 +36,24 @@ public partial class Gun : Resource
 	public float Slowing {get;set;}
 	[Export]
 	public int DamageModifier {get;set;}
+	[Export]
+	public bool IsLaser {get;set;}
+	[Export]
+	public int ExperiencePerLevel {get;set;} = 10;
+	[Export]
+	public int CurrentExperience {get;set;}
+	[Export]
+	public int CurrentLevel {get;set;}
+	[Export]
+	public int SkillPoints {get;set;}
+
+	public void AddExperience(int amount)
+	{
+		CurrentExperience += amount;
+		while (ExperiencePerLevel > 0 && CurrentExperience >= ExperiencePerLevel) {
+			CurrentExperience -= ExperiencePerLevel;
+			CurrentLevel++;
+			SkillPoints++;
+		}
+	}
 }

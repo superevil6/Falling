@@ -30,4 +30,6 @@ public partial class EnemyStatBlock : Resource
 	public AttackDirection AttackDirection {get; set;}
 	[Export]
 	public ItemDrop[] ItemDrops {get;set;}
+	[Export]
+	public bool IsBoss { get; set; }
 }

@@ -1,0 +1,18 @@
+[gd_scene load_steps=2 format=3 uid="uid://n7cjdbfsvwdq"]
+
+[ext_resource type="Script" path="res://assets/scripts/SelectionMenu.cs" id="1_select"]
+
+[node name="SelectionMenu" type="CanvasLayer"]
+script = ExtResource("1_select")
+
+[node name="Panel" type="Panel" parent="."]
+offset_left = 380.0
+offset_top = 200.0
+offset_right = 740.0
+offset_bottom = 520.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel"]
+offset_left = 32.0
+offset_top = 32.0
+offset_right = 328.0
+offset_bottom = 288.0

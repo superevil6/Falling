@@ -27,6 +27,16 @@ public partial class Enemy : Area2D
 	{
 		animatedSprite2D = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
 		CurrentHealth = Stats.MaxHealth;
+		SpawnDestinationIndicator();
+	}
+
+	private void SpawnDestinationIndicator()
+	{
+		var scene = GD.Load<PackedScene>("res://assets/objects/SpawnIndicator.tscn");
+		if (scene == null) return;
+		var indicator = scene.Instantiate<Node2D>();
+		GetParent().AddChild(indicator);
+		indicator.GlobalPosition = PostSpawnDestination;
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -78,16 +88,17 @@ public partial class Enemy : Area2D
 				}
 			}
 			else {
-				if (Stats.InstantSpawn)
-				{
+				if (Stats.InstantSpawn) {
 					Position = PostSpawnDestination;
 					ReachedPostSpawnDestination = true;
-				}
-				var motion = (PostSpawnDestination - Position) * Stats.MovementSpeed * (float)delta;
-				Position += motion.Normalized() * Stats.SpawnMovementSpeed;
-				if (Math.Abs(GlobalPosition.X - PostSpawnDestination.X) > 0.000005 && Math.Abs(GlobalPosition.Y - PostSpawnDestination.Y) > 0.000005) {
-					GD.Print("arrived");
-					ReachedPostSpawnDestination = true;
+				} else {
+					Vector2 toDestination = PostSpawnDestination - Position;
+					if (toDestination.Length() <= Stats.SpawnMovementSpeed) {
+						Position = PostSpawnDestination;
+						ReachedPostSpawnDestination = true;
+					} else {
+						Position += toDestination.Normalized() * Stats.SpawnMovementSpeed;
+					}
 				}
 			}
 		}
@@ -96,18 +107,40 @@ public partial class Enemy : Area2D
 	private void _on_area_entered(Node2D node2D){
 		var attack = node2D as Attack;
 		if (attack == null) return;
-		float damage = attack.Damage;
-		if (node2D is Bullet bullet && bullet.Element != ElementType.NonElemental) {
-			if (bullet.Element == ElementalWeakness) damage *= 2f;
-			else if (bullet.Element == ElementalDefense) damage *= 0.5f;
+		var element = (node2D is Bullet bullet) ? bullet.Element : ElementType.NonElemental;
+		TakeDamage(attack.Damage, element);
+	}
+
+	public void TakeDamage(int damage, ElementType element)
+	{
+		float dmg = damage;
+		if (element != ElementType.NonElemental) {
+			if (element == ElementalWeakness) dmg *= 2f;
+			else if (element == ElementalDefense) dmg *= 0.5f;
 		}
-		CurrentHealth -= Mathf.RoundToInt(damage);
+		CurrentHealth -= Mathf.RoundToInt(dmg);
+		if (CurrentHealth > 0) FlashRed();
+	}
+
+	private Tween flashTween;
+
+	private void FlashRed()
+	{
+		if (animatedSprite2D == null) return;
+		flashTween?.Kill();
+		animatedSprite2D.Modulate = new Color(1f, 0.3f, 0.3f);
+		flashTween = CreateTween();
+		flashTween.TweenProperty(animatedSprite2D, "modulate", Colors.White, 0.2f);
 	}
 
 	private void _on_animated_sprite_2d_animation_finished() {
 		switch (animatedSprite2D.Animation) {
 			case "Death":
 			DropItems();
+			if (Stats != null && Stats.IsBoss) {
+				var menu = GetParent()?.GetNodeOrNull<SelectionMenu>("Selection Menu");
+				menu?.Open();
+			}
 			var children = GetParent().GetChildren().Where(child => child.IsInGroup("Enemy")).Count();
 			GD.Print(GetParent().GetChildren().Where(child => child.IsInGroup("Enemy")).Count());
 			if (children <= 1) {
@@ -146,7 +179,7 @@ public partial class Enemy : Area2D
 			b.Set("BulletLifetime", Stats.Gun.BulletLifetime);
 			b.Gun = Stats.Gun;
 			b.Position = Position;
-			b.Rotation = Position.Angle();
+			b.Rotation = playerLocation.Angle();
 			b.SetCollisionLayerValue(5, true);
 			b.SetCollisionMaskValue(2, true);
 			GetParent().AddChild(b);

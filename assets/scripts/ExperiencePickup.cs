@@ -9,5 +9,33 @@ public partial class ExperiencePickup : Pickup
 	{
 		player.CurrentExperience += ExperienceAmount;
 		player.GetParent().GetNode<Label>("Experience Counter").Text = $"XP: {player.CurrentExperience}";
+		string leveledUpName = null;
+		if (player.Guns != null) {
+			foreach (var gun in player.Guns) {
+				if (gun == null) continue;
+				int prev = gun.CurrentLevel;
+				gun.AddExperience(ExperienceAmount);
+				if (gun.CurrentLevel > prev && leveledUpName == null) {
+					leveledUpName = !string.IsNullOrEmpty(gun.ResourcePath)
+						? System.IO.Path.GetFileNameWithoutExtension(gun.ResourcePath)
+						: "Gun";
+				}
+			}
+		}
+		if (player.BodyMods != null) {
+			foreach (var mod in player.BodyMods) {
+				if (mod == null) continue;
+				int prev = mod.Level;
+				mod.AddExperience(ExperienceAmount);
+				if (mod.Level > prev && leveledUpName == null) {
+					leveledUpName = !string.IsNullOrEmpty(mod.Name) ? mod.Name : "BodyMod";
+				}
+			}
+		}
+		player.UpdateGunLabel();
+		if (leveledUpName != null) {
+			var menu = player.GetParent().GetNodeOrNull<LevelUpMenu>("Level Up Menu");
+			menu?.Open(leveledUpName);
+		}
 	}
 }

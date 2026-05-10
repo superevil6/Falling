@@ -1,0 +1,7 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://dx5n6or0rm1b"]
+
+[ext_resource type="Script" uid="uid://1j6fi2jij0hu" path="res://assets/scripts/BodyMod.cs" id="1_2au4l"]
+
+[resource]
+script = ExtResource("1_2au4l")
+type = 1

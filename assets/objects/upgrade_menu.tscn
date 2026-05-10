@@ -2,18 +2,18 @@
 
 [ext_resource type="Script" path="res://assets/scripts/UpgradeMenu.cs" id="1_t4vm1"]
 
-[node name="Upgrade Menu" type="Node2D"]
+[node name="Upgrade Menu" type="CanvasLayer"]
 script = ExtResource("1_t4vm1")
 
 [node name="Panel" type="Panel" parent="."]
-offset_left = 64.0
-offset_top = 64.0
-offset_right = 1088.0
-offset_bottom = 576.0
+offset_left = 220.0
+offset_top = 120.0
+offset_right = 820.0
+offset_bottom = 600.0
 
-[node name="GunModsContainer" type="Container" parent="Panel"]
-layout_mode = 0
-offset_left = 64.0
-offset_top = 64.0
-offset_right = 960.0
-offset_bottom = 448.0
+[node name="Label" type="Label" parent="Panel"]
+offset_left = 24.0
+offset_top = 24.0
+offset_right = 576.0
+offset_bottom = 456.0
+text = "Upgrades"

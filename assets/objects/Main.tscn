@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://3wov1sd2nxg5"]
+[gd_scene load_steps=22 format=3 uid="uid://3wov1sd2nxg5"]
 
 [ext_resource type="Script" uid="uid://hfchjcen7ado" path="res://assets/scripts/Main.cs" id="1_yeolr"]
 [ext_resource type="Resource" uid="uid://drxdwiakxfced" path="res://assets/stages/Test Stage.tres" id="2_0q0aj"]
@@ -9,8 +9,18 @@
 [ext_resource type="Texture2D" uid="uid://cgofm01usxv4y" path="res://assets/sprites/Health Bar 1.png" id="5_hutc6"]
 [ext_resource type="Texture2D" uid="uid://bivtwitglgmte" path="res://assets/sprites/Health Bar 2.png" id="6_7tnf3"]
 [ext_resource type="PackedScene" uid="uid://cl8qfm2t0ht11" path="res://assets/stages/Walls/Test Wall.tscn" id="7_2iqqg"]
+[ext_resource type="Resource" uid="uid://dhxwiafwkl55" path="res://assets/weapons/Laser.tres" id="7_g572a"]
+[ext_resource type="Resource" uid="uid://b48w24n0dq0s7" path="res://assets/body mods/head mod.tres" id="7_xuisg"]
+[ext_resource type="Resource" uid="uid://dx5n6or0rm1b" path="res://assets/body mods/body mod.tres" id="8_0x35d"]
 [ext_resource type="Texture2D" uid="uid://csakvxsgokdoj" path="res://assets/sprites/Test Background 2.png" id="8_8o7ni"]
+[ext_resource type="Resource" uid="uid://dk5udce5pt6k7" path="res://assets/weapons/Machine Gun.tres" id="8_gvlvn"]
+[ext_resource type="Resource" uid="uid://d3b7r5oey1p82" path="res://assets/weapons/Shotgun.tres" id="9_arsnc"]
+[ext_resource type="Resource" uid="uid://cxnr0aut8isdt" path="res://assets/body mods/arm mod.tres" id="9_lgx2q"]
 [ext_resource type="Script" uid="uid://c1pb4r2d0t4rx" path="res://assets/scripts/WallQueue.cs" id="9_wallqueue"]
+[ext_resource type="Resource" uid="uid://dgdydgnsl0p2n" path="res://assets/body mods/leg mod.tres" id="10_3yxs6"]
+[ext_resource type="Resource" uid="uid://cc5s5y6gpiagm" path="res://assets/weapons/Pistol.tres" id="10_dyp24"]
+[ext_resource type="PackedScene" uid="uid://n7cjdbfsvwdq" path="res://assets/objects/SelectionMenu.tscn" id="11_select"]
+[ext_resource type="PackedScene" uid="uid://b9levelupmenu1" path="res://assets/objects/LevelUpMenu.tscn" id="12_levelup"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_3nds7"]
 shader = ExtResource("4_crcnl")
@@ -30,6 +40,12 @@ visible = false
 visible = false
 position = Vector2(-100, 66)
 
+[node name="Selection Menu" parent="." instance=ExtResource("11_select")]
+BodyMods = Array[Resource]([ExtResource("7_xuisg"), ExtResource("8_0x35d"), ExtResource("9_lgx2q"), ExtResource("10_3yxs6")])
+Guns = Array[Resource]([ExtResource("7_g572a"), ExtResource("8_gvlvn"), ExtResource("9_arsnc"), ExtResource("10_dyp24")])
+
+[node name="Level Up Menu" parent="." instance=ExtResource("12_levelup")]
+
 [node name="Left Wall Queue" type="Node2D" parent="."]
 position = Vector2(122, 0)
 script = ExtResource("9_wallqueue")
@@ -42,7 +58,7 @@ IsRightSide = true
 chunks = Array[PackedScene]([ExtResource("7_2iqqg")])
 
 [node name="Health Bar" type="TextureProgressBar" parent="."]
-offset_left = 15.0
+offset_left = 15.000001
 offset_top = 3.0
 offset_right = 527.0
 offset_bottom = 131.0
@@ -57,6 +73,13 @@ offset_top = 17.0
 offset_right = 394.0
 offset_bottom = 41.0
 text = "XP: 0"
+
+[node name="Gun Label" type="Label" parent="."]
+offset_left = 400.0
+offset_top = 17.0
+offset_right = 600.0
+offset_bottom = 41.0
+text = "Gun: -"
 
 [node name="ParallaxBackground" type="ParallaxBackground" parent="."]
 
