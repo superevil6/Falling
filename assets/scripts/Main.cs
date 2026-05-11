@@ -10,6 +10,10 @@ public partial class Main : Node2D
 	public int CurrentStage {get;set;} = 0;
 	[Export]
 	public PackedScene Player {get;set;}
+	[Export]
+	public GunUpgrade[] PossibleGunUpgrades {get;set;}
+	[Export]
+	public BodyUpgrade[] PossibleBodyUpgrades {get;set;}
 	private int CurrentEnemyGroupWave = 0;
 	public override void _Ready()
 	{
@@ -36,5 +40,4 @@ public partial class Main : Node2D
 		}
 	}
 }
-//TODO Walls need to destroy bullets on impact
 //TODO Explosion are blocking bullets for some reason

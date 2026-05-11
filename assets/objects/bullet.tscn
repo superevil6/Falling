@@ -13,7 +13,6 @@ collision_layer = 0
 script = ExtResource("1_m371v")
 BulletSpeed = 2000.0
 Explosion = ExtResource("3_iiand")
-Element = 3
 metadata/_edit_group_ = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

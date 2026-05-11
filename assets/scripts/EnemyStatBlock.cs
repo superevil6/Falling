@@ -23,10 +23,6 @@ public partial class EnemyStatBlock : Resource
 	[Export]
 	public Texture2D EnemySprite {get;set;}
 	[Export]
-	public DamageType DamageTypeStrength {get;set;}
-	[Export]
-	public DamageType DamageTypeWeakness {get;set;}
-	[Export]
 	public AttackDirection AttackDirection {get; set;}
 	[Export]
 	public ItemDrop[] ItemDrops {get;set;}

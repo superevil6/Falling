@@ -1,0 +1,9 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://bf0lwd3ker6ic"]
+
+[ext_resource type="Script" uid="uid://cjvebtbs1ft7k" path="res://assets/scripts/GunUpgrade.cs" id="1_64b4c"]
+
+[resource]
+script = ExtResource("1_64b4c")
+Type = 14
+Element = 1
+UpgradeName = "Fire Bullets"

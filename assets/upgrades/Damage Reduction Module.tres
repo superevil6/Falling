@@ -1,0 +1,10 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://cwkinfsvflpxc"]
+
+[ext_resource type="Script" uid="uid://c16jiuasboxwv" path="res://assets/scripts/BodyUpgrade.cs" id="1_rtbtk"]
+
+[resource]
+script = ExtResource("1_rtbtk")
+BodyUpgradeType = 1
+BodyModType = 1
+UpgradeName = "Damage Reduction Module"
+Value = 10.0

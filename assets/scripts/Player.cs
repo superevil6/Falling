@@ -8,8 +8,7 @@ public partial class Player : CharacterBody2D
 	public int MaxHealth {get;set;}
 	public int CurrentHealth;
 	public int CurrentExperience;
-	public List<GunMod> GunMods = new List<GunMod>();
-	public List<SwordMod> SwordMods = new List<SwordMod>();
+	public int DamageReduction;
 	private float gunCoolDown;
 	[Export]
 	public int Speed { get;set;} = 400;
@@ -17,6 +16,8 @@ public partial class Player : CharacterBody2D
 	public Gun[] Guns {get;set;} = new Gun[4];
 	[Export]
 	public BodyMod[] BodyMods {get;set;} = new BodyMod[4];
+	[Export]
+	public BodyUpgrade[] BodyUpgrades {get; set;}
 	private int currentGunIndex = 0;
 	public Gun Gun => (Guns != null && Guns.Length > 0 && currentGunIndex >= 0 && currentGunIndex < Guns.Length) ? Guns[currentGunIndex] : null;
 	[Export]
@@ -48,11 +49,19 @@ public partial class Player : CharacterBody2D
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		GunMods.Add(TestData.testMod);
-		GD.Print(GunMods.FirstOrDefault().Name);
 		ScreenSize = GetViewportRect().Size;
 		CurrentHealth = MaxHealth;
 		animatedSprite2D = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
+		if (Guns != null) {
+			for (int i = 0; i < Guns.Length; i++) {
+				if (Guns[i] != null) Guns[i] = (Gun)Guns[i].Duplicate();
+			}
+		}
+		if (BodyMods != null) {
+			for (int i = 0; i < BodyMods.Length; i++) {
+				if (BodyMods[i] != null) BodyMods[i] = (BodyMod)BodyMods[i].Duplicate();
+			}
+		}
 		GetParent().GetNode<TextureProgressBar>("Health Bar").MaxValue = MaxHealth;
 		GetParent().GetNode<TextureProgressBar>("Health Bar").Value = CurrentHealth;
 		GetParent().GetNode<Label>("Experience Counter").Text = $"XP: {CurrentExperience}";
@@ -98,6 +107,27 @@ public partial class Player : CharacterBody2D
 		if (shouldTrail && TimeSinceLastAfterImage >= AfterImageInterval) {
 			SpawnAfterImage();
 			TimeSinceLastAfterImage = 0f;
+		}
+	}
+
+	public void ApplyBodyUpgrade(BodyUpgrade upgrade)
+	{
+		if (upgrade == null) return;
+		switch (upgrade.BodyUpgradeType) {
+			case BodyUpgradeType.Health:
+				int delta = Mathf.RoundToInt(upgrade.Value);
+				MaxHealth += delta;
+				CurrentHealth += delta;
+				var hb = GetParent().GetNode<TextureProgressBar>("Health Bar");
+				hb.MaxValue = MaxHealth;
+				hb.Value = CurrentHealth;
+				break;
+			case BodyUpgradeType.DamageReduction:
+				DamageReduction += Mathf.RoundToInt(upgrade.Value);
+				break;
+			case BodyUpgradeType.MovementSpeed:
+				Speed += Mathf.RoundToInt(upgrade.Value);
+				break;
 		}
 	}
 
@@ -230,6 +260,7 @@ public partial class Player : CharacterBody2D
 			b.Set("Damage", Gun.Damage);
 			b.Set("BulletLifetime", Gun.BulletLifetime);
 			b.Gun = Gun;
+			if (Gun.Element != ElementType.NonElemental) b.Element = Gun.Element;
 			b.Position = Position + perp * (i - center) * perBulletSeparation;
 			b.Rotation = direction.Angle();
 			b.SetCollisionLayerValue(4, true);

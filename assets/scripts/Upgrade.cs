@@ -1,0 +1,9 @@
+using Godot;
+
+public partial class Upgrade : Resource
+{
+	[Export]
+	public string UpgradeName { get; set; }
+	[Export]
+	public float Value { get; set; }
+}

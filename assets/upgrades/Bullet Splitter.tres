@@ -1,0 +1,9 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://bxhvql7ys6i7d"]
+
+[ext_resource type="Script" uid="uid://cjvebtbs1ft7k" path="res://assets/scripts/GunUpgrade.cs" id="1_ynj0m"]
+
+[resource]
+script = ExtResource("1_ynj0m")
+Type = 7
+UpgradeName = "Bullet Splitter"
+Value = 1.0

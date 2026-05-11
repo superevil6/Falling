@@ -1,0 +1,9 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://cs8pps5d2oarb"]
+
+[ext_resource type="Script" uid="uid://cjvebtbs1ft7k" path="res://assets/scripts/GunUpgrade.cs" id="1_sem7g"]
+
+[resource]
+script = ExtResource("1_sem7g")
+Type = 1
+UpgradeName = "Fire Rate Module"
+Value = -0.2

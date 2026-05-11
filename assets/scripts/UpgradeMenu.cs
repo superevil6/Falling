@@ -51,6 +51,27 @@ public partial class UpgradeMenu : CanvasLayer
 				sb.AppendLine();
 			}
 		}
+		sb.AppendLine("=== Body Mods ===");
+		sb.AppendLine();
+		if (player.BodyMods != null) {
+			for (int i = 0; i < player.BodyMods.Length; i++) {
+				var mod = player.BodyMods[i];
+				if (mod == null) {
+					sb.AppendLine($"Slot {i + 1}: (empty)");
+				} else {
+					string name = !string.IsNullOrEmpty(mod.Name)
+						? mod.Name
+						: (!string.IsNullOrEmpty(mod.ResourcePath)
+							? System.IO.Path.GetFileNameWithoutExtension(mod.ResourcePath)
+							: "?");
+					sb.AppendLine($"Slot {i + 1}: {name}");
+					sb.AppendLine($"  Level: {mod.Level}");
+					sb.AppendLine($"  Experience: {mod.CurrentExperience} / {mod.ExperiencePerLevel}");
+					sb.AppendLine($"  Skill Points: {mod.SkillPoints}");
+				}
+				sb.AppendLine();
+			}
+		}
 		contentLabel.Text = sb.ToString();
 	}
 }

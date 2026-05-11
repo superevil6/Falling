@@ -28,10 +28,6 @@ public partial class SelectionMenu : CanvasLayer
 
 	public override void _Process(double delta)
 	{
-		// if (Input.IsActionJustPressed("selection_menu")) {
-		// 	if (Visible) Close();
-		// 	else Open();
-		// }
 		if (!Visible || Options == null || Options.Length == 0) return;
 		if (Input.IsActionJustPressed("move_down")) {
 			selectedIndex = (selectedIndex + 1) % Options.Length;
@@ -175,7 +171,7 @@ public partial class SelectionMenu : CanvasLayer
 		if (pick is Gun g && player.Guns != null) {
 			for (int i = 0; i < player.Guns.Length; i++) {
 				if (player.Guns[i] == null) {
-					player.Guns[i] = g;
+					player.Guns[i] = (Gun)g.Duplicate();
 					player.UpdateGunLabel();
 					return;
 				}
@@ -183,7 +179,7 @@ public partial class SelectionMenu : CanvasLayer
 		} else if (pick is BodyMod m && player.BodyMods != null) {
 			for (int i = 0; i < player.BodyMods.Length; i++) {
 				if (player.BodyMods[i] == null) {
-					player.BodyMods[i] = m;
+					player.BodyMods[i] = (BodyMod)m.Duplicate();
 					return;
 				}
 			}

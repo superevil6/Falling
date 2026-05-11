@@ -11,6 +11,27 @@ public partial class Enemy : Area2D
 	[Export]
 	public float WallContactDriftSpeed {get;set;} = 300f;
 	[Export]
+	public float RandomDirectionInterval {get;set;} = 1f;
+	private Vector2 randomDirection = Vector2.Zero;
+	private float randomDirectionTimer = 0f;
+	private RandomNumberGenerator rng = new RandomNumberGenerator();
+	[Export]
+	public float SmallSquareSize {get;set;} = 50f;
+	[Export]
+	public float LargeSquareSize {get;set;} = 150f;
+	[Export]
+	public float SmallCircleRadius {get;set;} = 50f;
+	[Export]
+	public float LargeCircleRadius {get;set;} = 150f;
+	[Export]
+	public float VerticalAmplitude {get;set;} = 100f;
+	[Export]
+	public float HorizontalAmplitude {get;set;} = 100f;
+	private int currentSquareCorner = 0;
+	private float currentCircleAngle = 0f;
+	private int verticalDirection = 1;
+	private int horizontalDirection = 1;
+	[Export]
 	public ElementType ElementalDefense { get; set; }
 	[Export]
 	public ElementType ElementalWeakness { get; set; }
@@ -27,6 +48,7 @@ public partial class Enemy : Area2D
 	{
 		animatedSprite2D = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
 		CurrentHealth = Stats.MaxHealth;
+		rng.Randomize();
 		SpawnDestinationIndicator();
 	}
 
@@ -68,11 +90,121 @@ public partial class Enemy : Area2D
 					Position += towards;
 					break;
 					case MovementType.AwayFromPlayer:
-					var away = -Position.DirectionTo(playerLocation) * Stats.MovementSpeed * (float)delta;
+					var away = -playerLocation * Stats.MovementSpeed * (float)delta;
 					Position += away;
 					break;
 					case MovementType.Random:
-
+					randomDirectionTimer -= (float)delta;
+					if (randomDirectionTimer <= 0 || randomDirection == Vector2.Zero) {
+						float angle = rng.RandfRange(0f, Mathf.Pi * 2f);
+						randomDirection = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
+						randomDirectionTimer = RandomDirectionInterval;
+					}
+					Position += randomDirection * Stats.MovementSpeed * (float)delta;
+					break;
+					case MovementType.SmallSquare:
+					{
+						Vector2 cornerOffset = currentSquareCorner switch {
+							0 => new Vector2(SmallSquareSize, SmallSquareSize),
+							1 => new Vector2(-SmallSquareSize, SmallSquareSize),
+							2 => new Vector2(-SmallSquareSize, -SmallSquareSize),
+							3 => new Vector2(SmallSquareSize, -SmallSquareSize),
+							_ => Vector2.Zero,
+						};
+						Vector2 squareTarget = PostSpawnDestination + cornerOffset;
+						Vector2 toSquareTarget = squareTarget - Position;
+						float squareStep = Stats.MovementSpeed * (float)delta;
+						if (toSquareTarget.Length() <= squareStep) {
+							Position = squareTarget;
+							currentSquareCorner = (currentSquareCorner + 1) % 4;
+						} else {
+							Position += toSquareTarget.Normalized() * squareStep;
+						}
+					}
+					break;
+					case MovementType.LargeSquare:
+					{
+						Vector2 cornerOffset = currentSquareCorner switch {
+							0 => new Vector2(LargeSquareSize, LargeSquareSize),
+							1 => new Vector2(-LargeSquareSize, LargeSquareSize),
+							2 => new Vector2(-LargeSquareSize, -LargeSquareSize),
+							3 => new Vector2(LargeSquareSize, -LargeSquareSize),
+							_ => Vector2.Zero,
+						};
+						Vector2 squareTarget = PostSpawnDestination + cornerOffset;
+						Vector2 toSquareTarget = squareTarget - Position;
+						float squareStep = Stats.MovementSpeed * (float)delta;
+						if (toSquareTarget.Length() <= squareStep) {
+							Position = squareTarget;
+							currentSquareCorner = (currentSquareCorner + 1) % 4;
+						} else {
+							Position += toSquareTarget.Normalized() * squareStep;
+						}
+					}
+					break;
+					case MovementType.SmallCircle:
+					{
+						float omega = SmallCircleRadius > 0f ? Stats.MovementSpeed / SmallCircleRadius : 0f;
+						currentCircleAngle += omega * (float)delta;
+						Position = PostSpawnDestination + new Vector2(Mathf.Cos(currentCircleAngle), Mathf.Sin(currentCircleAngle)) * SmallCircleRadius;
+					}
+					break;
+					case MovementType.LargeCircle:
+					{
+						float omega = LargeCircleRadius > 0f ? Stats.MovementSpeed / LargeCircleRadius : 0f;
+						currentCircleAngle += omega * (float)delta;
+						Position = PostSpawnDestination + new Vector2(Mathf.Cos(currentCircleAngle), Mathf.Sin(currentCircleAngle)) * LargeCircleRadius;
+					}
+					break;
+					case MovementType.VerticalBackAndForth:
+					{
+						float targetY = PostSpawnDestination.Y + verticalDirection * VerticalAmplitude;
+						float dy = targetY - Position.Y;
+						float step = Stats.MovementSpeed * (float)delta;
+						if (Mathf.Abs(dy) <= step) {
+							Position = new Vector2(Position.X, targetY);
+							verticalDirection = -verticalDirection;
+						} else {
+							Position += new Vector2(0, Mathf.Sign(dy) * step);
+						}
+					}
+					break;
+					case MovementType.HorizontalBackAndForth:
+					{
+						float targetX = PostSpawnDestination.X + horizontalDirection * HorizontalAmplitude;
+						float dx = targetX - Position.X;
+						float step = Stats.MovementSpeed * (float)delta;
+						if (Mathf.Abs(dx) <= step) {
+							Position = new Vector2(targetX, Position.Y);
+							horizontalDirection = -horizontalDirection;
+						} else {
+							Position += new Vector2(Mathf.Sign(dx) * step, 0);
+						}
+					}
+					break;
+					case MovementType.DiagonalBackAndForth:
+					{
+						float step = Stats.MovementSpeed * (float)delta;
+						float targetX = PostSpawnDestination.X + horizontalDirection * HorizontalAmplitude;
+						float dx = targetX - Position.X;
+						float newX;
+						if (Mathf.Abs(dx) <= step) {
+							newX = targetX;
+							horizontalDirection = -horizontalDirection;
+						} else {
+							newX = Position.X + Mathf.Sign(dx) * step;
+						}
+						float targetY = PostSpawnDestination.Y + verticalDirection * VerticalAmplitude;
+						float dy = targetY - Position.Y;
+						float newY;
+						if (Mathf.Abs(dy) <= step) {
+							newY = targetY;
+							verticalDirection = -verticalDirection;
+						} else {
+							newY = Position.Y + Mathf.Sign(dy) * step;
+						}
+						Position = new Vector2(newX, newY);
+					}
 					break;
 				}
 				if (player == null) player = GetParent()?.GetNodeOrNull<Player>("Player");

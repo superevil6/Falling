@@ -1,0 +1,9 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://rdgjyqjipc3m"]
+
+[ext_resource type="Script" uid="uid://cjvebtbs1ft7k" path="res://assets/scripts/GunUpgrade.cs" id="1_x23lu"]
+
+[resource]
+script = ExtResource("1_x23lu")
+Type = 13
+UpgradeName = "Bullet Size Booster"
+Value = 1.0

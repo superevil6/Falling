@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://b9levelupmenu1"]
+[gd_scene load_steps=2 format=3 uid="uid://cvg3dm8f0xry1"]
 
 [ext_resource type="Script" path="res://assets/scripts/LevelUpMenu.cs" id="1_levelup"]
 

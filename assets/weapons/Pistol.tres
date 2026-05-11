@@ -7,10 +7,8 @@
 script = ExtResource("2_hnubu")
 FireRate = 0.7
 Damage = 1
-BulletCount = 3
+BulletCount = 1
 BulletSpread = 0.3
 BulletType = ExtResource("1_h32k7")
 BulletLifetime = 1.0
-Ricochet = 2
-HeatSeeking = 3.0
-IsLaser = true
+GunUpgrades = null

@@ -1,0 +1,10 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://bab0pv8pox83n"]
+
+[ext_resource type="Script" uid="uid://c16jiuasboxwv" path="res://assets/scripts/BodyUpgrade.cs" id="1_x1nib"]
+
+[resource]
+script = ExtResource("1_x1nib")
+BodyUpgradeType = 2
+BodyModType = 3
+UpgradeName = "Speed Boost"
+Value = 20.0

@@ -17,7 +17,7 @@ public partial class Gun : Resource
 	[Export]
 	public float BulletLifetime {get;set;}
 	[Export]
-	public DamageType DamageType {get;set;}
+	public float BulletSize {get;set;} = 1f;
 	[Export]
 	public bool Pierce {get;set;}
 	[Export]
@@ -39,6 +39,8 @@ public partial class Gun : Resource
 	[Export]
 	public bool IsLaser {get;set;}
 	[Export]
+	public ElementType Element {get;set;}
+	[Export]
 	public int ExperiencePerLevel {get;set;} = 10;
 	[Export]
 	public int CurrentExperience {get;set;}
@@ -46,6 +48,8 @@ public partial class Gun : Resource
 	public int CurrentLevel {get;set;}
 	[Export]
 	public int SkillPoints {get;set;}
+	[Export]
+	public GunUpgrade[] GunUpgrades {get; set;}
 
 	public void AddExperience(int amount)
 	{
@@ -54,6 +58,28 @@ public partial class Gun : Resource
 			CurrentExperience -= ExperiencePerLevel;
 			CurrentLevel++;
 			SkillPoints++;
+		}
+	}
+
+	public void ApplyUpgrade(GunUpgrade upgrade)
+	{
+		if (upgrade == null) return;
+		switch (upgrade.Type) {
+			case GunUpgradeType.Damage: Damage += Mathf.RoundToInt(upgrade.Value); break;
+			case GunUpgradeType.FireRate: FireRate += upgrade.Value; break;
+			case GunUpgradeType.BulletCount: BulletCount += Mathf.RoundToInt(upgrade.Value); break;
+			case GunUpgradeType.BulletSpread: BulletSpread += upgrade.Value; break;
+			case GunUpgradeType.BulletLifeTime: BulletLifetime += upgrade.Value; break;
+			case GunUpgradeType.Pierce: Pierce = upgrade.Value > 0; break;
+			case GunUpgradeType.Explode: Explode = upgrade.Value > 0; break;
+			case GunUpgradeType.Split: Split += Mathf.RoundToInt(upgrade.Value); break;
+			case GunUpgradeType.Ricochet: Ricochet += Mathf.RoundToInt(upgrade.Value); break;
+			case GunUpgradeType.Wave: Wave += upgrade.Value; break;
+			case GunUpgradeType.SizeMultiplier: SizeMultiplier += upgrade.Value; break;
+			case GunUpgradeType.HeatSeeking: HeatSeeking += upgrade.Value; break;
+			case GunUpgradeType.Slowing: Slowing += upgrade.Value; break;
+			case GunUpgradeType.Element: Element = upgrade.Element; break;
+			case GunUpgradeType.BulletSize: BulletSize += upgrade.Value; break;
 		}
 	}
 }

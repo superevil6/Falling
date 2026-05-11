@@ -38,6 +38,9 @@ public partial class Bullet : Attack
 		if (Gun.SizeMultiplier > 0) {
 			Scale = new Vector2(Scale.X + Gun.SizeMultiplier, Scale.Y + Gun.SizeMultiplier);
 		}
+		if (Gun.BulletSize > 0) {
+			Scale = new Vector2(Scale.X * Gun.BulletSize, Scale.Y * Gun.BulletSize);
+		}
 		RemainingRicochets = Gun.Ricochet;
 	}
 
@@ -47,9 +50,11 @@ public partial class Bullet : Attack
 		if (Gun != null) {
 			if (Gun.Wave > 0) {
 				time += delta;
-				Position += new Vector2(
-				((float)Mathf.Cos(time * (Gun.Wave * 1.5))) * Direction.Y,
-				((float)Mathf.Cos(time * (Gun.Wave * 1))) * Direction.X).Normalized() * BulletSpeed * (float)delta;
+				const float waveAmp = 40f;
+				float omega = Gun.Wave;
+				Vector2 perp = Direction.Normalized().Rotated(Mathf.Pi / 2f);
+				float lateralVel = waveAmp * omega * Mathf.Cos((float)(time * omega));
+				Position += perp * lateralVel * (float)delta;
 			}
 			if (Gun.HeatSeeking > 0) {
 				var targetDir = ClosestEnemyDirection();
@@ -69,17 +74,23 @@ public partial class Bullet : Attack
 
 	private void _on_area_entered(Node2D node) {
 		if (node is Pickup) return;
-		HandleHit();
+		HandleHit(true);
 	}
-	private void _on_body_entered(Node2D node) => HandleHit();
+	private void _on_body_entered(Node2D node) => HandleHit(false);
 
-	private void HandleHit() {
+	private void HandleHit(bool hitEnemy) {
 		if (Gun == null) {
 			QueueFree();
 			return;
 		}
 		if (Gun.Explode) {
 			CallDeferred("GenerateExplosion");
+		}
+		if (hitEnemy && Gun.Split > 0) {
+			SpawnSplitBullets();
+			if (Gun.Pierce) return;
+			QueueFree();
+			return;
 		}
 		if (Gun.Pierce) return;
 		if (RemainingRicochets > 0) {
@@ -89,6 +100,29 @@ public partial class Bullet : Attack
 			return;
 		}
 		QueueFree();
+	}
+
+	private void SpawnSplitBullets()
+	{
+		if (Gun?.BulletType == null) return;
+		var parent = GetParent();
+		if (parent == null) return;
+		var rng = new RandomNumberGenerator();
+		rng.Randomize();
+		int count = Gun.Split + 1;
+		for (int i = 0; i < count; i++) {
+			var b = Gun.BulletType.Instantiate<Bullet>();
+			float angle = rng.RandfRange(0, Mathf.Pi * 2f);
+			b.Direction = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
+			b.Damage = Damage;
+			b.BulletLifetime = Gun.BulletLifetime > 0 ? Gun.BulletLifetime : 1f;
+			b.Element = Element;
+			b.Position = Position;
+			b.Rotation = b.Direction.Angle();
+			b.CollisionLayer = CollisionLayer;
+			b.CollisionMask = CollisionMask;
+			parent.CallDeferred("add_child", b);
+		}
 	}
 
 	private Vector2? ClosestEnemyDirection() {

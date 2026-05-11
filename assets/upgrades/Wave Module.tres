@@ -1,0 +1,9 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://eh1py7xe8kdq"]
+
+[ext_resource type="Script" uid="uid://cjvebtbs1ft7k" path="res://assets/scripts/GunUpgrade.cs" id="1_hckj1"]
+
+[resource]
+script = ExtResource("1_hckj1")
+Type = 9
+UpgradeName = "Wave Module"
+Value = 20.0
