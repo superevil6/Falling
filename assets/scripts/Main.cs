@@ -15,6 +15,7 @@ public partial class Main : Node2D
 	[Export]
 	public BodyUpgrade[] PossibleBodyUpgrades {get;set;}
 	private int CurrentEnemyGroupWave = 0;
+	private bool hasSpawnedFirstGroup = false;
 	public override void _Ready()
 	{
 		SpawnEnemyGroup();
@@ -31,12 +32,24 @@ public partial class Main : Node2D
 	}
 
 	public async void SpawnEnemyGroup () {
-		for (int i = 0; i < Stages[CurrentStage].EnemyGroup[CurrentEnemyGroupWave].Enemies.Count(); i++) {
-			Enemy e = Stages[CurrentStage].EnemyGroup[CurrentEnemyGroupWave].Enemies[i].Instantiate<Enemy>();
-			e.Position = Stages[CurrentStage].EnemyGroup[CurrentEnemyGroupWave].SpawnLocations[i];
-			e.Set("PostSpawnDestination", Stages[CurrentStage].EnemyGroup[CurrentEnemyGroupWave].PostSpawnDestination[i]);
+		var groups = Stages[CurrentStage].EnemyGroup;
+		if (groups == null || groups.Length == 0) return;
+		if (hasSpawnedFirstGroup) {
+			var previous = groups[CurrentEnemyGroupWave];
+			if (previous != null && previous.TimeBeforeNextGroup > 0) {
+				await ToSignal(GetTree().CreateTimer(previous.TimeBeforeNextGroup), "timeout");
+			}
+			CurrentEnemyGroupWave = (CurrentEnemyGroupWave + 1) % groups.Length;
+		}
+		hasSpawnedFirstGroup = true;
+		var group = groups[CurrentEnemyGroupWave];
+		if (group == null || group.Enemies == null) return;
+		for (int i = 0; i < group.Enemies.Count(); i++) {
+			Enemy e = group.Enemies[i].Instantiate<Enemy>();
+			e.Position = group.SpawnLocations[i];
+			e.Set("PostSpawnDestination", group.PostSpawnDestination[i]);
 			AddChild(e);
-			await ToSignal(GetTree().CreateTimer(Stages[CurrentStage].EnemyGroup[CurrentEnemyGroupWave].TimeBetweenSpawns), "timeout");
+			await ToSignal(GetTree().CreateTimer(group.TimeBetweenSpawns), "timeout");
 		}
 	}
 }

@@ -5,6 +5,8 @@ public partial class EnemyStatBlock : Resource
 	[Export]
 	public int MaxHealth {get;set;}
 	[Export]
+	public int DamageReduction {get;set;}
+	[Export]
 	public Gun Gun {get;set;}
 	[Export]
 	public MeleeWeapon Melee {get;set;}

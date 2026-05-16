@@ -9,6 +9,7 @@ public partial class Player : CharacterBody2D
 	public int CurrentHealth;
 	public int CurrentExperience;
 	public int DamageReduction;
+	public bool HasSeeEnemyHealth = true;
 	private float gunCoolDown;
 	[Export]
 	public int Speed { get;set;} = 400;
@@ -33,8 +34,13 @@ public partial class Player : CharacterBody2D
 	private bool IsDashing = false;
 	[Export]
 	public float DashDuration {get;set;} = 1;
+	[Export]
+	public float ShortDashDuration {get;set;} = 0.15f;
+	[Export]
+	public float ShortDashCooldown {get;set;} = 1f;
 	private float RemainingDashTime;
 	private Vector2 DashDirection;
+	private float shortDashCooldownRemaining = 0f;
 	private float CurrentSpeedMultiplier = 1.0f;
 	public bool IsTouchingWall;
 	[Export]
@@ -52,6 +58,7 @@ public partial class Player : CharacterBody2D
 		ScreenSize = GetViewportRect().Size;
 		CurrentHealth = MaxHealth;
 		animatedSprite2D = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
+		rng.Randomize();
 		if (Guns != null) {
 			for (int i = 0; i < Guns.Length; i++) {
 				if (Guns[i] != null) Guns[i] = (Gun)Guns[i].Duplicate();
@@ -127,6 +134,9 @@ public partial class Player : CharacterBody2D
 				break;
 			case BodyUpgradeType.MovementSpeed:
 				Speed += Mathf.RoundToInt(upgrade.Value);
+				break;
+			case BodyUpgradeType.SeeEnemyHealth:
+				HasSeeEnemyHealth = true;
 				break;
 		}
 	}
@@ -238,6 +248,16 @@ public partial class Player : CharacterBody2D
 			}
 
 		}
+		if (shortDashCooldownRemaining > 0) shortDashCooldownRemaining -= (float)delta;
+		if (Input.IsActionJustPressed("Dash") && !IsTouchingWall
+			&& shortDashCooldownRemaining <= 0 && RemainingDashTime <= 0) {
+			Vector2 dashDir = Input.GetVector("move_left", "move_right", "move_up", "move_down").Normalized();
+			if (dashDir != Vector2.Zero) {
+				RemainingDashTime = ShortDashDuration;
+				DashDirection = dashDir;
+				shortDashCooldownRemaining = ShortDashCooldown;
+			}
+		}
 		if (RemainingDashTime > 0) {
 			Velocity = DashDirection.Normalized() * (Speed * 400) * (float)delta;
 			MoveAndSlide();
@@ -248,14 +268,16 @@ public partial class Player : CharacterBody2D
 
 	private void Shoot(Vector2 aimDirection) {
 		animatedSprite2D.Animation = "Shooting";
-		float angleStep = Gun.BulletCount > 1 ? Gun.BulletSpread / (Gun.BulletCount - 1) : 0f;
-		float startAngle = -Gun.BulletSpread / 2f;
 		Vector2 perp = aimDirection.Normalized().Rotated(Mathf.Pi / 2f);
 		float center = (Gun.BulletCount - 1) / 2f;
 		float perBulletSeparation = Gun.BulletSpread * 60f;
+		float halfSpread = Gun.BulletSpread / 2f;
 		for (int i = 0; i < Gun.BulletCount; i++) {
 			Bullet b = Gun.BulletType.Instantiate<Bullet>();
-			Vector2 direction = aimDirection.Rotated(startAngle + i * angleStep);
+			float angle = Gun.BulletCount > 1 || Gun.BulletSpread > 0f
+				? rng.RandfRange(-halfSpread, halfSpread)
+				: 0f;
+			Vector2 direction = aimDirection.Rotated(angle);
 			b.Set("Direction", direction);
 			b.Set("Damage", Gun.Damage);
 			b.Set("BulletLifetime", Gun.BulletLifetime);

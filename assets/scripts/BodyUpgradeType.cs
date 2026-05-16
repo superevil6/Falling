@@ -4,5 +4,5 @@ public enum BodyUpgradeType
     DamageReduction = 1,
     MovementSpeed = 2,
     ItemMagnet = 3,
-    
+    SeeEnemyHealth = 4,
 }

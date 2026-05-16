@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://cl8qfm2t0ht11"]
 
 [ext_resource type="Script" uid="uid://tu36bfp3p2rn" path="res://assets/scripts/WallBody.cs" id="1_5v7o0"]
-[ext_resource type="Resource" uid="uid://btwqiyob025kj" path="res://assets/stages/Walls/Test Wall.tres" id="2_68yvv"]
+[ext_resource type="Resource" uid="uid://btwqiyob025kj" path="res://assets/stages/Stage One/Walls/Test Wall.tres" id="2_68yvv"]
 
 [node name="TestWall" type="StaticBody2D" groups=["Wall"]]
 script = ExtResource("1_5v7o0")

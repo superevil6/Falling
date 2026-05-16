@@ -1,0 +1,12 @@
+[gd_scene load_steps=2 format=3 uid="uid://cpkjwu8cghp1l"]
+
+[ext_resource type="Texture2D" uid="uid://csakvxsgokdoj" path="res://assets/sprites/Test Background 2.png" id="1_j5odi"]
+
+[node name="TestBackground" type="Node2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture_repeat = 2
+scale = Vector2(0.8266678, 0.8503227)
+texture = ExtResource("1_j5odi")
+region_enabled = true
+region_rect = Rect2(0, 0, 1388.823, 766.4386)

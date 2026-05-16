@@ -6,4 +6,4 @@
 script = ExtResource("1_sem7g")
 Type = 1
 UpgradeName = "Fire Rate Module"
-Value = -0.2
+Value = -0.1

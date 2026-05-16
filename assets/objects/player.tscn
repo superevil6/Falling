@@ -1,9 +1,12 @@
-[gd_scene load_steps=15 format=3 uid="uid://cfanc3brtl3ux"]
+[gd_scene load_steps=18 format=3 uid="uid://cfanc3brtl3ux"]
 
 [ext_resource type="Script" uid="uid://dhriy820co01m" path="res://assets/scripts/Player.cs" id="1_l4bou"]
-[ext_resource type="Resource" uid="uid://cc5s5y6gpiagm" path="res://assets/weapons/Pistol.tres" id="2_cc1jr"]
+[ext_resource type="Resource" uid="uid://d3fltykpxnmkp" path="res://assets/weapons/Flame Thrower.tres" id="2_xvjlw"]
+[ext_resource type="Resource" uid="uid://likngwjw3bfh" path="res://assets/weapons/Heat Seeking Pistol.tres" id="3_fh75e"]
 [ext_resource type="Resource" uid="uid://t4f5lqyn51u2" path="res://assets/weapons/Simple Sword.tres" id="3_idqgg"]
+[ext_resource type="Resource" uid="uid://ktyac25vkuh7" path="res://assets/weapons/Sniper Rifle.tres" id="4_bkysh"]
 [ext_resource type="Texture2D" uid="uid://dsmm5pqbthh2x" path="res://assets/objects/temp player.png" id="4_g5vn5"]
+[ext_resource type="Resource" uid="uid://nyp2oenwff6k" path="res://assets/weapons/Ice Pistol.tres" id="5_lvyht"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_8w5do"]
 atlas = ExtResource("4_g5vn5")
@@ -85,7 +88,7 @@ collision_layer = 2
 collision_mask = 17
 script = ExtResource("1_l4bou")
 MaxHealth = 5
-Guns = Array[Resource]([ExtResource("2_cc1jr"), null, null, null])
+Guns = Array[Resource]([ExtResource("2_xvjlw"), ExtResource("3_fh75e"), ExtResource("4_bkysh"), ExtResource("5_lvyht")])
 BodyMods = Array[Resource]([null, null, null, null])
 Melee = ExtResource("3_idqgg")
 WallKickPriorityTime = 0.5

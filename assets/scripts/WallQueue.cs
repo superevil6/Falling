@@ -29,15 +29,20 @@ public partial class WallQueue : Node2D
 		}
 	}
 
-	public override void _Process(double delta)
+	public Vector2 GetCurrentScrollMovement(double delta)
 	{
-		if (chunks == null || chunks.Length == 0) return;
-
 		if (player == null) player = GetParent()?.GetNodeOrNull<Player>("Player");
 		float inputY = Input.GetActionStrength("move_down") - Input.GetActionStrength("move_up");
 		float wallFactor = (player != null && player.IsTouchingWall) ? WallContactSpeedFactor : 1f;
 		float currentSpeed = speed * (1 + inputY * InputSpeedFactor) * wallFactor;
-		Vector2 movement = new Vector2(0, -currentSpeed * ((float)delta * 5));
+		return new Vector2(0, -currentSpeed * ((float)delta * 5));
+	}
+
+	public override void _Process(double delta)
+	{
+		if (chunks == null || chunks.Length == 0) return;
+
+		Vector2 movement = GetCurrentScrollMovement(delta);
 		for (int i = 0; i < activeChunks.Count; i++) {
 			activeChunks[i].Position += movement;
 		}

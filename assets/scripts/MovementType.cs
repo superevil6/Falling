@@ -10,5 +10,5 @@ public enum MovementType {
     VerticalBackAndForth = 8,
     HorizontalBackAndForth = 9,
     DiagonalBackAndForth = 10,
-    
+    WallOnly = 11
 }

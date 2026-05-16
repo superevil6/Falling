@@ -1,0 +1,12 @@
+[gd_scene load_steps=3 format=3 uid="uid://b6q8eaq0h3eea"]
+
+[ext_resource type="Script" uid="uid://tu36bfp3p2rn" path="res://assets/scripts/WallBody.cs" id="1_1n6up"]
+[ext_resource type="Resource" uid="uid://c3ag7pai0yk1o" path="res://assets/stages/Stage One/Walls/Test Wall 3.tres" id="2_1n6up"]
+
+[node name="TestWall" type="StaticBody2D" groups=["Wall"]]
+script = ExtResource("1_1n6up")
+WallData = ExtResource("2_1n6up")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]

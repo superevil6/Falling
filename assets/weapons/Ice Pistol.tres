@@ -1,0 +1,16 @@
+[gd_resource type="Resource" load_steps=3 format=3 uid="uid://nyp2oenwff6k"]
+
+[ext_resource type="PackedScene" uid="uid://cf1pg2x8l8lpf" path="res://assets/objects/bullet.tscn" id="1_n10vy"]
+[ext_resource type="Script" uid="uid://cvu57cdie1j01" path="res://assets/scripts/Gun.cs" id="2_teywq"]
+
+[resource]
+script = ExtResource("2_teywq")
+FireRate = 0.725
+Damage = 5
+BulletCount = 1
+BulletSpread = 0.3
+BulletType = ExtResource("1_n10vy")
+BulletLifetime = 1.0
+Slowing = 1.0
+Element = 2
+GunUpgrades = null

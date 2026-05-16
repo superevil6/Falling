@@ -1,0 +1,8 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://b82bg5gi7s1s1"]
+
+[ext_resource type="Script" uid="uid://c16jiuasboxwv" path="res://assets/scripts/BodyUpgrade.cs" id="1_2w7j6"]
+
+[resource]
+script = ExtResource("1_2w7j6")
+BodyUpgradeType = 4
+UpgradeName = "Vitality Analyzer"

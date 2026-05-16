@@ -12,6 +12,10 @@ public partial class Enemy : Area2D
 	public float WallContactDriftSpeed {get;set;} = 300f;
 	[Export]
 	public float RandomDirectionInterval {get;set;} = 1f;
+	[Export]
+	public float WallMargin {get;set;} = 30f;
+	private float leftWallX = 0f;
+	private float rightWallX = 0f;
 	private Vector2 randomDirection = Vector2.Zero;
 	private float randomDirectionTimer = 0f;
 	private RandomNumberGenerator rng = new RandomNumberGenerator();
@@ -47,8 +51,16 @@ public partial class Enemy : Area2D
 	public override void _Ready()
 	{
 		animatedSprite2D = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
-		CurrentHealth = Stats.MaxHealth;
+		float scale = ComputeStageScale();
+		scaledMaxHealth = Mathf.RoundToInt(Stats.MaxHealth * scale);
+		scaledDamage = Stats.Gun != null ? Mathf.RoundToInt(Stats.Gun.Damage * scale) : 0;
+		scaledDamageReduction = Mathf.RoundToInt(Stats.DamageReduction * scale);
+		CurrentHealth = scaledMaxHealth;
 		rng.Randomize();
+		var leftQ = GetParent()?.GetNodeOrNull<Node2D>("Left Wall Queue");
+		var rightQ = GetParent()?.GetNodeOrNull<Node2D>("Right Wall Queue");
+		leftWallX = leftQ != null ? leftQ.Position.X : 0f;
+		rightWallX = rightQ != null ? rightQ.Position.X : GetViewportRect().Size.X;
 		SpawnDestinationIndicator();
 	}
 
@@ -92,6 +104,11 @@ public partial class Enemy : Area2D
 					case MovementType.AwayFromPlayer:
 					var away = -playerLocation * Stats.MovementSpeed * (float)delta;
 					Position += away;
+					var screen = GetViewportRect().Size;
+					Position = new Vector2(
+						Mathf.Clamp(Position.X, leftWallX + WallMargin, rightWallX - WallMargin),
+						Mathf.Clamp(Position.Y, 0f, screen.Y)
+					);
 					break;
 					case MovementType.Random:
 					randomDirectionTimer -= (float)delta;
@@ -206,17 +223,35 @@ public partial class Enemy : Area2D
 						Position = new Vector2(newX, newY);
 					}
 					break;
-				}
-				if (player == null) player = GetParent()?.GetNodeOrNull<Player>("Player");
-				if (player != null) {
-					float driftY;
-					if (player.IsTouchingWall) {
-						driftY = WallContactDriftSpeed;
-					} else {
-						float inputY = Input.GetActionStrength("move_down") - Input.GetActionStrength("move_up");
-						driftY = -inputY * InputDriftSpeed;
+					case MovementType.WallOnly:
+					{
+						var queue = GetParent()?.GetNodeOrNull<WallQueue>("Left Wall Queue");
+						if (queue != null) {
+							Position += queue.GetCurrentScrollMovement(delta);
+						}
+						if (GlobalPosition.Y < -50f) {
+							QueueFree();
+							return;
+						}
 					}
-					Position += new Vector2(0, driftY * (float)delta);
+					break;
+				}
+				if (Stats.MovementType != MovementType.WallOnly) {
+					if (player == null) player = GetParent()?.GetNodeOrNull<Player>("Player");
+					if (player != null) {
+						float driftY;
+						if (player.IsTouchingWall) {
+							driftY = WallContactDriftSpeed;
+						} else {
+							float inputY = Input.GetActionStrength("move_down") - Input.GetActionStrength("move_up");
+							driftY = -inputY * InputDriftSpeed;
+						}
+						Position += new Vector2(0, driftY * (float)delta);
+					}
+					Position = new Vector2(
+						Mathf.Clamp(Position.X, leftWallX + WallMargin, rightWallX - WallMargin),
+						Position.Y
+					);
 				}
 			}
 			else {
@@ -243,6 +278,11 @@ public partial class Enemy : Area2D
 		TakeDamage(attack.Damage, element);
 	}
 
+	private bool hasBeenHit = false;
+	private int scaledMaxHealth;
+	private int scaledDamage;
+	private int scaledDamageReduction;
+
 	public void TakeDamage(int damage, ElementType element)
 	{
 		float dmg = damage;
@@ -250,8 +290,34 @@ public partial class Enemy : Area2D
 			if (element == ElementalWeakness) dmg *= 2f;
 			else if (element == ElementalDefense) dmg *= 0.5f;
 		}
-		CurrentHealth -= Mathf.RoundToInt(dmg);
+		int finalDamage = Mathf.Max(0, Mathf.RoundToInt(dmg) - scaledDamageReduction);
+		CurrentHealth -= finalDamage;
 		if (CurrentHealth > 0) FlashRed();
+		hasBeenHit = true;
+		QueueRedraw();
+	}
+
+	private float ComputeStageScale()
+	{
+		var main = GetParent() as Main;
+		int stage = main?.CurrentStage ?? 0;
+		return 1f + stage * 0.1f;
+	}
+
+	public override void _Draw()
+	{
+		if (!hasBeenHit || CurrentHealth <= 0) return;
+		var p = GetParent()?.GetNodeOrNull<Player>("Player");
+		if (p == null || !p.HasSeeEnemyHealth) return;
+		float barWidth = 40f;
+		float barHeight = 6f;
+		float yOffset = -30f;
+		float maxHealth = Mathf.Max(1, scaledMaxHealth);
+		float healthRatio = Mathf.Clamp((float)CurrentHealth / maxHealth, 0f, 1f);
+		Vector2 barPos = new Vector2(-barWidth / 2f, yOffset);
+		DrawRect(new Rect2(barPos, new Vector2(barWidth, barHeight)), new Color(0.1f, 0.1f, 0.1f, 0.85f));
+		DrawRect(new Rect2(barPos, new Vector2(barWidth * healthRatio, barHeight)), new Color(0.9f, 0.2f, 0.2f));
+		DrawRect(new Rect2(barPos, new Vector2(barWidth, barHeight)), Colors.Black, false, 1.0f);
 	}
 
 	private Tween flashTween;
@@ -307,7 +373,7 @@ public partial class Enemy : Area2D
 			animatedSprite2D.Play();
 			Bullet b = Stats.Gun.BulletType.Instantiate<Bullet>();
 			b.Set("Direction", playerLocation);
-			b.Set("Damage", Stats.Gun.Damage);
+			b.Set("Damage", scaledDamage);
 			b.Set("BulletLifetime", Stats.Gun.BulletLifetime);
 			b.Gun = Stats.Gun;
 			b.Position = Position;
