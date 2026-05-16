@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Godot;
 
@@ -14,6 +15,8 @@ public partial class Enemy : Area2D
 	public float RandomDirectionInterval {get;set;} = 1f;
 	[Export]
 	public float WallMargin {get;set;} = 30f;
+	[Export]
+	public float DropSpreadRadius {get;set;} = 25f;
 	private float leftWallX = 0f;
 	private float rightWallX = 0f;
 	private Vector2 randomDirection = Vector2.Zero;
@@ -57,6 +60,9 @@ public partial class Enemy : Area2D
 		scaledDamageReduction = Mathf.RoundToInt(Stats.DamageReduction * scale);
 		CurrentHealth = scaledMaxHealth;
 		rng.Randomize();
+		if (Stats.TeleportMovement) {
+			teleportTimer = Stats.TeleportHesitationTime;
+		}
 		var leftQ = GetParent()?.GetNodeOrNull<Node2D>("Left Wall Queue");
 		var rightQ = GetParent()?.GetNodeOrNull<Node2D>("Right Wall Queue");
 		leftWallX = leftQ != null ? leftQ.Position.X : 0f;
@@ -82,6 +88,15 @@ public partial class Enemy : Area2D
 		if (GunCoolDown > 0) {
 			GunCoolDown -= (float)delta;
 		}
+		if (Stats != null && (Stats.DropsBombs || Stats.UsesMines) && CurrentHealth > 0) {
+			activeDeployables.RemoveAll(d => !IsInstanceValid(d));
+			bombCooldownRemaining -= (float)delta;
+			if (bombCooldownRemaining <= 0f && activeDeployables.Count < Stats.BombMaxCount) {
+				if (Stats.UsesMines) PlaceMine();
+				else PlaceBomb();
+				bombCooldownRemaining = Stats.BombCooldown;
+			}
+		}
 		if (CurrentHealth <= 0) {
 			animatedSprite2D.Animation = "Death";
 			animatedSprite2D.Play();
@@ -92,6 +107,20 @@ public partial class Enemy : Area2D
     {
 		if (CurrentHealth > 0) {
 			if (ReachedPostSpawnDestination) {
+				if (Stats.TeleportMovement) {
+					teleportTimer -= (float)delta;
+					if (teleportTimer <= 1f && teleportTimer > 0f && !isPhasing) {
+						ApplyPhasingShader();
+						isPhasing = true;
+					}
+					if (teleportTimer > 0f) return;
+					teleportTimer = Stats.TeleportHesitationTime;
+					delta = Stats.TeleportHesitationTime;
+					if (isPhasing) {
+						RemovePhasingShader();
+						isPhasing = false;
+					}
+				}
 				var playerLocation = ((GetParent().GetNode("Player") as Node2D).GlobalPosition - GlobalPosition).Normalized();
 				switch (Stats.MovementType)
 				{
@@ -282,6 +311,13 @@ public partial class Enemy : Area2D
 	private int scaledMaxHealth;
 	private int scaledDamage;
 	private int scaledDamageReduction;
+	private float teleportTimer = 0f;
+	private bool isPhasing = false;
+	private static Shader phasingShader;
+	private float bombCooldownRemaining = 0f;
+	private List<Node2D> activeDeployables = new List<Node2D>();
+	private static PackedScene bombScene;
+	private static PackedScene mineScene;
 
 	public void TakeDamage(int damage, ElementType element)
 	{
@@ -302,6 +338,55 @@ public partial class Enemy : Area2D
 		var main = GetParent() as Main;
 		int stage = main?.CurrentStage ?? 0;
 		return 1f + stage * 0.1f;
+	}
+
+	private void PlaceBomb()
+	{
+		if (bombScene == null) {
+			bombScene = GD.Load<PackedScene>("res://assets/objects/Bomb.tscn");
+		}
+		if (bombScene == null) return;
+		var bomb = bombScene.Instantiate<Bomb>();
+		bomb.GlobalPosition = GlobalPosition;
+		bomb.Damage = Stats.BombDamage;
+		bomb.Radius = Stats.BombRadius;
+		bomb.FuseTime = Stats.BombFuseTime;
+		bomb.TargetsEnemy = false;
+		bomb.TargetsPlayer = true;
+		GetParent().AddChild(bomb);
+		activeDeployables.Add(bomb);
+	}
+
+	private void PlaceMine()
+	{
+		if (mineScene == null) {
+			mineScene = GD.Load<PackedScene>("res://assets/objects/Mine.tscn");
+		}
+		if (mineScene == null) return;
+		var mine = mineScene.Instantiate<Mine>();
+		mine.GlobalPosition = GlobalPosition;
+		mine.Damage = Stats.BombDamage;
+		mine.Radius = Stats.BombRadius;
+		mine.TargetsEnemy = false;
+		mine.TargetsPlayer = true;
+		GetParent().AddChild(mine);
+		activeDeployables.Add(mine);
+	}
+
+	private void ApplyPhasingShader()
+	{
+		if (animatedSprite2D == null) return;
+		if (phasingShader == null) {
+			phasingShader = GD.Load<Shader>("res://assets/shaders/Phasing.gdshader");
+		}
+		var mat = new ShaderMaterial();
+		mat.Shader = phasingShader;
+		animatedSprite2D.Material = mat;
+	}
+
+	private void RemovePhasingShader()
+	{
+		if (animatedSprite2D != null) animatedSprite2D.Material = null;
 	}
 
 	public override void _Draw()
@@ -359,7 +444,10 @@ public partial class Enemy : Area2D
 			if (drop?.Item == null) continue;
 			if (GD.Randf() < drop.Chance) {
 				var item = drop.Item.Instantiate<Node2D>();
-				item.GlobalPosition = GlobalPosition;
+				float angle = rng.RandfRange(0f, Mathf.Pi * 2f);
+				float radius = rng.RandfRange(0f, DropSpreadRadius);
+				Vector2 offset = new Vector2(Mathf.Cos(angle) * radius, Mathf.Sin(angle) * radius);
+				item.GlobalPosition = GlobalPosition + offset;
 				GetParent().AddChild(item);
 			}
 		}

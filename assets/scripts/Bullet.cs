@@ -20,10 +20,10 @@ public partial class Bullet : Attack
 	public override void _Ready()
 	{
 		string shaderPath = Element switch {
-			ElementType.Fire => "res://assets/objects/Fire.gdshader",
-			ElementType.Ice => "res://assets/objects/Ice.gdshader",
-			ElementType.Electric => "res://assets/objects/Lightning.gdshader",
-			ElementType.Poison => "res://assets/objects/Poison.gdshader",
+			ElementType.Fire => "res://assets/shaders/Fire.gdshader",
+			ElementType.Ice => "res://assets/shaders/Ice.gdshader",
+			ElementType.Electric => "res://assets/shaders/Lightning.gdshader",
+			ElementType.Poison => "res://assets/shaders/Poison.gdshader",
 			_ => null
 		};
 		if (shaderPath != null) {

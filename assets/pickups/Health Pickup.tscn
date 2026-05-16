@@ -1,10 +1,53 @@
-[gd_scene load_steps=4 format=3 uid="uid://kvxtmd0oovc4"]
+[gd_scene load_steps=11 format=3 uid="uid://kvxtmd0oovc4"]
 
 [ext_resource type="Script" uid="uid://b5d4tgtdsiwou" path="res://assets/scripts/HealthPickup.cs" id="1_86ael"]
-[ext_resource type="Texture2D" uid="uid://u0pxq71pxt4n" path="res://assets/sprites/bullet.png" id="2_cbtb1"]
+[ext_resource type="Shader" uid="uid://nej1tvi1ocse" path="res://assets/shaders/PixelArt.gdshader" id="2_86ael"]
+[ext_resource type="Texture2D" uid="uid://pks4bxxnojjc" path="res://assets/pickups/Energy Ball.png" id="3_cbtb1"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_xqkwk"]
 radius = 36.013885
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_xqkwk"]
+shader = ExtResource("2_86ael")
+shader_parameter/pixel_size = 2.0000000475
+shader_parameter/color_steps = 2
+shader_parameter/hue_shift = 0.23600005870999996
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_a6l4m"]
+atlas = ExtResource("3_cbtb1")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_22uqq"]
+atlas = ExtResource("3_cbtb1")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dmhl0"]
+atlas = ExtResource("3_cbtb1")
+region = Rect2(0, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_j4r2f"]
+atlas = ExtResource("3_cbtb1")
+region = Rect2(32, 32, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_pjit3"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_a6l4m")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_22uqq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dmhl0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_j4r2f")
+}],
+"loop": true,
+"name": &"Idle",
+"speed": 10.0
+}]
 
 [node name="Area2D" type="Area2D"]
 collision_mask = 3
@@ -13,5 +56,23 @@ script = ExtResource("1_86ael")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_xqkwk")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
-texture = ExtResource("2_cbtb1")
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+texture_filter = 1
+material = SubResource("ShaderMaterial_xqkwk")
+sprite_frames = SubResource("SpriteFrames_pjit3")
+animation = &"Idle"
+metadata/_aseprite_wizard_config_ = {
+"layer": "",
+"o_ex_p": "",
+"o_folder": "",
+"o_name": "",
+"only_visible": false,
+"slice": "",
+"source": "res://assets/sprites/Energy Ball.aseprite"
+}
+metadata/_aseprite_wizard_interface_config_ = {
+"layer_section": false,
+"output_section": false,
+"slice_section": false
+}
+metadata/_aseprite_wizard_source_file_hash_ = "994856740a5a0a03bbe07b4be8841b07"

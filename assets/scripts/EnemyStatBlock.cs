@@ -30,4 +30,22 @@ public partial class EnemyStatBlock : Resource
 	public ItemDrop[] ItemDrops {get;set;}
 	[Export]
 	public bool IsBoss { get; set; }
+	[Export]
+	public bool TeleportMovement {get;set;} = false;
+	[Export]
+	public float TeleportHesitationTime {get;set;} = 0.5f;
+	[Export]
+	public bool DropsBombs {get;set;} = false;
+	[Export]
+	public int BombDamage {get;set;} = 5;
+	[Export]
+	public float BombRadius {get;set;} = 100f;
+	[Export]
+	public float BombFuseTime {get;set;} = 2f;
+	[Export]
+	public float BombCooldown {get;set;} = 5f;
+	[Export]
+	public int BombMaxCount {get;set;} = 3;
+	[Export]
+	public bool UsesMines {get;set;} = false;
 }

@@ -12,6 +12,11 @@ public partial class Pickup : Area2D
 	public override void _Ready()
 	{
 		AreaEntered += OnAreaEntered;
+		var sprite = GetNodeOrNull<AnimatedSprite2D>("AnimatedSprite2D");
+		if (sprite != null && sprite.SpriteFrames != null && sprite.SpriteFrames.HasAnimation("Idle")) {
+			sprite.Animation = "Idle";
+			sprite.Play();
+		}
 	}
 
 	public override void _Process(double delta)

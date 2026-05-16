@@ -73,7 +73,7 @@ public partial class Player : CharacterBody2D
 		GetParent().GetNode<TextureProgressBar>("Health Bar").Value = CurrentHealth;
 		GetParent().GetNode<Label>("Experience Counter").Text = $"XP: {CurrentExperience}";
 		UpdateGunLabel();
-		afterImageShader = GD.Load<Shader>("res://assets/objects/AfterImage.gdshader");
+		afterImageShader = GD.Load<Shader>("res://assets/shaders/AfterImage.gdshader");
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -105,6 +105,9 @@ public partial class Player : CharacterBody2D
 			MeleeAttack(aimDirection);
 		}
 		#endregion
+		if (Input.IsActionJustPressed("bomb")) {
+			DropBomb();
+		}
 		Position = new Vector2(
 			x: Mathf.Clamp(Position.X, 0, ScreenSize.X),
 			y: Mathf.Clamp(Position.Y, 0, ScreenSize.Y)
@@ -192,10 +195,30 @@ public partial class Player : CharacterBody2D
 	private void _on_area_2d_area_entered(Node2D node2D){
 		GD.Print(node2D);
 		if (node2D.Name == "Bullet") {
-			CurrentHealth -= (node2D as Attack).Damage;
-			GetParent().GetNode<TextureProgressBar>("Health Bar").Value = CurrentHealth;
-			FlashRed();
+			TakeDamage((node2D as Attack).Damage);
 		}
+	}
+
+	public void TakeDamage(int amount)
+	{
+		if (CurrentHealth <= 0) return;
+		int finalDamage = Mathf.Max(0, amount - DamageReduction);
+		CurrentHealth -= finalDamage;
+		GetParent().GetNode<TextureProgressBar>("Health Bar").Value = CurrentHealth;
+		FlashRed();
+	}
+
+	private static PackedScene bombScene;
+
+	private void DropBomb()
+	{
+		if (bombScene == null) {
+			bombScene = GD.Load<PackedScene>("res://assets/objects/Bomb.tscn");
+		}
+		if (bombScene == null) return;
+		var bomb = bombScene.Instantiate<Bomb>();
+		bomb.GlobalPosition = GlobalPosition;
+		GetParent().AddChild(bomb);
 	}
 
 	private Tween flashTween;

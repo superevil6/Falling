@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://cfanc3brtl3ux"]
+[gd_scene load_steps=20 format=3 uid="uid://cfanc3brtl3ux"]
 
 [ext_resource type="Script" uid="uid://dhriy820co01m" path="res://assets/scripts/Player.cs" id="1_l4bou"]
 [ext_resource type="Resource" uid="uid://d3fltykpxnmkp" path="res://assets/weapons/Flame Thrower.tres" id="2_xvjlw"]
@@ -7,6 +7,13 @@
 [ext_resource type="Resource" uid="uid://ktyac25vkuh7" path="res://assets/weapons/Sniper Rifle.tres" id="4_bkysh"]
 [ext_resource type="Texture2D" uid="uid://dsmm5pqbthh2x" path="res://assets/objects/temp player.png" id="4_g5vn5"]
 [ext_resource type="Resource" uid="uid://nyp2oenwff6k" path="res://assets/weapons/Ice Pistol.tres" id="5_lvyht"]
+[ext_resource type="Shader" uid="uid://nej1tvi1ocse" path="res://assets/shaders/PixelArt.gdshader" id="7_fh75e"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_bkysh"]
+shader = ExtResource("7_fh75e")
+shader_parameter/pixel_size = 4.0
+shader_parameter/color_steps = 8
+shader_parameter/hue_shift = 0.0
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_8w5do"]
 atlas = ExtResource("4_g5vn5")
@@ -97,6 +104,7 @@ metadata/_edit_group_ = true
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 texture_filter = 1
+material = SubResource("ShaderMaterial_bkysh")
 sprite_frames = SubResource("SpriteFrames_w8w64")
 animation = &"Swording"
 metadata/_aseprite_wizard_config_ = {

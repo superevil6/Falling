@@ -66,7 +66,7 @@ public partial class BackgroundQueue : Node2D
 		if (sprite != null) {
 			if (darkenMaterial == null) {
 				darkenMaterial = new ShaderMaterial();
-				darkenMaterial.Shader = GD.Load<Shader>("res://assets/objects/Darken.gdshader");
+				darkenMaterial.Shader = GD.Load<Shader>("res://assets/shaders/Darken.gdshader");
 			}
 			sprite.Material = darkenMaterial;
 		}
