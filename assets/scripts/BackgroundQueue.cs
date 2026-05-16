@@ -3,22 +3,29 @@ using System.Collections.Generic;
 
 public partial class BackgroundQueue : Node2D
 {
+	[Export]
+	public PackedScene[] TilesOverride {get;set;}
+	[Export]
+	public float ScrollSpeedMultiplier {get;set;} = 1f;
+
 	private PackedScene[] tiles;
 	private int nextTileIndex = 0;
 	private List<Node2D> activeTiles = new List<Node2D>();
 	private float viewportHeight;
-	private float viewportWidth;
 	private WallQueue scrollSource;
 	private ShaderMaterial darkenMaterial;
 
 	public override void _Ready()
 	{
 		var rect = GetViewportRect().Size;
-		viewportWidth = rect.X;
 		viewportHeight = rect.Y;
-		var main = GetParent() as Main;
-		if (main != null && main.Stages != null && main.Stages.Length > 0) {
-			tiles = main.Stages[main.CurrentStage].BackgroundImages;
+		if (TilesOverride != null && TilesOverride.Length > 0) {
+			tiles = TilesOverride;
+		} else {
+			var main = GetParent() as Main;
+			if (main != null && main.Stages != null && main.Stages.Length > 0) {
+				tiles = main.Stages[main.CurrentStage].BackgroundImages;
+			}
 		}
 		scrollSource = GetParent()?.GetNodeOrNull<WallQueue>("Left Wall Queue");
 	}
@@ -27,7 +34,7 @@ public partial class BackgroundQueue : Node2D
 	{
 		if (tiles == null || tiles.Length == 0) return;
 
-		Vector2 movement = scrollSource?.GetCurrentScrollMovement(delta) ?? Vector2.Zero;
+		Vector2 movement = (scrollSource?.GetCurrentScrollMovement(delta) ?? Vector2.Zero) * ScrollSpeedMultiplier;
 		for (int i = 0; i < activeTiles.Count; i++) {
 			activeTiles[i].Position += movement;
 		}
@@ -62,15 +69,6 @@ public partial class BackgroundQueue : Node2D
 		var tile = scene.Instantiate<Node2D>();
 		AddChild(tile);
 
-		var sprite = FindFirstSprite(tile);
-		if (sprite != null) {
-			if (darkenMaterial == null) {
-				darkenMaterial = new ShaderMaterial();
-				darkenMaterial.Shader = GD.Load<Shader>("res://assets/shaders/Darken.gdshader");
-			}
-			sprite.Material = darkenMaterial;
-		}
-
 		float height = GetTileHeight(tile);
 		float globalY;
 		if (activeTiles.Count == 0) {
@@ -79,7 +77,7 @@ public partial class BackgroundQueue : Node2D
 			var prev = activeTiles[activeTiles.Count - 1];
 			globalY = prev.GlobalPosition.Y + GetTileHeight(prev) / 2f + height / 2f;
 		}
-		tile.GlobalPosition = new Vector2(viewportWidth / 2f, globalY);
+		tile.GlobalPosition = new Vector2(GlobalPosition.X, globalY);
 		activeTiles.Add(tile);
 	}
 

@@ -15,6 +15,10 @@ public partial class Gun : Resource
 	[Export]
 	public PackedScene BulletType {get;set;}
 	[Export]
+	public float BulletSpeed {get;set;} = 2000f;
+	[Export]
+	public SpriteFrames BulletSpriteFrames {get;set;}
+	[Export]
 	public float BulletLifetime {get;set;}
 	[Export]
 	public float BulletSize {get;set;} = 1f;

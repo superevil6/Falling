@@ -464,6 +464,11 @@ public partial class Enemy : Area2D
 			b.Set("Damage", scaledDamage);
 			b.Set("BulletLifetime", Stats.Gun.BulletLifetime);
 			b.Gun = Stats.Gun;
+			if (Stats.Gun.BulletSpeed > 0) b.BulletSpeed = Stats.Gun.BulletSpeed;
+			if (Stats.Gun.BulletSpriteFrames != null) {
+				var bSprite = b.GetNodeOrNull<AnimatedSprite2D>("AnimatedSprite2D");
+				if (bSprite != null) bSprite.SpriteFrames = Stats.Gun.BulletSpriteFrames;
+			}
 			b.Position = Position;
 			b.Rotation = playerLocation.Angle();
 			b.SetCollisionLayerValue(5, true);

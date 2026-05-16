@@ -1,4 +1,4 @@
-[gd_scene load_steps=38 format=3 uid="uid://3wov1sd2nxg5"]
+[gd_scene load_steps=42 format=3 uid="uid://3wov1sd2nxg5"]
 
 [ext_resource type="Script" uid="uid://hfchjcen7ado" path="res://assets/scripts/Main.cs" id="1_yeolr"]
 [ext_resource type="Resource" uid="uid://drxdwiakxfced" path="res://assets/stages/Stage One/Test Stage.tres" id="2_0q0aj"]
@@ -37,6 +37,10 @@
 [ext_resource type="Resource" uid="uid://cs8pps5d2oarb" path="res://assets/upgrades/Fire Rate Module.tres" id="14_5u4eo"]
 [ext_resource type="Resource" uid="uid://rdgjyqjipc3m" path="res://assets/upgrades/Bullet Size Booster.tres" id="15_0rsmt"]
 [ext_resource type="Resource" uid="uid://b82bg5gi7s1s1" path="res://assets/upgrades/Vitality Analyzer.tres" id="20_5u4eo"]
+[ext_resource type="PackedScene" uid="uid://b6q8eaq0h3eea" path="res://assets/stages/Stage One/Walls/Test Wall 3.tscn" id="36_4eblj"]
+[ext_resource type="PackedScene" uid="uid://bsqiy1qekhvm1" path="res://assets/stages/Stage One/Walls/Test Wall 2.tscn" id="38_0rsmt"]
+[ext_resource type="PackedScene" uid="uid://cn10ovrgf2oox" path="res://assets/stages/Stage One/Backgrounds/Test Background 2.tscn" id="39_5evvb"]
+[ext_resource type="PackedScene" uid="uid://cpkjwu8cghp1l" path="res://assets/stages/Stage One/Backgrounds/Test Background.tscn" id="39_6wugn"]
 
 [node name="Node2D" type="Node2D"]
 script = ExtResource("1_yeolr")
@@ -62,13 +66,13 @@ PickCount = 5
 [node name="Left Wall Queue" type="Node2D" parent="."]
 position = Vector2(122, 0)
 script = ExtResource("9_wallqueue")
-chunks = Array[PackedScene]([ExtResource("7_2iqqg")])
+chunks = Array[PackedScene]([ExtResource("7_2iqqg"), ExtResource("38_0rsmt"), ExtResource("36_4eblj")])
 
 [node name="Right Wall Queue" type="Node2D" parent="."]
 position = Vector2(1020, 0)
 script = ExtResource("9_wallqueue")
 IsRightSide = true
-chunks = Array[PackedScene]([ExtResource("7_2iqqg")])
+chunks = Array[PackedScene]([ExtResource("7_2iqqg"), ExtResource("38_0rsmt"), ExtResource("36_4eblj")])
 
 [node name="Health Bar" type="TextureProgressBar" parent="."]
 offset_left = 15.000001
@@ -94,6 +98,21 @@ offset_right = 600.0
 offset_bottom = 41.0
 text = "Gun: -"
 
-[node name="Background Queue" type="Node2D" parent="."]
+[node name="Background Queue Left" type="Node2D" parent="."]
 z_index = -10
+position = Vector2(61, 0)
 script = ExtResource("13_bgqueue")
+TilesOverride = Array[PackedScene]([ExtResource("39_6wugn")])
+
+[node name="Background Queue Middle" type="Node2D" parent="."]
+z_index = -10
+position = Vector2(571, 0)
+script = ExtResource("13_bgqueue")
+TilesOverride = Array[PackedScene]([ExtResource("39_5evvb")])
+ScrollSpeedMultiplier = 0.4
+
+[node name="Background Queue Right" type="Node2D" parent="."]
+z_index = -10
+position = Vector2(1086, 0)
+script = ExtResource("13_bgqueue")
+TilesOverride = Array[PackedScene]([ExtResource("39_6wugn")])

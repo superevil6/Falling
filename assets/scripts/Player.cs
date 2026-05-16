@@ -38,6 +38,9 @@ public partial class Player : CharacterBody2D
 	public float ShortDashDuration {get;set;} = 0.15f;
 	[Export]
 	public float ShortDashCooldown {get;set;} = 1f;
+	[Export]
+	public float ShortDashDistance {get;set;} = 80f;
+	private bool isShortDash = false;
 	private float RemainingDashTime;
 	private Vector2 DashDirection;
 	private float shortDashCooldownRemaining = 0f;
@@ -267,6 +270,7 @@ public partial class Player : CharacterBody2D
 				if (Input.IsActionJustPressed("Dash")) {
 					RemainingDashTime = DashDuration;
 					DashDirection= Input.GetVector("move_left", "move_right", "move_up", "move_down").Normalized();
+					isShortDash = false;
 				}
 			}
 
@@ -279,12 +283,17 @@ public partial class Player : CharacterBody2D
 				RemainingDashTime = ShortDashDuration;
 				DashDirection = dashDir;
 				shortDashCooldownRemaining = ShortDashCooldown;
+				isShortDash = true;
 			}
 		}
 		if (RemainingDashTime > 0) {
-			Velocity = DashDirection.Normalized() * (Speed * 400) * (float)delta;
+			float dashVelocity = isShortDash
+				? ShortDashDistance / Mathf.Max(ShortDashDuration, 0.001f)
+				: Speed * 400f * (float)delta;
+			Velocity = DashDirection.Normalized() * dashVelocity;
 			MoveAndSlide();
 			RemainingDashTime -= (float)delta;
+			if (RemainingDashTime <= 0) isShortDash = false;
 		}
 	}
 
@@ -305,6 +314,11 @@ public partial class Player : CharacterBody2D
 			b.Set("Damage", Gun.Damage);
 			b.Set("BulletLifetime", Gun.BulletLifetime);
 			b.Gun = Gun;
+			if (Gun.BulletSpeed > 0) b.BulletSpeed = Gun.BulletSpeed;
+			if (Gun.BulletSpriteFrames != null) {
+				var bSprite = b.GetNodeOrNull<AnimatedSprite2D>("AnimatedSprite2D");
+				if (bSprite != null) bSprite.SpriteFrames = Gun.BulletSpriteFrames;
+			}
 			if (Gun.Element != ElementType.NonElemental) b.Element = Gun.Element;
 			b.Position = Position + perp * (i - center) * perBulletSeparation;
 			b.Rotation = direction.Angle();
