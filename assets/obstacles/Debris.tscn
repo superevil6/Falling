@@ -1,0 +1,37 @@
+[gd_scene load_steps=7 format=3 uid="uid://cigtjgbww5was"]
+
+[ext_resource type="Shader" uid="uid://nej1tvi1ocse" path="res://assets/shaders/PixelArt.gdshader" id="1_kdlm1"]
+[ext_resource type="Script" uid="uid://ksmta524l86s" path="res://assets/scripts/DestructibleObstacle.cs" id="2_kdlm1"]
+[ext_resource type="Texture2D" uid="uid://8b6auhp0yx2m" path="res://assets/sprites/energy_ball.svg" id="3_kdlm1"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_q6nwq"]
+shader = ExtResource("1_kdlm1")
+shader_parameter/pixel_size = 4.0
+shader_parameter/color_steps = 8
+shader_parameter/hue_shift = 0.0
+shader_parameter/darkness = 0.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_kdlm1"]
+shader = ExtResource("1_kdlm1")
+shader_parameter/pixel_size = 4.0
+shader_parameter/color_steps = 8
+shader_parameter/hue_shift = 0.2650000600875
+shader_parameter/darkness = 0.34000001615
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_k6ah0"]
+radius = 25.019993
+
+[node name="Node2D2" type="Area2D"]
+material = SubResource("ShaderMaterial_q6nwq")
+collision_mask = 7
+script = ExtResource("2_kdlm1")
+MaxHealth = 5
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_kdlm1")
+texture = ExtResource("3_kdlm1")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+light_mask = 4
+visibility_layer = 8
+shape = SubResource("CircleShape2D_k6ah0")

@@ -3,6 +3,8 @@ using Godot;
 public partial class Gun : Resource
 {
 	[Export]
+	public Texture2D GunImage {get;set;}
+	[Export]
 	public GunType GunType {get; set;}
 	[Export]
 	public float FireRate {get;set;}
@@ -42,6 +44,14 @@ public partial class Gun : Resource
 	public int DamageModifier {get;set;}
 	[Export]
 	public bool IsLaser {get;set;}
+	[Export]
+	public int DotStacksPerHit {get;set;} = 0;
+	[Export]
+	public int SlowStacksPerHit {get;set;} = 0;
+	[Export]
+	public int FireRateStacksPerHit {get;set;} = 0;
+	[Export]
+	public int BlindStacksPerHit {get;set;} = 0;
 	[Export]
 	public ElementType Element {get;set;}
 	[Export]

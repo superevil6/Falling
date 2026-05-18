@@ -1,12 +1,29 @@
-[gd_scene load_steps=3 format=3 uid="uid://bsqiy1qekhvm1"]
+[gd_scene load_steps=6 format=3 uid="uid://bsqiy1qekhvm1"]
 
 [ext_resource type="Script" uid="uid://tu36bfp3p2rn" path="res://assets/scripts/WallBody.cs" id="1_ea25t"]
+[ext_resource type="Shader" uid="uid://nej1tvi1ocse" path="res://assets/shaders/PixelArt.gdshader" id="1_sdf6o"]
 [ext_resource type="Resource" uid="uid://d1tlv3wkhe7hh" path="res://assets/stages/Stage One/Walls/Test Wall 2.tres" id="2_ea25t"]
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_gbmoc"]
+shader = ExtResource("1_sdf6o")
+shader_parameter/pixel_size = 4.0
+shader_parameter/color_steps = 8
+shader_parameter/hue_shift = 0.0
+shader_parameter/darkness = 0.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_sdf6o"]
+shader = ExtResource("1_sdf6o")
+shader_parameter/pixel_size = 4.0
+shader_parameter/color_steps = 8
+shader_parameter/hue_shift = 0.0
+shader_parameter/darkness = 0.0
+
 [node name="TestWall" type="StaticBody2D" groups=["Wall"]]
+material = SubResource("ShaderMaterial_gbmoc")
 script = ExtResource("1_ea25t")
 WallData = ExtResource("2_ea25t")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_sdf6o")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

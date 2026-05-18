@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=3 uid="uid://df7o0aeqyvtx2"]
+
+[ext_resource type="Script" uid="uid://b60q14uq64nib" path="res://assets/scripts/ObstacleSpawner.cs" id="1_bge0h"]
+[ext_resource type="PackedScene" uid="uid://dn8sjicj4s07r" path="res://assets/obstacles/Laser.tscn" id="2_jybd4"]
+
+[node name="ObstacleSpawner" type="Node2D"]
+script = ExtResource("1_bge0h")
+Obstacles = Array[PackedScene]([ExtResource("2_jybd4")])

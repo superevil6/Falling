@@ -49,6 +49,7 @@ public partial class Enemy : Area2D
 	public Vector2 PostSpawnDestination {get;set;}
 	private bool ReachedPostSpawnDestination = false;
 	private Player player;
+	public StatusEffectController StatusEffects = new StatusEffectController();
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -88,6 +89,8 @@ public partial class Enemy : Area2D
 		if (GunCoolDown > 0) {
 			GunCoolDown -= (float)delta;
 		}
+		int dotDamage = StatusEffects.Tick((float)delta);
+		if (dotDamage > 0) TakeDamage(dotDamage, ElementType.NonElemental);
 		if (Stats != null && (Stats.DropsBombs || Stats.UsesMines) && CurrentHealth > 0) {
 			activeDeployables.RemoveAll(d => !IsInstanceValid(d));
 			bombCooldownRemaining -= (float)delta;
@@ -127,11 +130,11 @@ public partial class Enemy : Area2D
 					case MovementType.Stationary:
 					break;
 					case MovementType.TowardsPlayer:
-					var towards = playerLocation * Stats.MovementSpeed * (float)delta;
+					var towards = playerLocation * (Stats.MovementSpeed * StatusEffects.GetSpeedMultiplier()) * (float)delta;
 					Position += towards;
 					break;
 					case MovementType.AwayFromPlayer:
-					var away = -playerLocation * Stats.MovementSpeed * (float)delta;
+					var away = -playerLocation * (Stats.MovementSpeed * StatusEffects.GetSpeedMultiplier()) * (float)delta;
 					Position += away;
 					var screen = GetViewportRect().Size;
 					Position = new Vector2(
@@ -146,7 +149,7 @@ public partial class Enemy : Area2D
 						randomDirection = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
 						randomDirectionTimer = RandomDirectionInterval;
 					}
-					Position += randomDirection * Stats.MovementSpeed * (float)delta;
+					Position += randomDirection * (Stats.MovementSpeed * StatusEffects.GetSpeedMultiplier()) * (float)delta;
 					break;
 					case MovementType.SmallSquare:
 					{
@@ -159,7 +162,7 @@ public partial class Enemy : Area2D
 						};
 						Vector2 squareTarget = PostSpawnDestination + cornerOffset;
 						Vector2 toSquareTarget = squareTarget - Position;
-						float squareStep = Stats.MovementSpeed * (float)delta;
+						float squareStep = (Stats.MovementSpeed * StatusEffects.GetSpeedMultiplier()) * (float)delta;
 						if (toSquareTarget.Length() <= squareStep) {
 							Position = squareTarget;
 							currentSquareCorner = (currentSquareCorner + 1) % 4;
@@ -179,7 +182,7 @@ public partial class Enemy : Area2D
 						};
 						Vector2 squareTarget = PostSpawnDestination + cornerOffset;
 						Vector2 toSquareTarget = squareTarget - Position;
-						float squareStep = Stats.MovementSpeed * (float)delta;
+						float squareStep = (Stats.MovementSpeed * StatusEffects.GetSpeedMultiplier()) * (float)delta;
 						if (toSquareTarget.Length() <= squareStep) {
 							Position = squareTarget;
 							currentSquareCorner = (currentSquareCorner + 1) % 4;
@@ -190,14 +193,14 @@ public partial class Enemy : Area2D
 					break;
 					case MovementType.SmallCircle:
 					{
-						float omega = SmallCircleRadius > 0f ? Stats.MovementSpeed / SmallCircleRadius : 0f;
+						float omega = SmallCircleRadius > 0f ? (Stats.MovementSpeed * StatusEffects.GetSpeedMultiplier()) / SmallCircleRadius : 0f;
 						currentCircleAngle += omega * (float)delta;
 						Position = PostSpawnDestination + new Vector2(Mathf.Cos(currentCircleAngle), Mathf.Sin(currentCircleAngle)) * SmallCircleRadius;
 					}
 					break;
 					case MovementType.LargeCircle:
 					{
-						float omega = LargeCircleRadius > 0f ? Stats.MovementSpeed / LargeCircleRadius : 0f;
+						float omega = LargeCircleRadius > 0f ? (Stats.MovementSpeed * StatusEffects.GetSpeedMultiplier()) / LargeCircleRadius : 0f;
 						currentCircleAngle += omega * (float)delta;
 						Position = PostSpawnDestination + new Vector2(Mathf.Cos(currentCircleAngle), Mathf.Sin(currentCircleAngle)) * LargeCircleRadius;
 					}
@@ -206,7 +209,7 @@ public partial class Enemy : Area2D
 					{
 						float targetY = PostSpawnDestination.Y + verticalDirection * VerticalAmplitude;
 						float dy = targetY - Position.Y;
-						float step = Stats.MovementSpeed * (float)delta;
+						float step = (Stats.MovementSpeed * StatusEffects.GetSpeedMultiplier()) * (float)delta;
 						if (Mathf.Abs(dy) <= step) {
 							Position = new Vector2(Position.X, targetY);
 							verticalDirection = -verticalDirection;
@@ -219,7 +222,7 @@ public partial class Enemy : Area2D
 					{
 						float targetX = PostSpawnDestination.X + horizontalDirection * HorizontalAmplitude;
 						float dx = targetX - Position.X;
-						float step = Stats.MovementSpeed * (float)delta;
+						float step = (Stats.MovementSpeed * StatusEffects.GetSpeedMultiplier()) * (float)delta;
 						if (Mathf.Abs(dx) <= step) {
 							Position = new Vector2(targetX, Position.Y);
 							horizontalDirection = -horizontalDirection;
@@ -230,7 +233,7 @@ public partial class Enemy : Area2D
 					break;
 					case MovementType.DiagonalBackAndForth:
 					{
-						float step = Stats.MovementSpeed * (float)delta;
+						float step = (Stats.MovementSpeed * StatusEffects.GetSpeedMultiplier()) * (float)delta;
 						float targetX = PostSpawnDestination.X + horizontalDirection * HorizontalAmplitude;
 						float dx = targetX - Position.X;
 						float newX;
@@ -475,6 +478,6 @@ public partial class Enemy : Area2D
 			b.SetCollisionMaskValue(2, true);
 			GetParent().AddChild(b);
 		}
-		GunCoolDown = Stats.Gun.FireRate;
+		GunCoolDown = Stats.Gun.FireRate * StatusEffects.GetFireRateMultiplier();
 	}
 }

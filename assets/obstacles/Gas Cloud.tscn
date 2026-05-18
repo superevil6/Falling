@@ -1,0 +1,29 @@
+[gd_scene load_steps=6 format=3 uid="uid://g2dqeybd0in7"]
+
+[ext_resource type="Script" uid="uid://dderu813066fm" path="res://assets/scripts/Obstacle.cs" id="1_obs"]
+[ext_resource type="Shader" uid="uid://nej1tvi1ocse" path="res://assets/shaders/PixelArt.gdshader" id="2_algb7"]
+[ext_resource type="Texture2D" uid="uid://d1ty01q0onihg" path="res://assets/sprites/gas_cloud.svg" id="3_7ymya"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_q6nwq"]
+shader = ExtResource("2_algb7")
+shader_parameter/pixel_size = 4.0
+shader_parameter/color_steps = 8
+shader_parameter/hue_shift = 0.0
+shader_parameter/darkness = 0.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_k6ah0"]
+radius = 35.014282
+
+[node name="Node2D2" type="Area2D"]
+material = SubResource("ShaderMaterial_q6nwq")
+collision_mask = 3
+script = ExtResource("1_obs")
+Height = 700.0
+DealsDamage = true
+Damage = 20
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("3_7ymya")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_k6ah0")

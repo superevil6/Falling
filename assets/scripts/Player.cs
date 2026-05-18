@@ -10,6 +10,8 @@ public partial class Player : CharacterBody2D
 	public int CurrentExperience;
 	public int DamageReduction;
 	public bool HasSeeEnemyHealth = true;
+	public StatusEffectController StatusEffects = new StatusEffectController();
+	private float wallTouchTickTimer = 0f;
 	private float gunCoolDown;
 	[Export]
 	public int Speed { get;set;} = 400;
@@ -34,6 +36,10 @@ public partial class Player : CharacterBody2D
 	private bool IsDashing = false;
 	[Export]
 	public float DashDuration {get;set;} = 1;
+	[Export]
+	public float KnockbackDuration {get;set;} = 0.2f;
+	private Vector2 knockbackVelocity = Vector2.Zero;
+	private float knockbackTimer = 0f;
 	[Export]
 	public float ShortDashDuration {get;set;} = 0.15f;
 	[Export]
@@ -115,6 +121,8 @@ public partial class Player : CharacterBody2D
 			x: Mathf.Clamp(Position.X, 0, ScreenSize.X),
 			y: Mathf.Clamp(Position.Y, 0, ScreenSize.Y)
 		);
+		int dotDamage = StatusEffects.Tick((float)delta);
+		if (dotDamage > 0) TakeDamage(dotDamage);
 		TimeSinceLastAfterImage += (float)delta;
 		bool shouldTrail = (Input.IsActionPressed("move_down") || RemainingDashTime > 0) && !IsTouchingWall;
 		if (shouldTrail && TimeSinceLastAfterImage >= AfterImageInterval) {
@@ -185,7 +193,7 @@ public partial class Player : CharacterBody2D
  	public void GetInput()
 	{
 		Vector2 inputDirection = Input.GetVector("move_left", "move_right", "move_up", "move_down");
-		float effectiveSpeed = Speed * CurrentSpeedMultiplier;
+		float effectiveSpeed = Speed * CurrentSpeedMultiplier * StatusEffects.GetSpeedMultiplier();
 		Vector2 velocity = inputDirection * effectiveSpeed;
 		if (!IsTouchingWall) {
 			if (velocity.Y > 0) velocity.Y *= 1.5f;
@@ -209,6 +217,23 @@ public partial class Player : CharacterBody2D
 		CurrentHealth -= finalDamage;
 		GetParent().GetNode<TextureProgressBar>("Health Bar").Value = CurrentHealth;
 		FlashRed();
+	}
+
+	public void ApplyKnockback(Vector2 direction, float speed)
+	{
+		knockbackVelocity = direction.Normalized() * speed;
+		knockbackTimer = KnockbackDuration;
+	}
+
+	private void ApplyWallStatusTick(Wall wall, float delta)
+	{
+		wallTouchTickTimer -= delta;
+		if (wallTouchTickTimer > 0f) return;
+		if (wall.DotStacksPerTick > 0) StatusEffects.AddStacks(StatusEffectType.DamageOverTime, wall.DotStacksPerTick);
+		if (wall.SlowStacksPerTick > 0) StatusEffects.AddStacks(StatusEffectType.Slow, wall.SlowStacksPerTick);
+		if (wall.FireRateStacksPerTick > 0) StatusEffects.AddStacks(StatusEffectType.ReducedFireRate, wall.FireRateStacksPerTick);
+		if (wall.BlindStacksPerTick > 0) StatusEffects.AddStacks(StatusEffectType.Blind, wall.BlindStacksPerTick);
+		wallTouchTickTimer = wall.StatusTickInterval > 0f ? wall.StatusTickInterval : 1f;
 	}
 
 	private static PackedScene bombScene;
@@ -237,6 +262,12 @@ public partial class Player : CharacterBody2D
 
 	public override void _PhysicsProcess(double delta) //TODO Wall kicking variables can probably be removed in favor of checking float time remaining
 	{
+		if (knockbackTimer > 0f) {
+			Velocity = knockbackVelocity;
+			MoveAndSlide();
+			knockbackTimer -= (float)delta;
+			return;
+		}
 		if (!IsDashing) {
 			GetInput();
 			MoveAndSlide();
@@ -254,6 +285,7 @@ public partial class Player : CharacterBody2D
 				IsTouchingWall = true;
 				if (GetSlideCollision(0).GetCollider() is WallBody wb && wb.WallData != null) {
 					CurrentSpeedMultiplier = wb.WallData.SpeedReduction;
+					ApplyWallStatusTick(wb.WallData, (float)delta);
 				}
 				if (Input.GetVector("move_left", "move_right", "move_up", "move_down").Normalized().X >= 0.5f 
 				|| Input.GetVector("move_left", "move_right", "move_up", "move_down").Normalized().X <= -0.5f){
@@ -275,6 +307,7 @@ public partial class Player : CharacterBody2D
 			}
 
 		}
+		if (!IsTouchingWall) wallTouchTickTimer = 0f;
 		if (shortDashCooldownRemaining > 0) shortDashCooldownRemaining -= (float)delta;
 		if (Input.IsActionJustPressed("Dash") && !IsTouchingWall
 			&& shortDashCooldownRemaining <= 0 && RemainingDashTime <= 0) {
@@ -302,11 +335,12 @@ public partial class Player : CharacterBody2D
 		animatedSprite2D.Animation = "Shooting";
 		Vector2 perp = aimDirection.Normalized().Rotated(Mathf.Pi / 2f);
 		float center = (Gun.BulletCount - 1) / 2f;
-		float perBulletSeparation = Gun.BulletSpread * 60f;
-		float halfSpread = Gun.BulletSpread / 2f;
+		float effectiveSpread = Gun.BulletSpread + StatusEffects.GetSpreadIncrease();
+		float perBulletSeparation = effectiveSpread * 60f;
+		float halfSpread = effectiveSpread / 2f;
 		for (int i = 0; i < Gun.BulletCount; i++) {
 			Bullet b = Gun.BulletType.Instantiate<Bullet>();
-			float angle = Gun.BulletCount > 1 || Gun.BulletSpread > 0f
+			float angle = Gun.BulletCount > 1 || effectiveSpread > 0f
 				? rng.RandfRange(-halfSpread, halfSpread)
 				: 0f;
 			Vector2 direction = aimDirection.Rotated(angle);
@@ -328,7 +362,7 @@ public partial class Player : CharacterBody2D
 			GetParent().AddChild(b);
 		}
 		animatedSprite2D.Play();
-		gunCoolDown = Gun.FireRate;
+		gunCoolDown = Gun.FireRate * StatusEffects.GetFireRateMultiplier();
 	}
 
 	private void UpdateLaserBeam(Vector2 aimDirection)
@@ -371,7 +405,7 @@ public partial class Player : CharacterBody2D
 		}
 		if (hitEnemy != null && gunCoolDown <= 0) {
 			hitEnemy.TakeDamage(Gun.Damage, ElementType.NonElemental);
-			gunCoolDown = Gun.FireRate;
+			gunCoolDown = Gun.FireRate * StatusEffects.GetFireRateMultiplier();
 		}
 	}
 

@@ -3,6 +3,7 @@ shader_type canvas_item;
 uniform float pixel_size : hint_range(1.0, 32.0) = 4.0;
 uniform int color_steps : hint_range(2, 256) = 8;
 uniform float hue_shift : hint_range(-1.0, 1.0) = 0.0;
+uniform float darkness : hint_range(0.0, 1.0) = 0.0;
 
 vec3 rgb2hsv(vec3 c) {
 	vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
@@ -29,5 +30,6 @@ void fragment() {
 		color.rgb = hsv2rgb(hsv);
 	}
 	color.rgb = floor(color.rgb * float(color_steps)) / float(color_steps);
+	color.rgb *= (1.0 - darkness);
 	COLOR = color;
 }

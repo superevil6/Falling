@@ -74,6 +74,12 @@ public partial class Bullet : Attack
 
 	private void _on_area_entered(Node2D node) {
 		if (node is Pickup) return;
+		if (Gun != null && node is Enemy e) {
+			if (Gun.DotStacksPerHit > 0) e.StatusEffects.AddStacks(StatusEffectType.DamageOverTime, Gun.DotStacksPerHit);
+			if (Gun.SlowStacksPerHit > 0) e.StatusEffects.AddStacks(StatusEffectType.Slow, Gun.SlowStacksPerHit);
+			if (Gun.FireRateStacksPerHit > 0) e.StatusEffects.AddStacks(StatusEffectType.ReducedFireRate, Gun.FireRateStacksPerHit);
+			if (Gun.BlindStacksPerHit > 0) e.StatusEffects.AddStacks(StatusEffectType.Blind, Gun.BlindStacksPerHit);
+		}
 		HandleHit(true);
 	}
 	private void _on_body_entered(Node2D node) => HandleHit(false);

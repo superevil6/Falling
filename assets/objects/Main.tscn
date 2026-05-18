@@ -1,4 +1,4 @@
-[gd_scene load_steps=42 format=3 uid="uid://3wov1sd2nxg5"]
+[gd_scene load_steps=43 format=3 uid="uid://3wov1sd2nxg5"]
 
 [ext_resource type="Script" uid="uid://hfchjcen7ado" path="res://assets/scripts/Main.cs" id="1_yeolr"]
 [ext_resource type="Resource" uid="uid://drxdwiakxfced" path="res://assets/stages/Stage One/Test Stage.tres" id="2_0q0aj"]
@@ -41,6 +41,7 @@
 [ext_resource type="PackedScene" uid="uid://bsqiy1qekhvm1" path="res://assets/stages/Stage One/Walls/Test Wall 2.tscn" id="38_0rsmt"]
 [ext_resource type="PackedScene" uid="uid://cn10ovrgf2oox" path="res://assets/stages/Stage One/Backgrounds/Test Background 2.tscn" id="39_5evvb"]
 [ext_resource type="PackedScene" uid="uid://cpkjwu8cghp1l" path="res://assets/stages/Stage One/Backgrounds/Test Background.tscn" id="39_6wugn"]
+[ext_resource type="PackedScene" uid="uid://df7o0aeqyvtx2" path="res://assets/objects/Obstacle Spawner.tscn" id="42_xlgnj"]
 
 [node name="Node2D" type="Node2D"]
 script = ExtResource("1_yeolr")
@@ -64,12 +65,12 @@ Guns = Array[Resource]([ExtResource("7_g572a"), ExtResource("8_gvlvn"), ExtResou
 PickCount = 5
 
 [node name="Left Wall Queue" type="Node2D" parent="."]
-position = Vector2(122, 0)
+position = Vector2(104, 0)
 script = ExtResource("9_wallqueue")
 chunks = Array[PackedScene]([ExtResource("7_2iqqg"), ExtResource("38_0rsmt"), ExtResource("36_4eblj")])
 
 [node name="Right Wall Queue" type="Node2D" parent="."]
-position = Vector2(1020, 0)
+position = Vector2(1417, 0)
 script = ExtResource("9_wallqueue")
 IsRightSide = true
 chunks = Array[PackedScene]([ExtResource("7_2iqqg"), ExtResource("38_0rsmt"), ExtResource("36_4eblj")])
@@ -100,19 +101,23 @@ text = "Gun: -"
 
 [node name="Background Queue Left" type="Node2D" parent="."]
 z_index = -10
-position = Vector2(61, 0)
+position = Vector2(104, 0)
 script = ExtResource("13_bgqueue")
 TilesOverride = Array[PackedScene]([ExtResource("39_6wugn")])
 
 [node name="Background Queue Middle" type="Node2D" parent="."]
 z_index = -10
-position = Vector2(571, 0)
+position = Vector2(629, 0)
 script = ExtResource("13_bgqueue")
 TilesOverride = Array[PackedScene]([ExtResource("39_5evvb")])
 ScrollSpeedMultiplier = 0.4
 
 [node name="Background Queue Right" type="Node2D" parent="."]
 z_index = -10
-position = Vector2(1086, 0)
+position = Vector2(1417, 0)
 script = ExtResource("13_bgqueue")
 TilesOverride = Array[PackedScene]([ExtResource("39_6wugn")])
+
+[node name="ObstacleSpawner" parent="." instance=ExtResource("42_xlgnj")]
+position = Vector2(836, 817.00006)
+scale = Vector2(-4.2207904, 13.964333)

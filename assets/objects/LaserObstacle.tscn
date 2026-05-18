@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://b8laserobs1"]
+
+[ext_resource type="Script" path="res://assets/scripts/LaserObstacle.cs" id="1_laserobs"]
+
+[node name="LaserObstacle" type="Area2D"]
+script = ExtResource("1_laserobs")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]

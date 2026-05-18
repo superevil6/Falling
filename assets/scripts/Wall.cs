@@ -10,4 +10,14 @@ public partial class Wall : Resource
 	public float SpeedReduction {get;set;} = 1.0f;
 	[Export]
 	public float Height {get;set;}
+	[Export]
+	public float StatusTickInterval {get;set;} = 1f;
+	[Export]
+	public int DotStacksPerTick {get;set;} = 0;
+	[Export]
+	public int SlowStacksPerTick {get;set;} = 0;
+	[Export]
+	public int FireRateStacksPerTick {get;set;} = 0;
+	[Export]
+	public int BlindStacksPerTick {get;set;} = 0;
 }

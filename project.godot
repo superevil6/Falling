@@ -15,6 +15,10 @@ run/main_scene="res://assets/objects/Main.tscn"
 config/features=PackedStringArray("4.5", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
+[display]
+
+window/size/viewport_width=1500
+
 [dotnet]
 
 project/assembly_name="Falling"

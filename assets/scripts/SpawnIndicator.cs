@@ -6,6 +6,8 @@ public partial class SpawnIndicator : Node2D
 	public float Duration {get;set;} = 1.0f;
 	[Export]
 	public float Radius {get;set;} = 32.0f;
+	[Export]
+	public Color TriangleColor {get;set;} = new Color(1f, 0.8f, 0f);
 
 	private float lifetime;
 
@@ -31,7 +33,7 @@ public partial class SpawnIndicator : Node2D
 		Vector2 left = new Vector2(-s * 0.866f, s * 0.5f);
 		Vector2 right = new Vector2(s * 0.866f, s * 0.5f);
 		var triangle = new Vector2[] { top, left, right };
-		DrawColoredPolygon(triangle, new Color(1f, 0.8f, 0f));
+		DrawColoredPolygon(triangle, TriangleColor);
 		float outlineWidth = 3.0f;
 		DrawLine(top, left, Colors.Black, outlineWidth);
 		DrawLine(left, right, Colors.Black, outlineWidth);
