@@ -47,7 +47,7 @@ public partial class Mine : Area2D
 			}
 		}
 		if (TargetsPlayer) {
-			var p = GetTree().Root.GetNodeOrNull<Player>("Node2D/Player");
+			var p = GetTree().CurrentScene?.GetNodeOrNull<Player>("Player");
 			if (p != null && p.CurrentHealth > 0
 				&& p.GlobalPosition.DistanceTo(GlobalPosition) <= Radius) {
 				p.TakeDamage(Damage);

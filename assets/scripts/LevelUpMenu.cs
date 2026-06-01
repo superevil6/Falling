@@ -14,7 +14,9 @@ public partial class LevelUpMenu : CanvasLayer
 	private Control radial;
 	private Label titleLabel;
 	private Label descriptionLabel;
+	private Label entityNameLabel;
 	private Control cursor;
+	private TextureRect entityImage;
 	private int selectedIndex = 0;
 	private int rotationSteps = 0;
 	private float currentRotation = 0f;
@@ -35,6 +37,8 @@ public partial class LevelUpMenu : CanvasLayer
 		radial = GetNode<Control>("Panel/Radial");
 		descriptionLabel = GetNodeOrNull<Label>("Panel/Description");
 		cursor = GetNodeOrNull<Control>("Panel/Cursor");
+		entityImage = GetNodeOrNull<TextureRect>("Panel/EntityImage");
+		entityNameLabel = GetNodeOrNull<Label>("Panel/EntityName");
 		ProcessMode = ProcessModeEnum.Always;
 		Visible = false;
 	}
@@ -62,7 +66,7 @@ public partial class LevelUpMenu : CanvasLayer
 			}
 			if (currentBodyMod != null && currentBodyUpgrades != null
 				&& selectedIndex >= 0 && selectedIndex < currentBodyUpgrades.Length) {
-				var player = GetTree().Root.GetNodeOrNull<Player>("Node2D/Player");
+				var player = GetTree().CurrentScene?.GetNodeOrNull<Player>("Player");
 				player?.ApplyBodyUpgrade(currentBodyUpgrades[selectedIndex]);
 			}
 			EmitSignal(SignalName.UpgradeChosen, selectedIndex, currentEntityName);
@@ -90,7 +94,9 @@ public partial class LevelUpMenu : CanvasLayer
 		currentEntityName = next.name ?? "";
 		currentGun = next.gun;
 		currentBodyMod = next.mod;
-		if (titleLabel != null) titleLabel.Text = $"{currentEntityName} Leveled Up!";
+		if (titleLabel != null) titleLabel.Text = "Level Up!";
+		if (entityNameLabel != null) entityNameLabel.Text = currentEntityName;
+		if (entityImage != null) entityImage.Texture = next.gun?.GunImage ?? next.mod?.ModImage;
 		if (next.gun != null) {
 			BuildGunUpgradeOptions(next.gun);
 			currentBodyUpgrades = null;
@@ -119,7 +125,7 @@ public partial class LevelUpMenu : CanvasLayer
 	private void BuildGunUpgradeOptions(Gun gun)
 	{
 		currentUpgrades = null;
-		var main = GetTree().Root.GetNodeOrNull<Main>("Node2D");
+		var main = GetTree().CurrentScene as Main;
 		if (main == null || main.PossibleGunUpgrades == null) {
 			currentGunUpgrades = null;
 			return;
@@ -162,7 +168,7 @@ public partial class LevelUpMenu : CanvasLayer
 	private void BuildBodyUpgradeOptions(BodyMod mod)
 	{
 		currentUpgrades = null;
-		var main = GetTree().Root.GetNodeOrNull<Main>("Node2D");
+		var main = GetTree().CurrentScene as Main;
 		if (main == null || main.PossibleBodyUpgrades == null) {
 			currentBodyUpgrades = null;
 			return;

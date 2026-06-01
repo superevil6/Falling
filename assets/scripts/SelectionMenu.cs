@@ -109,7 +109,7 @@ public partial class SelectionMenu : CanvasLayer
 
 	private bool IsPlayerGunsFull()
 	{
-		var player = GetTree().Root.GetNode<Node>("Node2D")?.GetNodeOrNull<Player>("Player");
+		var player = GetTree().CurrentScene?.GetNodeOrNull<Player>("Player");
 		if (player == null || player.Guns == null) return false;
 		for (int i = 0; i < player.Guns.Length; i++) {
 			if (player.Guns[i] == null) return false;
@@ -119,7 +119,7 @@ public partial class SelectionMenu : CanvasLayer
 
 	private bool IsPlayerBodyModsFull()
 	{
-		var player = GetTree().Root.GetNode<Node>("Node2D")?.GetNodeOrNull<Player>("Player");
+		var player = GetTree().CurrentScene?.GetNodeOrNull<Player>("Player");
 		if (player == null || player.BodyMods == null) return false;
 		for (int i = 0; i < player.BodyMods.Length; i++) {
 			if (player.BodyMods[i] == null) return false;
@@ -129,7 +129,7 @@ public partial class SelectionMenu : CanvasLayer
 
 	private bool PlayerHasGunType(GunType type)
 	{
-		var player = GetTree().Root.GetNode<Node>("Node2D")?.GetNodeOrNull<Player>("Player");
+		var player = GetTree().CurrentScene?.GetNodeOrNull<Player>("Player");
 		if (player == null || player.Guns == null) return false;
 		for (int i = 0; i < player.Guns.Length; i++) {
 			if (player.Guns[i] != null && player.Guns[i].GunType == type) return true;
@@ -139,7 +139,7 @@ public partial class SelectionMenu : CanvasLayer
 
 	private bool PlayerHasBodyType(BodyModType type)
 	{
-		var player = GetTree().Root.GetNode<Node>("Node2D")?.GetNodeOrNull<Player>("Player");
+		var player = GetTree().CurrentScene?.GetNodeOrNull<Player>("Player");
 		if (player == null || player.BodyMods == null) return false;
 		for (int i = 0; i < player.BodyMods.Length; i++) {
 			if (player.BodyMods[i] != null && player.BodyMods[i].type == type) return true;
@@ -166,7 +166,7 @@ public partial class SelectionMenu : CanvasLayer
 	private void ApplyPickToPlayer(Resource pick)
 	{
 		if (pick == null) return;
-		var player = GetTree().Root.GetNode<Node>("Node2D")?.GetNodeOrNull<Player>("Player");
+		var player = GetTree().CurrentScene?.GetNodeOrNull<Player>("Player");
 		if (player == null) return;
 		if (pick is Gun g && player.Guns != null) {
 			for (int i = 0; i < player.Guns.Length; i++) {

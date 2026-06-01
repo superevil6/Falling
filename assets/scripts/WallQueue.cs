@@ -32,7 +32,14 @@ public partial class WallQueue : Node2D
 	public Vector2 GetCurrentScrollMovement(double delta)
 	{
 		if (player == null) player = GetParent()?.GetNodeOrNull<Player>("Player");
-		float inputY = Input.GetActionStrength("move_down") - Input.GetActionStrength("move_up");
+		float inputY = 0f;
+		if (player != null) {
+			float raw = Input.GetActionStrength("move_down") - Input.GetActionStrength("move_up");
+			float screenH = player.ScreenSize.Y;
+			bool pushingTopEdge = player.Position.Y <= screenH * 0.1f && raw < 0f;
+			bool pushingBottomEdge = player.Position.Y >= screenH * 0.9f && raw > 0f;
+			if (pushingTopEdge || pushingBottomEdge) inputY = raw;
+		}
 		float wallFactor = (player != null && player.IsTouchingWall) ? WallContactSpeedFactor : 1f;
 		float currentSpeed = speed * (1 + inputY * InputSpeedFactor) * wallFactor;
 		return new Vector2(0, -currentSpeed * ((float)delta * 5));

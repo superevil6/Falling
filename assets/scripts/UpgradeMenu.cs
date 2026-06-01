@@ -26,7 +26,7 @@ public partial class UpgradeMenu : CanvasLayer
 	private void RefreshContent()
 	{
 		if (player == null) {
-			player = GetTree().Root.GetNode<Node>("Node2D")?.GetNodeOrNull<Player>("Player");
+			player = GetTree().CurrentScene?.GetNodeOrNull<Player>("Player");
 		}
 		if (player == null) return;
 
@@ -50,7 +50,7 @@ public partial class UpgradeMenu : CanvasLayer
 							? System.IO.Path.GetFileNameWithoutExtension(gun.ResourcePath)
 							: "?");
 					string text = $"Slot {i + 1}: {name}\n"
-						+ $"Lv {gun.CurrentLevel}   XP {gun.CurrentExperience}/{gun.ExperiencePerLevel}   SP {gun.SkillPoints}";
+						+ $"Lv {gun.CurrentLevel}   XP {gun.CurrentExperience}/{gun.ExperiencePerLevel}";
 					list.AddChild(BuildRow(gun.GunImage, text));
 				}
 			}
@@ -69,7 +69,7 @@ public partial class UpgradeMenu : CanvasLayer
 							? System.IO.Path.GetFileNameWithoutExtension(mod.ResourcePath)
 							: "?");
 					string text = $"Slot {i + 1}: {name}\n"
-						+ $"Lv {mod.Level}   XP {mod.CurrentExperience}/{mod.ExperiencePerLevel}   SP {mod.SkillPoints}";
+						+ $"Lv {mod.Level}   XP {mod.CurrentExperience}/{mod.ExperiencePerLevel}";
 					list.AddChild(BuildRow(mod.ModImage, text));
 				}
 			}

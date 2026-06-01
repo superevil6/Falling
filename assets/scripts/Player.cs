@@ -10,6 +10,7 @@ public partial class Player : CharacterBody2D
 	public int CurrentExperience;
 	public int DamageReduction;
 	public bool HasSeeEnemyHealth = true;
+	public float ItemMagnetMultiplier = 1f;
 	public StatusEffectController StatusEffects = new StatusEffectController();
 	private float wallTouchTickTimer = 0f;
 	private float gunCoolDown;
@@ -131,7 +132,7 @@ public partial class Player : CharacterBody2D
 		}
 		Position = new Vector2(
 			x: Mathf.Clamp(Position.X, 0, ScreenSize.X),
-			y: Mathf.Clamp(Position.Y, 0, ScreenSize.Y)
+			y: Mathf.Clamp(Position.Y, ScreenSize.Y * 0.1f, ScreenSize.Y * 0.9f)
 		);
 		int dotDamage = StatusEffects.Tick((float)delta);
 		if (dotDamage > 0) TakeDamage(dotDamage);
@@ -164,6 +165,9 @@ public partial class Player : CharacterBody2D
 			case BodyUpgradeType.SeeEnemyHealth:
 				HasSeeEnemyHealth = true;
 				break;
+			case BodyUpgradeType.ItemMagnet:
+				ItemMagnetMultiplier += (upgrade.Value - 1f);
+				break;
 		}
 	}
 
@@ -181,7 +185,7 @@ public partial class Player : CharacterBody2D
 				? System.IO.Path.GetFileNameWithoutExtension(Gun.ResourcePath)
 				: "-");
 		GetParent().GetNode<Label>("Gun Label").Text =
-			$"Gun: {gunName}  Lv{Gun.CurrentLevel}  XP {Gun.CurrentExperience}/{Gun.ExperiencePerLevel}  SP {Gun.SkillPoints}";
+			$"Gun: {gunName}  Lv{Gun.CurrentLevel}  XP {Gun.CurrentExperience}/{Gun.ExperiencePerLevel}";
 		if (gunImage != null) gunImage.Texture = Gun.GunImage;
 	}
 
@@ -458,16 +462,12 @@ public partial class Player : CharacterBody2D
 	}
 
 	private void SpawnBulletSpread(Vector2 aimDirection) {
-		Vector2 perp = aimDirection.Normalized().Rotated(Mathf.Pi / 2f);
-		float center = (Gun.BulletCount - 1) / 2f;
 		float effectiveSpread = Gun.BulletSpread + StatusEffects.GetSpreadIncrease();
-		float perBulletSeparation = effectiveSpread * 60f;
 		float halfSpread = effectiveSpread / 2f;
-		for (int i = 0; i < Gun.BulletCount; i++) {
+		int n = Mathf.Max(1, Gun.BulletCount);
+		for (int i = 0; i < n; i++) {
 			Bullet b = Gun.BulletType.Instantiate<Bullet>();
-			float angle = Gun.BulletCount > 1 || effectiveSpread > 0f
-				? rng.RandfRange(-halfSpread, halfSpread)
-				: 0f;
+			float angle = n == 1 ? 0f : -halfSpread + i * (effectiveSpread / (n - 1));
 			Vector2 direction = aimDirection.Rotated(angle);
 			bool crit = RollCrit(Gun, out int dmg, Gun.Damage);
 			b.Set("Direction", direction);
@@ -481,7 +481,7 @@ public partial class Player : CharacterBody2D
 			}
 			if (Gun.Element != ElementType.NonElemental) b.Element = Gun.Element;
 			b.AuraColor = crit ? CritAuraColor : new Color(0.3f, 0.6f, 1f, 0.8f);
-			b.Position = Position + perp * (i - center) * perBulletSeparation;
+			b.Position = Position;
 			b.Rotation = direction.Angle();
 			b.SetCollisionLayerValue(4, true);
 			b.SetCollisionMaskValue(3, true);

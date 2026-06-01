@@ -97,7 +97,7 @@ public partial class DestructibleObstacle : Area2D
 				e.TakeDamage(ExplosionDamage, ElementType.NonElemental);
 			}
 		}
-		var p = GetTree().Root.GetNodeOrNull<Player>("Node2D/Player");
+		var p = GetTree().CurrentScene?.GetNodeOrNull<Player>("Player");
 		if (p != null && p.CurrentHealth > 0
 			&& p.GlobalPosition.DistanceTo(GlobalPosition) <= ExplosionRadius) {
 			p.TakeDamage(ExplosionDamage);

@@ -16,9 +16,11 @@ public partial class ExperiencePickup : Pickup
 				int prev = gun.CurrentLevel;
 				gun.AddExperience(ExperienceAmount);
 				if (gun.CurrentLevel > prev) {
-					string name = !string.IsNullOrEmpty(gun.ResourcePath)
-						? System.IO.Path.GetFileNameWithoutExtension(gun.ResourcePath)
-						: "Gun";
+					string name = !string.IsNullOrEmpty(gun.SourceName)
+						? gun.SourceName
+						: (!string.IsNullOrEmpty(gun.ResourcePath)
+							? System.IO.Path.GetFileNameWithoutExtension(gun.ResourcePath)
+							: "Gun");
 					menu?.Open(name, gun, null);
 				}
 			}

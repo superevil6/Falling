@@ -6,3 +6,4 @@
 script = ExtResource("1_2w7j6")
 BodyUpgradeType = 4
 UpgradeName = "Vitality Analyzer"
+UpgradeDescription = "View enemy health bars."

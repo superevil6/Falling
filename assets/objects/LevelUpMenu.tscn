@@ -24,13 +24,29 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
 
+[node name="EntityImage" type="TextureRect" parent="Panel"]
+texture_filter = 1
+offset_left = 260.0
+offset_top = 200.0
+offset_right = 340.0
+offset_bottom = 280.0
+expand_mode = 1
+stretch_mode = 5
+
+[node name="EntityName" type="Label" parent="Panel"]
+offset_left = 200.0
+offset_top = 286.0
+offset_right = 400.0
+offset_bottom = 316.0
+horizontal_alignment = 1
+
 [node name="Description" type="Label" parent="Panel"]
 offset_left = 180.0
-offset_top = 250.0
+offset_top = 322.0
 offset_right = 420.0
-offset_bottom = 390.0
+offset_bottom = 400.0
 horizontal_alignment = 1
-vertical_alignment = 1
+vertical_alignment = 0
 autowrap_mode = 2
 
 [node name="Cursor" type="TextureRect" parent="Panel"]

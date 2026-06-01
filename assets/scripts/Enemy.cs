@@ -16,6 +16,10 @@ public partial class Enemy : Area2D
 	[Export]
 	public float WallMargin {get;set;} = 30f;
 	[Export]
+	public float SeparationRadius {get;set;} = 60f;
+	[Export]
+	public float SeparationStrength {get;set;} = 2.0f;
+	[Export]
 	public float DropSpreadRadius {get;set;} = 25f;
 	private float leftWallX = 0f;
 	private float rightWallX = 0f;
@@ -148,8 +152,11 @@ public partial class Enemy : Area2D
 					case MovementType.Stationary:
 					break;
 					case MovementType.TowardsPlayer:
-					var towards = playerLocation * EffectiveMovementSpeed * (float)delta;
-					Position += towards;
+					Vector2 chaseDir = playerLocation;
+					Vector2 separation = GetSeparationVector(SeparationRadius);
+					Vector2 blended = (chaseDir + separation * SeparationStrength);
+					if (blended != Vector2.Zero) blended = blended.Normalized();
+					Position += blended * EffectiveMovementSpeed * (float)delta;
 					break;
 					case MovementType.AwayFromPlayer:
 					var away = -playerLocation * EffectiveMovementSpeed * (float)delta;
@@ -289,12 +296,19 @@ public partial class Enemy : Area2D
 				if (Stats.MovementType != MovementType.WallOnly) {
 					if (player == null) player = GetParent()?.GetNodeOrNull<Player>("Player");
 					if (player != null) {
-						float driftY;
+						var main = GetParent() as Main;
+						float driftSpeed = main?.EnemyInputDriftSpeed ?? InputDriftSpeed;
+						float driftY = 0f;
 						if (player.IsTouchingWall) {
 							driftY = WallContactDriftSpeed;
 						} else {
 							float inputY = Input.GetActionStrength("move_down") - Input.GetActionStrength("move_up");
-							driftY = -inputY * InputDriftSpeed;
+							float screenH = player.ScreenSize.Y;
+							bool pushingTopEdge = player.Position.Y <= screenH * 0.1f && inputY < 0f;
+							bool pushingBottomEdge = player.Position.Y >= screenH * 0.9f && inputY > 0f;
+							if (pushingTopEdge || pushingBottomEdge) {
+								driftY = -inputY * driftSpeed;
+							}
 						}
 						Position += new Vector2(0, driftY * (float)delta);
 					}
@@ -358,6 +372,24 @@ public partial class Enemy : Area2D
 			coreDeathTriggered = true;
 			TriggerCoreDeath();
 		}
+	}
+
+	private Vector2 GetSeparationVector(float radius)
+	{
+		if (radius <= 0f) return Vector2.Zero;
+		Vector2 sep = Vector2.Zero;
+		int count = 0;
+		foreach (var n in GetTree().GetNodesInGroup("Enemy")) {
+			if (n is Enemy other && other != this && other.CurrentHealth > 0) {
+				float d = GlobalPosition.DistanceTo(other.GlobalPosition);
+				if (d > 0f && d < radius) {
+					Vector2 away = (GlobalPosition - other.GlobalPosition) / d;
+					sep += away * (1f - d / radius);
+					count++;
+				}
+			}
+		}
+		return count > 0 ? sep / count : Vector2.Zero;
 	}
 
 	private float GetLeaderBoost(LeaderType type)

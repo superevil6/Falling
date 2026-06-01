@@ -9,6 +9,8 @@ public partial class Main : Node2D
 	[Export]
 	public int CurrentStage {get;set;} = 0;
 	[Export]
+	public float EnemyInputDriftSpeed {get;set;} = 50f;
+	[Export]
 	public PackedScene Player {get;set;}
 	[Export]
 	public GunUpgrade[] PossibleGunUpgrades {get;set;}

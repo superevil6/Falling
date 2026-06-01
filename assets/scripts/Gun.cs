@@ -84,8 +84,6 @@ public partial class Gun : Resource
 	[Export]
 	public int CurrentLevel {get;set;}
 	[Export]
-	public int SkillPoints {get;set;}
-	[Export]
 	public GunUpgrade[] GunUpgrades {get; set;}
 
 	public void AddExperience(int amount)
@@ -94,7 +92,6 @@ public partial class Gun : Resource
 		while (ExperiencePerLevel > 0 && CurrentExperience >= ExperiencePerLevel) {
 			CurrentExperience -= ExperiencePerLevel;
 			CurrentLevel++;
-			SkillPoints++;
 		}
 	}
 

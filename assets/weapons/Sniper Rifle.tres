@@ -1,10 +1,12 @@
-[gd_resource type="Resource" load_steps=3 format=3 uid="uid://ktyac25vkuh7"]
+[gd_resource type="Resource" load_steps=4 format=3 uid="uid://ktyac25vkuh7"]
 
 [ext_resource type="PackedScene" uid="uid://cf1pg2x8l8lpf" path="res://assets/objects/bullet.tscn" id="1_jisv3"]
+[ext_resource type="Texture2D" uid="uid://u7faqv4fufa0" path="res://assets/sprites/Weapons/Sniper Rifle.png" id="2_6ihid"]
 [ext_resource type="Script" uid="uid://cvu57cdie1j01" path="res://assets/scripts/Gun.cs" id="2_ysa6b"]
 
 [resource]
 script = ExtResource("2_ysa6b")
+GunImage = ExtResource("2_6ihid")
 FireRate = 1.5
 Damage = 10
 BulletCount = 1

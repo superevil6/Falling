@@ -14,6 +14,7 @@ shader = ExtResource("3_kirwa")
 shader_parameter/pixel_size = 4.0
 shader_parameter/color_steps = 8
 shader_parameter/hue_shift = 0.0
+shader_parameter/darkness = 0.0
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_kft1t"]
 atlas = ExtResource("3_m04ux")

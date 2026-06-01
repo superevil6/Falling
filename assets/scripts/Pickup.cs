@@ -25,10 +25,11 @@ public partial class Pickup : Area2D
 			player = GetParent()?.GetNodeOrNull<Player>("Player");
 			if (player == null) return;
 		}
+		float mult = player.ItemMagnetMultiplier;
 		float dist = GlobalPosition.DistanceTo(player.GlobalPosition);
-		if (dist < MagnetRadius && dist > 0.01f) {
+		if (dist < MagnetRadius * mult && dist > 0.01f) {
 			Vector2 toPlayer = (player.GlobalPosition - GlobalPosition).Normalized();
-			GlobalPosition += toPlayer * MagnetSpeed * (float)delta;
+			GlobalPosition += toPlayer * MagnetSpeed * mult * (float)delta;
 		}
 	}
 

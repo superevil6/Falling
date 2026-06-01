@@ -1,0 +1,10 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://dkjbvxqqbuwho"]
+
+[ext_resource type="Script" uid="uid://c16jiuasboxwv" path="res://assets/scripts/BodyUpgrade.cs" id="1_8v6is"]
+
+[resource]
+script = ExtResource("1_8v6is")
+BodyUpgradeType = 3
+UpgradeName = "Magnetism"
+UpgradeDescription = "Draw in more pickup items such as health and mercury."
+Value = 1.5

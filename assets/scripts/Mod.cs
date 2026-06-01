@@ -14,8 +14,6 @@ public partial class Mod : Resource
 	public int Value2 { get; set; }
 	[Export]
 	public int ExperiencePerLevel { get; set; } = 10;
-	[Export]
-	public int SkillPoints { get; set; }
 
 	public void AddExperience(int amount)
 	{
@@ -23,7 +21,6 @@ public partial class Mod : Resource
 		while (ExperiencePerLevel > 0 && CurrentExperience >= ExperiencePerLevel) {
 			CurrentExperience -= ExperiencePerLevel;
 			Level++;
-			SkillPoints++;
 		}
 	}
 }
