@@ -1,9 +1,0 @@
-[gd_resource type="Resource" load_steps=2 format=3 uid="uid://cynmi0118qnrs"]
-
-[ext_resource type="Script" uid="uid://cjvebtbs1ft7k" path="res://assets/scripts/GunUpgrade.cs" id="1_us4an"]
-
-[resource]
-script = ExtResource("1_us4an")
-Type = 14
-Element = 4
-UpgradeName = "Poison Bullets"

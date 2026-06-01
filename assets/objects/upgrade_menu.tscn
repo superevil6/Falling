@@ -11,9 +11,19 @@ offset_top = 120.0
 offset_right = 820.0
 offset_bottom = 600.0
 
-[node name="Label" type="Label" parent="Panel"]
+[node name="Header" type="Label" parent="Panel"]
 offset_left = 24.0
-offset_top = 24.0
+offset_top = 16.0
 offset_right = 576.0
-offset_bottom = 456.0
+offset_bottom = 68.0
 text = "Upgrades"
+
+[node name="Scroll" type="ScrollContainer" parent="Panel"]
+offset_left = 16.0
+offset_top = 76.0
+offset_right = 584.0
+offset_bottom = 464.0
+
+[node name="List" type="VBoxContainer" parent="Panel/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3

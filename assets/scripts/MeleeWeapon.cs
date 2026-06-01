@@ -9,11 +9,15 @@ public partial class MeleeWeapon : Resource
 	[Export]
 	public int Damage {get;set;}
 	[Export]
-	public float SwingDuration {get;set;}
+	public float SwingDuration {get;set;} = 0.3f;
 	[Export]
 	public float WidthMultiplier {get;set;}
 	[Export]
 	public float HeightMultiplier {get;set;}
+	[Export]
+	public float SwingArc {get;set;} = Mathf.Pi * 0.75f;
+	[Export]
+	public float OffsetDistance {get;set;} = 90f;
 	//Attack is meant to hold the animation, and the collider.
 	[Export]
 	public PackedScene Attack {get;set;}

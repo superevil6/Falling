@@ -11,6 +11,8 @@ public partial class Bullet : Attack
 	public PackedScene Explosion {get;set;}
 	[Export]
 	public ElementType Element { get; set; }
+	public Color AuraColor {get;set;} = new Color(0, 0, 0, 0);
+	public float AuraRadius {get;set;} = 3f;
 	private int ExplosionDamage;
 	private int RemainingRicochets;
 
@@ -42,6 +44,17 @@ public partial class Bullet : Attack
 			Scale = new Vector2(Scale.X * Gun.BulletSize, Scale.Y * Gun.BulletSize);
 		}
 		RemainingRicochets = Gun.Ricochet;
+	}
+
+	public override void _Draw()
+	{
+		if (AuraColor.A <= 0f) return;
+		var outer = new Color(AuraColor.R, AuraColor.G, AuraColor.B, AuraColor.A * 0.15f);
+		var mid = new Color(AuraColor.R, AuraColor.G, AuraColor.B, AuraColor.A * 0.30f);
+		var inner = new Color(AuraColor.R, AuraColor.G, AuraColor.B, AuraColor.A * 0.45f);
+		DrawCircle(Vector2.Zero, AuraRadius * 1.6f, outer);
+		DrawCircle(Vector2.Zero, AuraRadius * 1.1f, mid);
+		DrawCircle(Vector2.Zero, AuraRadius * 0.6f, inner);
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.

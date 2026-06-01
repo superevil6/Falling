@@ -32,6 +32,11 @@ public partial class LaserObstacle : Area2D
 		GlobalPosition = IsHorizontal
 			? new Vector2(viewport.X / 2f, GlobalPosition.Y)
 			: new Vector2(GlobalPosition.X, viewport.Y / 2f);
+		if (LaserColor.A <= 0f) LaserColor = new Color(LaserColor.R, LaserColor.G, LaserColor.B, 1f);
+		if (LaserColor.R <= 0f && LaserColor.G <= 0f && LaserColor.B <= 0f) {
+			LaserColor = new Color(1f, 0.3f, 0.3f, 1f);
+		}
+		ZIndex = 5;
 		AreaEntered += OnAreaEntered;
 		BodyEntered += OnBodyEntered;
 	}
@@ -46,8 +51,8 @@ public partial class LaserObstacle : Area2D
 	public override void _Draw()
 	{
 		float pulse = 0.7f + 0.3f * Mathf.Sin((Duration - remainingTime) * 20f);
-		Color body = new Color(LaserColor.R * pulse, LaserColor.G * pulse, LaserColor.B * pulse, LaserColor.A);
-		Color core = new Color(1f, 1f, 1f, LaserColor.A * 0.8f);
+		Color body = new Color(LaserColor.R * pulse * 0.5f, LaserColor.G * pulse * 0.5f, LaserColor.B * pulse * 0.5f, 1f);
+		Color core = new Color(LaserColor.R * pulse, LaserColor.G * pulse, LaserColor.B * pulse, 1f);
 		float coreThickness = Thickness * 0.3f;
 		Rect2 bodyRect;
 		Rect2 coreRect;

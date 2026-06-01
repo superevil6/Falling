@@ -7,5 +7,7 @@ public partial class Upgrade : Resource
 	[Export]
 	public string UpgradeName { get; set; }
 	[Export]
+	public string UpgradeDescription { get; set; }
+	[Export]
 	public float Value { get; set; }
 }

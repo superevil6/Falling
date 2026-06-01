@@ -1,0 +1,22 @@
+[gd_resource type="Resource" load_steps=7 format=3 uid="uid://c4upx6ks3go7l"]
+
+[ext_resource type="Texture2D" uid="uid://bf0cc77bwoikv" path="res://assets/sprites/test enemy.png" id="1_lxmm1"]
+[ext_resource type="Resource" uid="uid://dpbu2nab2atvi" path="res://assets/weapons/Basic Slow Enemy Shot.tres" id="2_byimy"]
+[ext_resource type="Resource" uid="uid://yinsm4qyoywv" path="res://assets/pickups/Health Pickup.tres" id="3_s3veu"]
+[ext_resource type="Resource" uid="uid://bpi2u85b8oi7t" path="res://assets/pickups/Small EXP Pickup.tres" id="4_hbjuq"]
+[ext_resource type="Resource" uid="uid://t4f5lqyn51u2" path="res://assets/weapons/Simple Sword.tres" id="5_tffsm"]
+[ext_resource type="Script" uid="uid://d2sp0jc5eu40u" path="res://assets/scripts/EnemyStatBlock.cs" id="6_s0t15"]
+
+[resource]
+script = ExtResource("6_s0t15")
+MaxHealth = 5
+Gun = ExtResource("2_byimy")
+Melee = ExtResource("5_tffsm")
+MovementType = 3
+SpawnMovementSpeed = 8
+MovementSpeed = 150.0
+Size = 1.0
+EnemySprite = ExtResource("1_lxmm1")
+ItemDrops = Array[Resource]([ExtResource("3_s3veu"), ExtResource("4_hbjuq")])
+TeleportMovement = true
+TeleportHesitationTime = 2.0

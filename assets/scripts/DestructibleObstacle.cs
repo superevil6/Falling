@@ -79,7 +79,7 @@ public partial class DestructibleObstacle : Area2D
 		p.ApplyKnockback(new Vector2(dirX, 0f), KnockbackSpeed);
 	}
 
-	private void TakeDamage(int amount)
+	public void TakeDamage(int amount)
 	{
 		currentHealth -= amount;
 		FlashRed();

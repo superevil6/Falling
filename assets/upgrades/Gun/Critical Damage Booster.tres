@@ -1,0 +1,12 @@
+[gd_resource type="Resource" load_steps=3 format=3 uid="uid://6ur7uvhul6sj"]
+
+[ext_resource type="Texture2D" uid="uid://c7sfp0d6nw71r" path="res://assets/sprites/Power Up Icons/Crit Multiplier.png" id="1_rmcps"]
+[ext_resource type="Script" uid="uid://cjvebtbs1ft7k" path="res://assets/scripts/GunUpgrade.cs" id="2_oy6uc"]
+
+[resource]
+script = ExtResource("2_oy6uc")
+Type = 16
+UpgradeImage = ExtResource("1_rmcps")
+UpgradeName = "Golden Powder"
+UpgradeDescription = "Increases the power of Golden Bullets."
+Value = 1.0

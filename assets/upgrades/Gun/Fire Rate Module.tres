@@ -1,0 +1,11 @@
+[gd_resource type="Resource" load_steps=3 format=3 uid="uid://cs8pps5d2oarb"]
+
+[ext_resource type="Texture2D" uid="uid://dildlb4tjpp18" path="res://assets/sprites/Power Up Icons/Fire Rate Up.png" id="1_6ytli"]
+[ext_resource type="Script" uid="uid://cjvebtbs1ft7k" path="res://assets/scripts/GunUpgrade.cs" id="1_sem7g"]
+
+[resource]
+script = ExtResource("1_sem7g")
+Type = 1
+UpgradeImage = ExtResource("1_6ytli")
+UpgradeName = "Fire Rate Module"
+Value = -0.1

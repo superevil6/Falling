@@ -2,16 +2,23 @@ using Godot;
 
 public partial class Gun : Resource
 {
+	public string SourceName {get;set;}
 	[Export]
 	public Texture2D GunImage {get;set;}
 	[Export]
 	public GunType GunType {get; set;}
+	[Export]
+	public string GunDescription {get; set;}
 	[Export]
 	public float FireRate {get;set;}
 	[Export]
 	public int Damage {get;set;}
 	[Export]
 	public int BulletCount {get;set;}
+	[Export]
+	public int DirectionalCount {get;set;} = 1;
+	[Export]
+	public float DirectionalAngle {get;set;} = 0f;
 	[Export]
 	public float BulletSpread {get;set;}
 	[Export]
@@ -44,6 +51,22 @@ public partial class Gun : Resource
 	public int DamageModifier {get;set;}
 	[Export]
 	public bool IsLaser {get;set;}
+	[Export]
+	public bool IsChargeWeapon {get;set;}
+	[Export(PropertyHint.Range, "0,1,0.01")]
+	public float CriticalChance {get;set;} = 0f;
+	[Export]
+	public float CriticalMultiplier {get;set;} = 2f;
+	[Export]
+	public int MinDamage {get;set;} = 1;
+	[Export]
+	public int MaxDamage {get;set;} = 10;
+	[Export]
+	public float MinSize {get;set;} = 1f;
+	[Export]
+	public float MaxSize {get;set;} = 3f;
+	[Export]
+	public float ChargeTime {get;set;} = 1.5f;
 	[Export]
 	public int DotStacksPerHit {get;set;} = 0;
 	[Export]

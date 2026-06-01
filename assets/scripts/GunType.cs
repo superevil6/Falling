@@ -6,5 +6,7 @@ public enum GunType
     Flamethrower = 3,
     Rocket = 4,
     MachineGun = 5,
-    Laser = 6
+    Laser = 6,
+    Charge = 7,
+    MultiDirection = 8
 }

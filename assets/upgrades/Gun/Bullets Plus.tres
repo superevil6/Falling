@@ -1,0 +1,11 @@
+[gd_resource type="Resource" load_steps=3 format=3 uid="uid://s55rq53eyjdj"]
+
+[ext_resource type="Texture2D" uid="uid://cuadt1t3i78af" path="res://assets/sprites/Power Up Icons/Bullet Plus.png" id="1_b3jnv"]
+[ext_resource type="Script" uid="uid://cjvebtbs1ft7k" path="res://assets/scripts/GunUpgrade.cs" id="1_s7xub"]
+
+[resource]
+script = ExtResource("1_s7xub")
+Type = 2
+UpgradeImage = ExtResource("1_b3jnv")
+UpgradeName = "Bullet Plus"
+Value = 1.0

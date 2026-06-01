@@ -45,6 +45,9 @@ public partial class Enemy : Area2D
 	[Export]
 	public int CurrentHealth {get;set;}
 	private float GunCoolDown;
+	private float meleeCoolDown;
+	private bool telegraphActive = false;
+	private const float TelegraphLeadTime = 0.5f;
 	public AnimatedSprite2D animatedSprite2D;
 	public Vector2 PostSpawnDestination {get;set;}
 	private bool ReachedPostSpawnDestination = false;
@@ -61,6 +64,7 @@ public partial class Enemy : Area2D
 		scaledDamageReduction = Mathf.RoundToInt(Stats.DamageReduction * scale);
 		CurrentHealth = scaledMaxHealth;
 		rng.Randomize();
+		if (Stats.Gun != null) GunCoolDown = TelegraphLeadTime;
 		if (Stats.TeleportMovement) {
 			teleportTimer = Stats.TeleportHesitationTime;
 		}
@@ -83,11 +87,25 @@ public partial class Enemy : Area2D
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
-		if (GunCoolDown <= 0 && CurrentHealth > 0) {
-			Shoot();
+		if (Stats?.IsLeader == true && CurrentHealth > 0) QueueRedraw();
+		if (Stats?.Gun != null && CurrentHealth > 0) {
+			if (!telegraphActive && GunCoolDown > 0f && GunCoolDown <= TelegraphLeadTime) {
+				SpawnAttackIndicator();
+				telegraphActive = true;
+			}
+			if (GunCoolDown <= 0f) {
+				Shoot();
+				telegraphActive = false;
+			}
 		}
 		if (GunCoolDown > 0) {
 			GunCoolDown -= (float)delta;
+		}
+		if (meleeCoolDown > 0) {
+			meleeCoolDown -= (float)delta;
+		}
+		if (Stats?.Melee != null && meleeCoolDown <= 0 && CurrentHealth > 0) {
+			TrySwingMelee();
 		}
 		int dotDamage = StatusEffects.Tick((float)delta);
 		if (dotDamage > 0) TakeDamage(dotDamage, ElementType.NonElemental);
@@ -130,11 +148,11 @@ public partial class Enemy : Area2D
 					case MovementType.Stationary:
 					break;
 					case MovementType.TowardsPlayer:
-					var towards = playerLocation * (Stats.MovementSpeed * StatusEffects.GetSpeedMultiplier()) * (float)delta;
+					var towards = playerLocation * EffectiveMovementSpeed * (float)delta;
 					Position += towards;
 					break;
 					case MovementType.AwayFromPlayer:
-					var away = -playerLocation * (Stats.MovementSpeed * StatusEffects.GetSpeedMultiplier()) * (float)delta;
+					var away = -playerLocation * EffectiveMovementSpeed * (float)delta;
 					Position += away;
 					var screen = GetViewportRect().Size;
 					Position = new Vector2(
@@ -149,7 +167,7 @@ public partial class Enemy : Area2D
 						randomDirection = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
 						randomDirectionTimer = RandomDirectionInterval;
 					}
-					Position += randomDirection * (Stats.MovementSpeed * StatusEffects.GetSpeedMultiplier()) * (float)delta;
+					Position += randomDirection * EffectiveMovementSpeed * (float)delta;
 					break;
 					case MovementType.SmallSquare:
 					{
@@ -162,7 +180,7 @@ public partial class Enemy : Area2D
 						};
 						Vector2 squareTarget = PostSpawnDestination + cornerOffset;
 						Vector2 toSquareTarget = squareTarget - Position;
-						float squareStep = (Stats.MovementSpeed * StatusEffects.GetSpeedMultiplier()) * (float)delta;
+						float squareStep = EffectiveMovementSpeed * (float)delta;
 						if (toSquareTarget.Length() <= squareStep) {
 							Position = squareTarget;
 							currentSquareCorner = (currentSquareCorner + 1) % 4;
@@ -182,7 +200,7 @@ public partial class Enemy : Area2D
 						};
 						Vector2 squareTarget = PostSpawnDestination + cornerOffset;
 						Vector2 toSquareTarget = squareTarget - Position;
-						float squareStep = (Stats.MovementSpeed * StatusEffects.GetSpeedMultiplier()) * (float)delta;
+						float squareStep = EffectiveMovementSpeed * (float)delta;
 						if (toSquareTarget.Length() <= squareStep) {
 							Position = squareTarget;
 							currentSquareCorner = (currentSquareCorner + 1) % 4;
@@ -193,14 +211,14 @@ public partial class Enemy : Area2D
 					break;
 					case MovementType.SmallCircle:
 					{
-						float omega = SmallCircleRadius > 0f ? (Stats.MovementSpeed * StatusEffects.GetSpeedMultiplier()) / SmallCircleRadius : 0f;
+						float omega = SmallCircleRadius > 0f ? EffectiveMovementSpeed / SmallCircleRadius : 0f;
 						currentCircleAngle += omega * (float)delta;
 						Position = PostSpawnDestination + new Vector2(Mathf.Cos(currentCircleAngle), Mathf.Sin(currentCircleAngle)) * SmallCircleRadius;
 					}
 					break;
 					case MovementType.LargeCircle:
 					{
-						float omega = LargeCircleRadius > 0f ? (Stats.MovementSpeed * StatusEffects.GetSpeedMultiplier()) / LargeCircleRadius : 0f;
+						float omega = LargeCircleRadius > 0f ? EffectiveMovementSpeed / LargeCircleRadius : 0f;
 						currentCircleAngle += omega * (float)delta;
 						Position = PostSpawnDestination + new Vector2(Mathf.Cos(currentCircleAngle), Mathf.Sin(currentCircleAngle)) * LargeCircleRadius;
 					}
@@ -209,7 +227,7 @@ public partial class Enemy : Area2D
 					{
 						float targetY = PostSpawnDestination.Y + verticalDirection * VerticalAmplitude;
 						float dy = targetY - Position.Y;
-						float step = (Stats.MovementSpeed * StatusEffects.GetSpeedMultiplier()) * (float)delta;
+						float step = EffectiveMovementSpeed * (float)delta;
 						if (Mathf.Abs(dy) <= step) {
 							Position = new Vector2(Position.X, targetY);
 							verticalDirection = -verticalDirection;
@@ -222,7 +240,7 @@ public partial class Enemy : Area2D
 					{
 						float targetX = PostSpawnDestination.X + horizontalDirection * HorizontalAmplitude;
 						float dx = targetX - Position.X;
-						float step = (Stats.MovementSpeed * StatusEffects.GetSpeedMultiplier()) * (float)delta;
+						float step = EffectiveMovementSpeed * (float)delta;
 						if (Mathf.Abs(dx) <= step) {
 							Position = new Vector2(targetX, Position.Y);
 							horizontalDirection = -horizontalDirection;
@@ -233,7 +251,7 @@ public partial class Enemy : Area2D
 					break;
 					case MovementType.DiagonalBackAndForth:
 					{
-						float step = (Stats.MovementSpeed * StatusEffects.GetSpeedMultiplier()) * (float)delta;
+						float step = EffectiveMovementSpeed * (float)delta;
 						float targetX = PostSpawnDestination.X + horizontalDirection * HorizontalAmplitude;
 						float dx = targetX - Position.X;
 						float newX;
@@ -311,6 +329,7 @@ public partial class Enemy : Area2D
 	}
 
 	private bool hasBeenHit = false;
+	private bool coreDeathTriggered = false;
 	private int scaledMaxHealth;
 	private int scaledDamage;
 	private int scaledDamageReduction;
@@ -329,11 +348,45 @@ public partial class Enemy : Area2D
 			if (element == ElementalWeakness) dmg *= 2f;
 			else if (element == ElementalDefense) dmg *= 0.5f;
 		}
-		int finalDamage = Mathf.Max(0, Mathf.RoundToInt(dmg) - scaledDamageReduction);
+		int boostedReduction = Mathf.RoundToInt(scaledDamageReduction * (1f + GetLeaderBoost(LeaderType.Defense)));
+		int finalDamage = Mathf.Max(0, Mathf.RoundToInt(dmg) - boostedReduction);
 		CurrentHealth -= finalDamage;
 		if (CurrentHealth > 0) FlashRed();
 		hasBeenHit = true;
 		QueueRedraw();
+		if (Stats?.IsCore == true && CurrentHealth <= 0 && !coreDeathTriggered) {
+			coreDeathTriggered = true;
+			TriggerCoreDeath();
+		}
+	}
+
+	private float GetLeaderBoost(LeaderType type)
+	{
+		float total = 0f;
+		foreach (var n in GetTree().GetNodesInGroup("Enemy")) {
+			if (n is Enemy e && e != this && e.CurrentHealth > 0
+				&& e.Stats?.IsLeader == true && e.Stats.LeaderType == type) {
+				total += e.Stats.LeaderBoostPercentage;
+			}
+		}
+		return total / 100f;
+	}
+
+	private float EffectiveMovementSpeed => Stats.MovementSpeed
+		* StatusEffects.GetSpeedMultiplier()
+		* (1f + GetLeaderBoost(LeaderType.Speed));
+
+	private void TriggerCoreDeath()
+	{
+		foreach (var n in GetTree().GetNodesInGroup("Enemy")) {
+			if (n is Enemy e && e != this && e.CurrentHealth > 0) {
+				e.CurrentHealth = 0;
+				if (e.animatedSprite2D != null) {
+					e.animatedSprite2D.Animation = "Death";
+					e.animatedSprite2D.Play();
+				}
+			}
+		}
 	}
 
 	private float ComputeStageScale()
@@ -394,6 +447,7 @@ public partial class Enemy : Area2D
 
 	public override void _Draw()
 	{
+		if (Stats?.IsLeader == true && CurrentHealth > 0) DrawLeaderAura();
 		if (!hasBeenHit || CurrentHealth <= 0) return;
 		var p = GetParent()?.GetNodeOrNull<Player>("Player");
 		if (p == null || !p.HasSeeEnemyHealth) return;
@@ -406,6 +460,22 @@ public partial class Enemy : Area2D
 		DrawRect(new Rect2(barPos, new Vector2(barWidth, barHeight)), new Color(0.1f, 0.1f, 0.1f, 0.85f));
 		DrawRect(new Rect2(barPos, new Vector2(barWidth * healthRatio, barHeight)), new Color(0.9f, 0.2f, 0.2f));
 		DrawRect(new Rect2(barPos, new Vector2(barWidth, barHeight)), Colors.Black, false, 1.0f);
+	}
+
+	private void DrawLeaderAura()
+	{
+		Color c = Stats.LeaderType switch {
+			LeaderType.Attack => new Color(1f, 0.2f, 0.2f),
+			LeaderType.Defense => new Color(0.3f, 0.5f, 1f),
+			LeaderType.FireRate => new Color(1f, 0.9f, 0.2f),
+			LeaderType.Speed => new Color(0.3f, 1f, 0.4f),
+			_ => Colors.White,
+		};
+		float pulse = 0.85f + 0.15f * Mathf.Sin(Time.GetTicksMsec() / 200f);
+		float r = 55f * pulse;
+		DrawCircle(Vector2.Zero, r * 1.6f, new Color(c.R, c.G, c.B, 0.12f));
+		DrawCircle(Vector2.Zero, r * 1.1f, new Color(c.R, c.G, c.B, 0.22f));
+		DrawCircle(Vector2.Zero, r * 0.7f, new Color(c.R, c.G, c.B, 0.32f));
 	}
 
 	private Tween flashTween;
@@ -456,28 +526,68 @@ public partial class Enemy : Area2D
 		}
 	}
 
+	private void SpawnAttackIndicator() {
+		var p = GetParent()?.GetNodeOrNull<Player>("Player");
+		if (p == null) return;
+		Vector2 dir = (p.GlobalPosition - GlobalPosition).Normalized();
+		if (dir == Vector2.Zero) return;
+		var ind = new AttackIndicator();
+		ind.Anchor = this;
+		ind.Duration = TelegraphLeadTime;
+		ind.GlobalPosition = GlobalPosition;
+		ind.Rotation = dir.Angle();
+		GetParent().AddChild(ind);
+	}
+
+	private void TrySwingMelee() {
+		if (Stats.Melee.Attack == null) return;
+		var p = GetParent()?.GetNodeOrNull<Player>("Player");
+		if (p == null) return;
+		Vector2 toPlayer = p.GlobalPosition - GlobalPosition;
+		if (toPlayer.Length() > Stats.MeleeRange) return;
+		MeleeAttack a = Stats.Melee.Attack.Instantiate<MeleeAttack>();
+		a.Direction = toPlayer.Normalized();
+		a.Damage = Mathf.Max(1, Mathf.RoundToInt(Stats.Melee.Damage * ComputeStageScale()));
+		a.SwingDuration = Stats.Melee.SwingDuration;
+		a.SwingArc = Stats.Melee.SwingArc;
+		a.OffsetDistance = Stats.Melee.OffsetDistance;
+		a.SetCollisionLayerValue(5, true);
+		a.SetCollisionMaskValue(2, true);
+		AddChild(a);
+		meleeCoolDown = Stats.MeleeCooldown;
+	}
+
 	private void Shoot() {
-		for (int i = 0; i < Stats.Gun.BulletCount; i++) {
-			var playerLocation = ((GetParent().GetNode("Player") as Node2D).GlobalPosition - GlobalPosition).Normalized();
-			animatedSprite2D.Animation = "Shoot";
-			animatedSprite2D.LookAt(playerLocation);
-			animatedSprite2D.Play();
-			Bullet b = Stats.Gun.BulletType.Instantiate<Bullet>();
-			b.Set("Direction", playerLocation);
-			b.Set("Damage", scaledDamage);
-			b.Set("BulletLifetime", Stats.Gun.BulletLifetime);
-			b.Gun = Stats.Gun;
-			if (Stats.Gun.BulletSpeed > 0) b.BulletSpeed = Stats.Gun.BulletSpeed;
-			if (Stats.Gun.BulletSpriteFrames != null) {
-				var bSprite = b.GetNodeOrNull<AnimatedSprite2D>("AnimatedSprite2D");
-				if (bSprite != null) bSprite.SpriteFrames = Stats.Gun.BulletSpriteFrames;
+		int boostedDamage = Mathf.RoundToInt(scaledDamage * (1f + GetLeaderBoost(LeaderType.Attack)));
+		var playerLocation = ((GetParent().GetNode("Player") as Node2D).GlobalPosition - GlobalPosition).Normalized();
+		animatedSprite2D.Animation = "Shoot";
+		animatedSprite2D.LookAt(playerLocation);
+		animatedSprite2D.Play();
+		int dirCount = Mathf.Max(1, Stats.Gun.DirectionalCount);
+		float dirStep = Mathf.DegToRad(Stats.Gun.DirectionalAngle);
+		for (int d = 0; d < dirCount; d++) {
+			Vector2 dir = playerLocation.Rotated(dirStep * d);
+			for (int i = 0; i < Stats.Gun.BulletCount; i++) {
+				bool crit = Stats.Gun.CriticalChance > 0f && rng.Randf() < Stats.Gun.CriticalChance;
+				int dmg = crit ? Mathf.RoundToInt(boostedDamage * Stats.Gun.CriticalMultiplier) : boostedDamage;
+				Bullet b = Stats.Gun.BulletType.Instantiate<Bullet>();
+				b.Set("Direction", dir);
+				b.Set("Damage", dmg);
+				b.Set("BulletLifetime", Stats.Gun.BulletLifetime);
+				b.Gun = Stats.Gun;
+				if (Stats.Gun.BulletSpeed > 0) b.BulletSpeed = Stats.Gun.BulletSpeed;
+				if (Stats.Gun.BulletSpriteFrames != null) {
+					var bSprite = b.GetNodeOrNull<AnimatedSprite2D>("AnimatedSprite2D");
+					if (bSprite != null) bSprite.SpriteFrames = Stats.Gun.BulletSpriteFrames;
+				}
+				b.AuraColor = crit ? new Color(1f, 0.84f, 0.1f, 0.95f) : new Color(1f, 0.3f, 0.3f, 0.8f);
+				b.Position = Position;
+				b.Rotation = dir.Angle();
+				b.SetCollisionLayerValue(5, true);
+				b.SetCollisionMaskValue(2, true);
+				GetParent().AddChild(b);
 			}
-			b.Position = Position;
-			b.Rotation = playerLocation.Angle();
-			b.SetCollisionLayerValue(5, true);
-			b.SetCollisionMaskValue(2, true);
-			GetParent().AddChild(b);
 		}
-		GunCoolDown = Stats.Gun.FireRate * StatusEffects.GetFireRateMultiplier();
+		GunCoolDown = Stats.Gun.FireRate * StatusEffects.GetFireRateMultiplier() / (1f + GetLeaderBoost(LeaderType.FireRate));
 	}
 }

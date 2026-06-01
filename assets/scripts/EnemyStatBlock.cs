@@ -11,6 +11,10 @@ public partial class EnemyStatBlock : Resource
 	[Export]
 	public MeleeWeapon Melee {get;set;}
 	[Export]
+	public float MeleeRange {get;set;} = 120f;
+	[Export]
+	public float MeleeCooldown {get;set;} = 1.5f;
+	[Export]
 	public MovementType MovementType {get;set;}
 	[Export]
 	public int SpawnMovementSpeed { get; set; } = 5;
@@ -30,6 +34,14 @@ public partial class EnemyStatBlock : Resource
 	public ItemDrop[] ItemDrops {get;set;}
 	[Export]
 	public bool IsBoss { get; set; }
+	[Export]
+	public bool IsCore { get; set; }
+	[Export]
+	public bool IsLeader { get; set; }
+	[Export]
+	public LeaderType LeaderType { get; set; }
+	[Export]
+	public float LeaderBoostPercentage { get; set; } = 25f;
 	[Export]
 	public bool TeleportMovement {get;set;} = false;
 	[Export]

@@ -61,6 +61,8 @@ public partial class Player : CharacterBody2D
 	private float TimeSinceLastAfterImage = 0f;
 	private Shader afterImageShader;
 	private Line2D activeLaser;
+	private float chargeAmount = 0f;
+	private float chargePulseTime = 0f;
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
@@ -70,7 +72,11 @@ public partial class Player : CharacterBody2D
 		rng.Randomize();
 		if (Guns != null) {
 			for (int i = 0; i < Guns.Length; i++) {
-				if (Guns[i] != null) Guns[i] = (Gun)Guns[i].Duplicate();
+				if (Guns[i] != null) {
+					string srcName = System.IO.Path.GetFileNameWithoutExtension(Guns[i].ResourcePath);
+					Guns[i] = (Gun)Guns[i].Duplicate();
+					Guns[i].SourceName = srcName;
+				}
 			}
 		}
 		if (BodyMods != null) {
@@ -93,11 +99,17 @@ public partial class Player : CharacterBody2D
 		else if (Input.IsActionJustPressed("gun_2")) { currentGunIndex = 1; gunSwitched = true; }
 		else if (Input.IsActionJustPressed("gun_3")) { currentGunIndex = 2; gunSwitched = true; }
 		else if (Input.IsActionJustPressed("gun_4")) { currentGunIndex = 3; gunSwitched = true; }
-		if (gunSwitched) UpdateGunLabel();
+		if (gunSwitched) {
+			UpdateGunLabel();
+			CancelCharge();
+		}
 		#region Shooting
 		Vector2 aimDirection = Input.GetVector("aim_left", "aim_right", "aim_up", "aim_down");
 		bool wantsToFire = Input.IsActionPressed("gun") && aimDirection != Vector2.Zero && Gun != null;
-		if (Gun != null && Gun.IsLaser && wantsToFire) {
+		if (Gun != null && Gun.IsChargeWeapon) {
+			ClearLaser();
+			UpdateChargeState(aimDirection, (float)delta);
+		} else if (Gun != null && Gun.IsLaser && wantsToFire) {
 			UpdateLaserBeam(aimDirection);
 		} else {
 			ClearLaser();
@@ -157,15 +169,20 @@ public partial class Player : CharacterBody2D
 
 	public void UpdateGunLabel()
 	{
+		var gunImage = GetParent().GetNodeOrNull<TextureRect>("Gun Image");
 		if (Gun == null) {
 			GetParent().GetNode<Label>("Gun Label").Text = "Gun: -";
+			if (gunImage != null) gunImage.Texture = null;
 			return;
 		}
-		string gunName = !string.IsNullOrEmpty(Gun.ResourcePath)
-			? System.IO.Path.GetFileNameWithoutExtension(Gun.ResourcePath)
-			: "-";
+		string gunName = !string.IsNullOrEmpty(Gun.SourceName)
+			? Gun.SourceName
+			: (!string.IsNullOrEmpty(Gun.ResourcePath)
+				? System.IO.Path.GetFileNameWithoutExtension(Gun.ResourcePath)
+				: "-");
 		GetParent().GetNode<Label>("Gun Label").Text =
 			$"Gun: {gunName}  Lv{Gun.CurrentLevel}  XP {Gun.CurrentExperience}/{Gun.ExperiencePerLevel}  SP {Gun.SkillPoints}";
+		if (gunImage != null) gunImage.Texture = Gun.GunImage;
 	}
 
 	private void SpawnAfterImage()
@@ -331,8 +348,116 @@ public partial class Player : CharacterBody2D
 	}
 
 
+	private void UpdateChargeState(Vector2 aimDirection, float delta) {
+		if (gunCoolDown > 0f) {
+			ApplyChargeGlow(0f);
+			return;
+		}
+		bool holding = Input.IsActionPressed("gun") && aimDirection != Vector2.Zero;
+		if (holding) {
+			chargeAmount = Mathf.Min(chargeAmount + delta, Gun.ChargeTime);
+			chargePulseTime += delta;
+		} else {
+			chargePulseTime = 0f;
+		}
+		if (Input.IsActionJustReleased("gun") && chargeAmount > 0f && aimDirection != Vector2.Zero) {
+			FireCharged(aimDirection);
+			gunCoolDown = Gun.FireRate * StatusEffects.GetFireRateMultiplier();
+			chargeAmount = 0f;
+		}
+		if (Input.IsActionJustReleased("gun") && aimDirection == Vector2.Zero) {
+			chargeAmount = 0f;
+		}
+		float ratio = Gun.ChargeTime > 0f ? chargeAmount / Gun.ChargeTime : 0f;
+		ApplyChargeGlow(ratio);
+	}
+
+	private void CancelCharge() {
+		chargeAmount = 0f;
+		chargePulseTime = 0f;
+		ApplyChargeGlow(0f);
+	}
+
+	private void ApplyChargeGlow(float ratio) {
+		ratio = Mathf.Clamp(ratio, 0f, 1f);
+		QueueRedraw();
+		if (ratio <= 0f) {
+			animatedSprite2D.Modulate = Colors.White;
+			return;
+		}
+		bool maxed = ratio >= 1f;
+		float pulse = 0.85f + 0.15f * Mathf.Sin(chargePulseTime * (maxed ? 24f : 14f));
+		Color target = maxed ? new Color(2.0f, 1.6f, 0.5f, 1f) : new Color(1.3f, 1.5f, 2.0f, 1f);
+		animatedSprite2D.Modulate = Colors.White.Lerp(target, ratio * pulse);
+	}
+
+	public override void _Draw()
+	{
+		if (Gun == null || !Gun.IsChargeWeapon || chargeAmount <= 0f) return;
+		float ratio = Gun.ChargeTime > 0f ? Mathf.Clamp(chargeAmount / Gun.ChargeTime, 0f, 1f) : 1f;
+		bool maxed = ratio >= 1f;
+		Color c = maxed ? new Color(1f, 0.85f, 0.2f) : new Color(0.3f, 0.6f, 1f);
+		float pulse = 0.85f + 0.15f * Mathf.Sin(chargePulseTime * (maxed ? 24f : 14f));
+		float r = Mathf.Lerp(35f, 95f, ratio) * pulse;
+		float baseAlpha = maxed ? 1f : Mathf.Lerp(0.3f, 1f, ratio);
+		DrawCircle(Vector2.Zero, r * 1.6f, new Color(c.R, c.G, c.B, 0.12f * baseAlpha));
+		DrawCircle(Vector2.Zero, r * 1.1f, new Color(c.R, c.G, c.B, 0.22f * baseAlpha));
+		DrawCircle(Vector2.Zero, r * 0.7f, new Color(c.R, c.G, c.B, 0.32f * baseAlpha));
+	}
+
+	private void FireCharged(Vector2 aimDirection) {
+		animatedSprite2D.Animation = "Shooting";
+		animatedSprite2D.Play();
+		float ratio = Gun.ChargeTime > 0f ? Mathf.Clamp(chargeAmount / Gun.ChargeTime, 0f, 1f) : 1f;
+		int baseDamage = Mathf.RoundToInt(Mathf.Lerp(Gun.MinDamage, Gun.MaxDamage, ratio));
+		float sizeMult = Mathf.Lerp(Gun.MinSize, Gun.MaxSize, ratio);
+		int dirCount = Mathf.Max(1, Gun.DirectionalCount);
+		float dirStep = Mathf.DegToRad(Gun.DirectionalAngle);
+		for (int d = 0; d < dirCount; d++) {
+			Vector2 dir = aimDirection.Rotated(dirStep * d).Normalized();
+			bool crit = RollCrit(Gun, out int damage, baseDamage);
+			Bullet b = Gun.BulletType.Instantiate<Bullet>();
+			b.Set("Direction", dir);
+			b.Set("Damage", damage);
+			b.Set("BulletLifetime", Gun.BulletLifetime);
+			b.Gun = Gun;
+			if (Gun.BulletSpeed > 0) b.BulletSpeed = Gun.BulletSpeed;
+			if (Gun.BulletSpriteFrames != null) {
+				var bSprite = b.GetNodeOrNull<AnimatedSprite2D>("AnimatedSprite2D");
+				if (bSprite != null) bSprite.SpriteFrames = Gun.BulletSpriteFrames;
+			}
+			if (Gun.Element != ElementType.NonElemental) b.Element = Gun.Element;
+			b.AuraColor = crit ? CritAuraColor : new Color(0.3f, 0.6f, 1f, 0.8f);
+			b.Position = Position;
+			b.Rotation = dir.Angle();
+			b.SetCollisionLayerValue(4, true);
+			b.SetCollisionMaskValue(3, true);
+			b.SetCollisionMaskValue(1, true);
+			GetParent().AddChild(b);
+			b.Scale *= sizeMult;
+		}
+	}
+
+	private static readonly Color CritAuraColor = new Color(1f, 0.84f, 0.1f, 0.95f);
+
+	private bool RollCrit(Gun gun, out int damage, int baseDamage) {
+		bool crit = gun.CriticalChance > 0f && rng.Randf() < gun.CriticalChance;
+		damage = crit ? Mathf.RoundToInt(baseDamage * gun.CriticalMultiplier) : baseDamage;
+		return crit;
+	}
+
 	private void Shoot(Vector2 aimDirection) {
 		animatedSprite2D.Animation = "Shooting";
+		int dirCount = Mathf.Max(1, Gun.DirectionalCount);
+		float dirStep = Mathf.DegToRad(Gun.DirectionalAngle);
+		for (int d = 0; d < dirCount; d++) {
+			SpawnBulletSpread(aimDirection.Rotated(dirStep * d));
+		}
+		animatedSprite2D.Play();
+		gunCoolDown = Gun.FireRate * StatusEffects.GetFireRateMultiplier();
+	}
+
+	private void SpawnBulletSpread(Vector2 aimDirection) {
 		Vector2 perp = aimDirection.Normalized().Rotated(Mathf.Pi / 2f);
 		float center = (Gun.BulletCount - 1) / 2f;
 		float effectiveSpread = Gun.BulletSpread + StatusEffects.GetSpreadIncrease();
@@ -344,8 +469,9 @@ public partial class Player : CharacterBody2D
 				? rng.RandfRange(-halfSpread, halfSpread)
 				: 0f;
 			Vector2 direction = aimDirection.Rotated(angle);
+			bool crit = RollCrit(Gun, out int dmg, Gun.Damage);
 			b.Set("Direction", direction);
-			b.Set("Damage", Gun.Damage);
+			b.Set("Damage", dmg);
 			b.Set("BulletLifetime", Gun.BulletLifetime);
 			b.Gun = Gun;
 			if (Gun.BulletSpeed > 0) b.BulletSpeed = Gun.BulletSpeed;
@@ -354,6 +480,7 @@ public partial class Player : CharacterBody2D
 				if (bSprite != null) bSprite.SpriteFrames = Gun.BulletSpriteFrames;
 			}
 			if (Gun.Element != ElementType.NonElemental) b.Element = Gun.Element;
+			b.AuraColor = crit ? CritAuraColor : new Color(0.3f, 0.6f, 1f, 0.8f);
 			b.Position = Position + perp * (i - center) * perBulletSeparation;
 			b.Rotation = direction.Angle();
 			b.SetCollisionLayerValue(4, true);
@@ -361,8 +488,6 @@ public partial class Player : CharacterBody2D
 			b.SetCollisionMaskValue(1, true);
 			GetParent().AddChild(b);
 		}
-		animatedSprite2D.Play();
-		gunCoolDown = Gun.FireRate * StatusEffects.GetFireRateMultiplier();
 	}
 
 	private void UpdateLaserBeam(Vector2 aimDirection)
@@ -377,6 +502,7 @@ public partial class Player : CharacterBody2D
 		var excluded = new Godot.Collections.Array<Rid>();
 		Vector2 endPoint = to;
 		Enemy hitEnemy = null;
+		DestructibleObstacle hitObstacle = null;
 		int safety = 32;
 		while (safety-- > 0) {
 			query.Exclude = excluded;
@@ -389,6 +515,7 @@ public partial class Player : CharacterBody2D
 			}
 			endPoint = (Vector2)result["position"];
 			if (collider is Enemy e) hitEnemy = e;
+			else if (collider is DestructibleObstacle d) hitObstacle = d;
 			break;
 		}
 		if (activeLaser == null) {
@@ -403,8 +530,9 @@ public partial class Player : CharacterBody2D
 			activeLaser.SetPointPosition(0, from);
 			activeLaser.SetPointPosition(1, endPoint);
 		}
-		if (hitEnemy != null && gunCoolDown <= 0) {
-			hitEnemy.TakeDamage(Gun.Damage, ElementType.NonElemental);
+		if (gunCoolDown <= 0 && (hitEnemy != null || hitObstacle != null)) {
+			if (hitEnemy != null) hitEnemy.TakeDamage(Gun.Damage, ElementType.NonElemental);
+			if (hitObstacle != null) hitObstacle.TakeDamage(Gun.Damage);
 			gunCoolDown = Gun.FireRate * StatusEffects.GetFireRateMultiplier();
 		}
 	}
@@ -418,14 +546,15 @@ public partial class Player : CharacterBody2D
 	}
 
 	private void MeleeAttack(Vector2 aimDirection) {
+		if (Melee?.Attack == null) return;
 		animatedSprite2D.Animation = "Swording";
 		animatedSprite2D.Play();
 		MeleeAttack a = Melee.Attack.Instantiate<MeleeAttack>();
-		a.Set("Direction", aimDirection.Normalized());
-		a.Set("Damage", Melee.Damage);
-		a.Set("SwingDuration", Melee.SwingDuration);
-		a.Position = new Vector2(aimDirection.X * 150, aimDirection.Y * 150);
-		a.Rotation = aimDirection.Angle();
+		a.Direction = aimDirection.Normalized();
+		a.Damage = Melee.Damage;
+		a.SwingDuration = Melee.SwingDuration;
+		a.SwingArc = Melee.SwingArc;
+		a.OffsetDistance = Melee.OffsetDistance;
 		a.SetCollisionLayerValue(4, true);
 		a.SetCollisionMaskValue(5, true);
 		AddChild(a);

@@ -14,5 +14,7 @@ public enum GunUpgradeType
     HeatSeeking = 11,
     Slowing = 12,
     BulletSize = 13,
-    Element = 14
+    Element = 14,
+    CriticalChance = 15,
+    CriticalMultiplier = 16,
 }

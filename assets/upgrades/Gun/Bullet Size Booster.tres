@@ -1,0 +1,11 @@
+[gd_resource type="Resource" load_steps=3 format=3 uid="uid://rdgjyqjipc3m"]
+
+[ext_resource type="Texture2D" uid="uid://dexyikn83gl7j" path="res://assets/sprites/Power Up Icons/Bullet Size Plus.png" id="1_3vba4"]
+[ext_resource type="Script" uid="uid://cjvebtbs1ft7k" path="res://assets/scripts/GunUpgrade.cs" id="1_x23lu"]
+
+[resource]
+script = ExtResource("1_x23lu")
+Type = 13
+UpgradeImage = ExtResource("1_3vba4")
+UpgradeName = "Bullet Size Booster"
+Value = 1.0

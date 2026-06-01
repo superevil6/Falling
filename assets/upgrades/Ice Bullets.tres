@@ -1,9 +1,0 @@
-[gd_resource type="Resource" load_steps=2 format=3 uid="uid://cwi5idfhoaro"]
-
-[ext_resource type="Script" uid="uid://cjvebtbs1ft7k" path="res://assets/scripts/GunUpgrade.cs" id="1_bh2c7"]
-
-[resource]
-script = ExtResource("1_bh2c7")
-Type = 14
-Element = 2
-UpgradeName = "Ice Bullets"

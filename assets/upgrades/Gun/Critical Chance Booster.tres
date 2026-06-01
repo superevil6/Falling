@@ -1,0 +1,12 @@
+[gd_resource type="Resource" load_steps=3 format=3 uid="uid://i26dy0b1i5b5"]
+
+[ext_resource type="Texture2D" uid="uid://b1yn3ieqbe188" path="res://assets/sprites/Power Up Icons/Crit Chance.png" id="1_6axxd"]
+[ext_resource type="Script" uid="uid://cjvebtbs1ft7k" path="res://assets/scripts/GunUpgrade.cs" id="2_yplof"]
+
+[resource]
+script = ExtResource("2_yplof")
+Type = 15
+UpgradeImage = ExtResource("1_6axxd")
+UpgradeName = "Golden Casing"
+UpgradeDescription = "Increases your chance of firing Golden Bullets."
+Value = 5.0

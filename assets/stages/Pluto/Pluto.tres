@@ -1,0 +1,22 @@
+[gd_resource type="Resource" load_steps=12 format=3 uid="uid://blj7cvw1dm7qh"]
+
+[ext_resource type="PackedScene" uid="uid://cpkjwu8cghp1l" path="res://assets/stages/Stage One/Backgrounds/Test Background.tscn" id="1_kptco"]
+[ext_resource type="Resource" path="res://assets/enemy groups/Cross.tres" id="2_6o3ty"]
+[ext_resource type="Resource" path="res://assets/enemy groups/Pentagon.tres" id="3_f2opl"]
+[ext_resource type="Resource" path="res://assets/enemy groups/Circle Formation.tres" id="4_bstuk"]
+[ext_resource type="Resource" path="res://assets/enemy groups/Vertical Line.tres" id="5_c84yv"]
+[ext_resource type="Resource" path="res://assets/enemy groups/V Formation.tres" id="6_mufi5"]
+[ext_resource type="Resource" path="res://assets/enemy groups/Triangle.tres" id="7_s1mfs"]
+[ext_resource type="PackedScene" uid="uid://cl8qfm2t0ht11" path="res://assets/stages/Stage One/Walls/Test Wall.tscn" id="8_bbw3q"]
+[ext_resource type="PackedScene" uid="uid://bsqiy1qekhvm1" path="res://assets/stages/Stage One/Walls/Test Wall 2.tscn" id="9_va8af"]
+[ext_resource type="PackedScene" uid="uid://b6q8eaq0h3eea" path="res://assets/stages/Stage One/Walls/Test Wall 3.tscn" id="10_5v22t"]
+[ext_resource type="Script" uid="uid://byqq3mnl0fxbu" path="res://assets/scripts/Stage.cs" id="11_fyero"]
+
+[resource]
+script = ExtResource("11_fyero")
+Name = "Pluto"
+EnemyGroup = Array[Resource]([ExtResource("2_6o3ty"), ExtResource("3_f2opl"), ExtResource("4_bstuk"), ExtResource("5_c84yv"), ExtResource("6_mufi5"), ExtResource("7_s1mfs")])
+Hazards = Array[PackedScene]([])
+LeftWallChunks = Array[PackedScene]([ExtResource("8_bbw3q"), ExtResource("9_va8af"), ExtResource("10_5v22t")])
+RightWallChunks = Array[PackedScene]([ExtResource("8_bbw3q"), ExtResource("9_va8af"), ExtResource("10_5v22t")])
+BackgroundImages = Array[PackedScene]([ExtResource("1_kptco")])

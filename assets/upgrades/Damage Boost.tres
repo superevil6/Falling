@@ -1,8 +1,0 @@
-[gd_resource type="Resource" load_steps=2 format=3 uid="uid://o8x2wl1vdkpy"]
-
-[ext_resource type="Script" uid="uid://cjvebtbs1ft7k" path="res://assets/scripts/GunUpgrade.cs" id="1_e2gll"]
-
-[resource]
-script = ExtResource("1_e2gll")
-UpgradeName = "Damage Boost"
-Value = 1.0

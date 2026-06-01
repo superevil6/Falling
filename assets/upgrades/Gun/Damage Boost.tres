@@ -1,0 +1,10 @@
+[gd_resource type="Resource" load_steps=3 format=3 uid="uid://o8x2wl1vdkpy"]
+
+[ext_resource type="Texture2D" uid="uid://d4hmslwmnmxew" path="res://assets/sprites/Power Up Icons/Bullet Damage Boost.png" id="1_ct4r5"]
+[ext_resource type="Script" uid="uid://cjvebtbs1ft7k" path="res://assets/scripts/GunUpgrade.cs" id="1_e2gll"]
+
+[resource]
+script = ExtResource("1_e2gll")
+UpgradeImage = ExtResource("1_ct4r5")
+UpgradeName = "Damage Boost"
+Value = 1.0

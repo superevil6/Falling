@@ -1,0 +1,11 @@
+[gd_resource type="Resource" load_steps=3 format=3 uid="uid://cwi5idfhoaro"]
+
+[ext_resource type="Texture2D" uid="uid://diayf4atbt0jw" path="res://assets/sprites/Power Up Icons/Cold Bullet.png" id="1_2mr1d"]
+[ext_resource type="Script" uid="uid://cjvebtbs1ft7k" path="res://assets/scripts/GunUpgrade.cs" id="1_bh2c7"]
+
+[resource]
+script = ExtResource("1_bh2c7")
+Type = 14
+Element = 2
+UpgradeImage = ExtResource("1_2mr1d")
+UpgradeName = "Ice Bullets"

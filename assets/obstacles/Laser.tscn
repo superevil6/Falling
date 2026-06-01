@@ -1,18 +1,12 @@
-[gd_scene load_steps=4 format=3 uid="uid://dn8sjicj4s07r"]
+[gd_scene load_steps=2 format=3 uid="uid://dn8sjicj4s07r"]
 
-[ext_resource type="Shader" uid="uid://nej1tvi1ocse" path="res://assets/shaders/PixelArt.gdshader" id="1_kqx3p"]
 [ext_resource type="Script" uid="uid://b55pmdrdquejn" path="res://assets/scripts/LaserObstacle.cs" id="2_kqx3p"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_q6nwq"]
-shader = ExtResource("1_kqx3p")
-shader_parameter/pixel_size = 4.0
-shader_parameter/color_steps = 8
-shader_parameter/hue_shift = 0.0
-shader_parameter/darkness = 0.0
-
 [node name="Node2D2" type="Area2D"]
-material = SubResource("ShaderMaterial_q6nwq")
 collision_mask = 3
 script = ExtResource("2_kqx3p")
+Damage = 10
+Thickness = 200.0
+LaserColor = Color(0, 0.70032614, 0.41474104, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
