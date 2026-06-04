@@ -1,0 +1,11 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://cu1pu8seg4cln"]
+
+[ext_resource type="Script" uid="uid://cjvebtbs1ft7k" path="res://assets/scripts/GunUpgrade.cs" id="1_pywb2"]
+
+[resource]
+script = ExtResource("1_pywb2")
+Type = 11
+UpgradeName = "Magnetic Rounds"
+UpgradeDescription = "Bullets gain a large amount of heat seeking property, and will follow enemies."
+Value = 10.0
+Rarity = 2

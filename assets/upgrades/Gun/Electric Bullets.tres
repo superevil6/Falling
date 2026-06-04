@@ -9,3 +9,6 @@ Type = 14
 Element = 3
 UpgradeImage = ExtResource("1_pm1c5")
 UpgradeName = "Electric Bullets"
+UpgradeDescription = "Shoot charged rounds that cause enemies to not be able to attack. "
+Value = 1.0
+Rarity = 1

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://d325lnbfktyi"]
+
+[ext_resource type="Script" uid="uid://cjvebtbs1ft7k" path="res://assets/scripts/GunUpgrade.cs" id="2_uexpm"]
+
+[resource]
+script = ExtResource("2_uexpm")
+Type = 17
+UpgradeName = "Vamprism"
+UpgradeDescription = "Bullets fired by this gun puncture enemies and release their mercury, healing you."
+Value = 1.0
+Rarity = 2

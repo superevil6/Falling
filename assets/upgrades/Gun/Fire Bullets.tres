@@ -9,3 +9,6 @@ Type = 14
 Element = 1
 UpgradeImage = ExtResource("1_kmsmu")
 UpgradeName = "Fire Bullets"
+UpgradeDescription = "Shoot enflamed rounds that burn enemies for additional damage over time."
+Value = 1.0
+Rarity = 1

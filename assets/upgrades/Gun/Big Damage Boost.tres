@@ -7,4 +7,6 @@
 script = ExtResource("1_vkwt3")
 UpgradeImage = ExtResource("1_wnckw")
 UpgradeName = "Big Damage Boost"
+UpgradeDescription = "Greatly increases gun damage."
 Value = 3.0
+Rarity = 1

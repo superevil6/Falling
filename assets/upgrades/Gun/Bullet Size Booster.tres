@@ -8,4 +8,5 @@ script = ExtResource("1_x23lu")
 Type = 13
 UpgradeImage = ExtResource("1_3vba4")
 UpgradeName = "Bullet Size Booster"
+UpgradeDescription = "Shoot bigger bullets."
 Value = 1.0

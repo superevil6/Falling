@@ -1,8 +1,10 @@
 using Godot;
+using System.Collections.Generic;
 
 public partial class Gun : Resource
 {
 	public string SourceName {get;set;}
+	public List<GunUpgrade> AppliedUpgrades {get;set;} = new List<GunUpgrade>();
 	[Export]
 	public Texture2D GunImage {get;set;}
 	[Export]
@@ -58,6 +60,8 @@ public partial class Gun : Resource
 	[Export]
 	public float CriticalMultiplier {get;set;} = 2f;
 	[Export]
+	public float LifeSteal {get;set;} = 0f;
+	[Export]
 	public int MinDamage {get;set;} = 1;
 	[Export]
 	public int MaxDamage {get;set;} = 10;
@@ -98,6 +102,7 @@ public partial class Gun : Resource
 	public void ApplyUpgrade(GunUpgrade upgrade)
 	{
 		if (upgrade == null) return;
+		AppliedUpgrades.Add(upgrade);
 		switch (upgrade.Type) {
 			case GunUpgradeType.Damage: Damage += Mathf.RoundToInt(upgrade.Value); break;
 			case GunUpgradeType.FireRate: FireRate += upgrade.Value; break;
@@ -114,6 +119,7 @@ public partial class Gun : Resource
 			case GunUpgradeType.Slowing: Slowing += upgrade.Value; break;
 			case GunUpgradeType.Element: Element = upgrade.Element; break;
 			case GunUpgradeType.BulletSize: BulletSize += upgrade.Value; break;
+			case GunUpgradeType.LifeSteal: LifeSteal += upgrade.Value; break;
 		}
 	}
 }

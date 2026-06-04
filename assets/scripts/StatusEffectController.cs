@@ -46,6 +46,30 @@ public class StatusEffectController
 		return GetStackCount(StatusEffectType.Blind) * SpreadPerStack;
 	}
 
+	public Color GetTint()
+	{
+		float weightSum = 0f;
+		Vector3 accum = Vector3.Zero;
+		foreach (var kv in stackExpiries) {
+			int n = kv.Value.Count;
+			if (n <= 0) continue;
+			float ratio = Mathf.Min(1f, n / 10f);
+			Color c = kv.Key switch {
+				StatusEffectType.DamageOverTime => new Color(1f, 0.15f, 0.15f),
+				StatusEffectType.Slow => new Color(0.3f, 0.5f, 1f),
+				StatusEffectType.ReducedFireRate => new Color(1f, 0.95f, 0.2f),
+				StatusEffectType.Blind => new Color(0.25f, 0.25f, 0.25f),
+				_ => Colors.White,
+			};
+			accum += new Vector3(c.R, c.G, c.B) * ratio;
+			weightSum += ratio;
+		}
+		if (weightSum <= 0f) return Colors.White;
+		Vector3 avg = accum / weightSum;
+		float intensity = Mathf.Min(1f, weightSum);
+		return Colors.White.Lerp(new Color(avg.X, avg.Y, avg.Z), intensity);
+	}
+
 	public int Tick(float delta)
 	{
 		currentTime += delta;

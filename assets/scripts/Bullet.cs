@@ -92,6 +92,12 @@ public partial class Bullet : Attack
 			if (Gun.SlowStacksPerHit > 0) e.StatusEffects.AddStacks(StatusEffectType.Slow, Gun.SlowStacksPerHit);
 			if (Gun.FireRateStacksPerHit > 0) e.StatusEffects.AddStacks(StatusEffectType.ReducedFireRate, Gun.FireRateStacksPerHit);
 			if (Gun.BlindStacksPerHit > 0) e.StatusEffects.AddStacks(StatusEffectType.Blind, Gun.BlindStacksPerHit);
+			switch (Element) {
+				case ElementType.Fire: e.StatusEffects.AddStack(StatusEffectType.DamageOverTime); break;
+				case ElementType.Ice: e.StatusEffects.AddStack(StatusEffectType.Slow); break;
+				case ElementType.Electric: e.StatusEffects.AddStack(StatusEffectType.ReducedFireRate); break;
+				case ElementType.Poison: e.StatusEffects.AddStack(StatusEffectType.DamageOverTime); break;
+			}
 		}
 		HandleHit(true);
 	}

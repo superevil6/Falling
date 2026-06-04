@@ -1,0 +1,11 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://bn5uc3dswywli"]
+
+[ext_resource type="Script" uid="uid://cjvebtbs1ft7k" path="res://assets/scripts/GunUpgrade.cs" id="2_k7p7q"]
+
+[resource]
+script = ExtResource("2_k7p7q")
+Type = 11
+UpgradeName = "Radar Module"
+UpgradeDescription = "Bullets gain a small amount of heat seeking property, and will follow enemies."
+Value = 3.0
+Rarity = 1

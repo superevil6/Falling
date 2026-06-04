@@ -6,4 +6,6 @@
 script = ExtResource("1_ynj0m")
 Type = 7
 UpgradeName = "Bullet Splitter"
+UpgradeDescription = "Bullets fragment after hitting enemies, causing them to shoot off in random directions."
 Value = 1.0
+Rarity = 1

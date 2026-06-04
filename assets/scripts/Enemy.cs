@@ -20,6 +20,8 @@ public partial class Enemy : Area2D
 	[Export]
 	public float SeparationStrength {get;set;} = 2.0f;
 	[Export]
+	public bool CanMelee {get;set;} = true;
+	[Export]
 	public float DropSpreadRadius {get;set;} = 25f;
 	private float leftWallX = 0f;
 	private float rightWallX = 0f;
@@ -108,11 +110,12 @@ public partial class Enemy : Area2D
 		if (meleeCoolDown > 0) {
 			meleeCoolDown -= (float)delta;
 		}
-		if (Stats?.Melee != null && meleeCoolDown <= 0 && CurrentHealth > 0) {
+		if (CanMelee && Stats?.Melee != null && meleeCoolDown <= 0 && CurrentHealth > 0) {
 			TrySwingMelee();
 		}
 		int dotDamage = StatusEffects.Tick((float)delta);
 		if (dotDamage > 0) TakeDamage(dotDamage, ElementType.NonElemental);
+		if (animatedSprite2D != null) animatedSprite2D.SelfModulate = StatusEffects.GetTint();
 		if (Stats != null && (Stats.DropsBombs || Stats.UsesMines) && CurrentHealth > 0) {
 			activeDeployables.RemoveAll(d => !IsInstanceValid(d));
 			bombCooldownRemaining -= (float)delta;
@@ -340,6 +343,13 @@ public partial class Enemy : Area2D
 		if (attack == null) return;
 		var element = (node2D is Bullet bullet) ? bullet.Element : ElementType.NonElemental;
 		TakeDamage(attack.Damage, element);
+		if (node2D is Bullet b && b.Gun != null && b.Gun.LifeSteal > 0f) {
+			int heal = Mathf.RoundToInt(b.Gun.LifeSteal);
+			if (heal > 0) {
+				var p = GetTree().CurrentScene?.GetNodeOrNull<Player>("Player");
+				p?.Heal(heal);
+			}
+		}
 	}
 
 	private bool hasBeenHit = false;
@@ -529,10 +539,11 @@ public partial class Enemy : Area2D
 				var menu = GetParent()?.GetNodeOrNull<SelectionMenu>("Selection Menu");
 				menu?.Open();
 			}
-			var children = GetParent().GetChildren().Where(child => child.IsInGroup("Enemy")).Count();
-			GD.Print(GetParent().GetChildren().Where(child => child.IsInGroup("Enemy")).Count());
-			if (children <= 1) {
-				GetParent<Main>().SpawnEnemyGroup();
+			int othersAlive = GetParent().GetChildren()
+				.Where(child => child != this && child is Enemy other && other.CurrentHealth > 0)
+				.Count();
+			if (othersAlive == 0) {
+				GetParent<Main>().CallDeferred(nameof(Main.SpawnEnemyGroup));
 			}
 			QueueFree();
 			break;

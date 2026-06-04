@@ -10,4 +10,6 @@ public partial class Upgrade : Resource
 	public string UpgradeDescription { get; set; }
 	[Export]
 	public float Value { get; set; }
+	[Export]
+	public UpgradeRarity Rarity {get; set;}
 }

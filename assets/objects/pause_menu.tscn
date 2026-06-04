@@ -6,11 +6,53 @@
 process_mode = 3
 script = ExtResource("1_e7mqj")
 
+[node name="GunsPanel" type="Panel" parent="."]
+offset_left = 150.0
+offset_top = -36.0
+offset_right = 840.0
+offset_bottom = 434.0
+
+[node name="Header" type="Label" parent="GunsPanel"]
+offset_left = 16.0
+offset_top = 12.0
+offset_right = 670.0
+offset_bottom = 48.0
+text = "Weapons"
+
+[node name="List" type="VBoxContainer" parent="GunsPanel"]
+offset_left = 16.0
+offset_top = 56.0
+offset_right = 674.0
+offset_bottom = 460.0
+
+[node name="BodyModsPanel" type="Panel" parent="."]
+offset_left = 860.0
+offset_top = -36.0
+offset_right = 1550.0
+offset_bottom = 434.0
+
+[node name="Header" type="Label" parent="BodyModsPanel"]
+offset_left = 16.0
+offset_top = 12.0
+offset_right = 670.0
+offset_bottom = 48.0
+text = "Body Mods"
+
+[node name="Scroll" type="ScrollContainer" parent="BodyModsPanel"]
+offset_left = 16.0
+offset_top = 56.0
+offset_right = 674.0
+offset_bottom = 460.0
+
+[node name="List" type="VBoxContainer" parent="BodyModsPanel/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
-offset_left = 551.0
-offset_top = 249.0
-offset_right = 799.0
-offset_bottom = 379.0
+offset_left = 1330.0
+offset_top = 454.0
+offset_right = 1550.0
+offset_bottom = 574.0
 
 [node name="Unpause" type="Button" parent="VBoxContainer"]
 layout_mode = 2

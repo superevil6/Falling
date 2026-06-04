@@ -9,4 +9,5 @@ Type = 8
 ApplicableGunTypes = Array[int]([0, 1, 2, 5])
 UpgradeImage = ExtResource("1_w7y43")
 UpgradeName = "Ricochet Module"
+UpgradeDescription = "Causes bullets to bounce of enemies and walls. More Ricochet Modules enable more bounces."
 Value = 1.0

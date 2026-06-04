@@ -1,0 +1,11 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://b8jnye5a1cr0y"]
+
+[ext_resource type="Script" uid="uid://cjvebtbs1ft7k" path="res://assets/scripts/GunUpgrade.cs" id="2_uo5iv"]
+
+[resource]
+script = ExtResource("2_uo5iv")
+Type = 6
+UpgradeName = "Hollow Tips"
+UpgradeDescription = "Bullets explode on impact. "
+Value = 1.0
+Rarity = 2

@@ -1,5 +1,6 @@
 using Godot;
 using System.Collections.Generic;
+using System.Linq;
 
 public partial class LevelUpMenu : CanvasLayer
 {
@@ -148,19 +149,16 @@ public partial class LevelUpMenu : CanvasLayer
 		}
 		var rng = new RandomNumberGenerator();
 		rng.Randomize();
-		for (int i = 0; i < applicable.Count; i++) {
-			int j = rng.RandiRange(i, applicable.Count - 1);
-			(applicable[i], applicable[j]) = (applicable[j], applicable[i]);
-		}
-		int take = Mathf.Min(PickCount, applicable.Count);
+		var picked = PickByRarity(applicable, gun.CurrentLevel, PickCount, rng);
+		int take = picked.Count;
 		currentGunUpgrades = new GunUpgrade[take];
 		currentUpgrades = new Upgrade[take];
 		Options = new string[take];
 		for (int i = 0; i < take; i++) {
-			currentGunUpgrades[i] = applicable[i];
-			currentUpgrades[i] = applicable[i];
-			Options[i] = !string.IsNullOrEmpty(applicable[i].UpgradeName)
-				? applicable[i].UpgradeName
+			currentGunUpgrades[i] = picked[i];
+			currentUpgrades[i] = picked[i];
+			Options[i] = !string.IsNullOrEmpty(picked[i].UpgradeName)
+				? picked[i].UpgradeName
 				: "Upgrade";
 		}
 	}
@@ -184,21 +182,52 @@ public partial class LevelUpMenu : CanvasLayer
 		}
 		var rng = new RandomNumberGenerator();
 		rng.Randomize();
-		for (int i = 0; i < applicable.Count; i++) {
-			int j = rng.RandiRange(i, applicable.Count - 1);
-			(applicable[i], applicable[j]) = (applicable[j], applicable[i]);
-		}
-		int take = Mathf.Min(PickCount, applicable.Count);
+		var picked = PickByRarity(applicable, mod.Level, PickCount, rng);
+		int take = picked.Count;
 		currentBodyUpgrades = new BodyUpgrade[take];
 		currentUpgrades = new Upgrade[take];
 		Options = new string[take];
 		for (int i = 0; i < take; i++) {
-			currentBodyUpgrades[i] = applicable[i];
-			currentUpgrades[i] = applicable[i];
-			Options[i] = !string.IsNullOrEmpty(applicable[i].UpgradeName)
-				? applicable[i].UpgradeName
+			currentBodyUpgrades[i] = picked[i];
+			currentUpgrades[i] = picked[i];
+			Options[i] = !string.IsNullOrEmpty(picked[i].UpgradeName)
+				? picked[i].UpgradeName
 				: "Upgrade";
 		}
+	}
+
+	private List<T> PickByRarity<T>(List<T> applicable, int level, int pickCount, RandomNumberGenerator rng) where T : Upgrade
+	{
+		bool forceRare = level > 0 && level % 5 == 0;
+		var available = new List<T>(applicable);
+		var picked = new List<T>();
+		int take = Mathf.Min(pickCount, applicable.Count);
+		for (int i = 0; i < take; i++) {
+			UpgradeRarity rarity = forceRare ? UpgradeRarity.Rare : RollRarity(rng);
+			var pool = available.Where(u => u.Rarity == rarity).ToList();
+			if (pool.Count == 0 && rarity == UpgradeRarity.Rare) {
+				rarity = rng.Randf() < 0.667f ? UpgradeRarity.Common : UpgradeRarity.Uncommon;
+				pool = available.Where(u => u.Rarity == rarity).ToList();
+				if (pool.Count == 0) {
+					rarity = rarity == UpgradeRarity.Common ? UpgradeRarity.Uncommon : UpgradeRarity.Common;
+					pool = available.Where(u => u.Rarity == rarity).ToList();
+				}
+			}
+			if (pool.Count == 0) pool = available;
+			if (pool.Count == 0) break;
+			var u = pool[rng.RandiRange(0, pool.Count - 1)];
+			picked.Add(u);
+			available.Remove(u);
+		}
+		return picked;
+	}
+
+	private UpgradeRarity RollRarity(RandomNumberGenerator rng)
+	{
+		float r = rng.Randf();
+		if (r < 0.10f) return UpgradeRarity.Rare;
+		if (r < 0.40f) return UpgradeRarity.Uncommon;
+		return UpgradeRarity.Common;
 	}
 
 	private static readonly Vector2 WidgetSize = new Vector2(140f, 150f);
@@ -310,9 +339,23 @@ public partial class LevelUpMenu : CanvasLayer
 		label.AutowrapMode = TextServer.AutowrapMode.WordSmart;
 		label.Size = new Vector2(WidgetSize.X, WidgetSize.Y - labelTop);
 		label.Position = new Vector2(0f, labelTop);
+		label.AddThemeColorOverride("font_color", GetRarityColor(index));
 		root.AddChild(label);
 
 		return root;
+	}
+
+	private Color GetRarityColor(int index)
+	{
+		if (currentUpgrades == null || index >= currentUpgrades.Length || currentUpgrades[index] == null) {
+			return Colors.White;
+		}
+		return currentUpgrades[index].Rarity switch {
+			UpgradeRarity.Common => new Color(0.3f, 0.9f, 0.3f),
+			UpgradeRarity.Uncommon => new Color(0.75f, 0.3f, 0.95f),
+			UpgradeRarity.Rare => new Color(1f, 0.55f, 0.1f),
+			_ => Colors.White,
+		};
 	}
 
 	private void UpdateHighlight()

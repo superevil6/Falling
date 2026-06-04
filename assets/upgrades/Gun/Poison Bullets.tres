@@ -9,3 +9,6 @@ Type = 14
 Element = 4
 UpgradeImage = ExtResource("1_1nkql")
 UpgradeName = "Poison Bullets"
+UpgradeDescription = "Honestly, not sure what these do at this point. Think of something."
+Value = 1.0
+Rarity = 1

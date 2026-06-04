@@ -17,4 +17,5 @@ public enum GunUpgradeType
     Element = 14,
     CriticalChance = 15,
     CriticalMultiplier = 16,
+    LifeSteal = 17,
 }

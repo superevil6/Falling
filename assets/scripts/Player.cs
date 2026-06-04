@@ -10,7 +10,10 @@ public partial class Player : CharacterBody2D
 	public int CurrentExperience;
 	public int DamageReduction;
 	public bool HasSeeEnemyHealth = true;
+	public bool HasLaserSight = false;
 	public float ItemMagnetMultiplier = 1f;
+	public float HealthRegenPerSecond = 0f;
+	private float healthRegenAccumulator = 0f;
 	public StatusEffectController StatusEffects = new StatusEffectController();
 	private float wallTouchTickTimer = 0f;
 	private float gunCoolDown;
@@ -46,11 +49,14 @@ public partial class Player : CharacterBody2D
 	[Export]
 	public float ShortDashCooldown {get;set;} = 1f;
 	[Export]
+	public int MaxDashCharges {get;set;} = 1;
+	private int currentDashCharges;
+	private float dashRegenTimer = 0f;
+	[Export]
 	public float ShortDashDistance {get;set;} = 80f;
 	private bool isShortDash = false;
 	private float RemainingDashTime;
 	private Vector2 DashDirection;
-	private float shortDashCooldownRemaining = 0f;
 	private float CurrentSpeedMultiplier = 1.0f;
 	public bool IsTouchingWall;
 	[Export]
@@ -62,12 +68,14 @@ public partial class Player : CharacterBody2D
 	private float TimeSinceLastAfterImage = 0f;
 	private Shader afterImageShader;
 	private Line2D activeLaser;
+	private Line2D laserSightLine;
 	private float chargeAmount = 0f;
 	private float chargePulseTime = 0f;
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
 		ScreenSize = GetViewportRect().Size;
+		currentDashCharges = MaxDashCharges;
 		CurrentHealth = MaxHealth;
 		animatedSprite2D = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
 		rng.Randomize();
@@ -121,6 +129,11 @@ public partial class Player : CharacterBody2D
 		if (gunCoolDown > 0) {
 			gunCoolDown -= (float)delta;
 		}
+		if (HasLaserSight && aimDirection != Vector2.Zero) {
+			UpdateLaserSight(aimDirection);
+		} else {
+			ClearLaserSight();
+		}
 		#endregion
 		#region Sword
 		if (Input.IsActionJustPressed("sword") && aimDirection.Normalized() != Vector2.Zero) {
@@ -136,6 +149,15 @@ public partial class Player : CharacterBody2D
 		);
 		int dotDamage = StatusEffects.Tick((float)delta);
 		if (dotDamage > 0) TakeDamage(dotDamage);
+		animatedSprite2D.SelfModulate = StatusEffects.GetTint();
+		if (HealthRegenPerSecond > 0f && CurrentHealth > 0 && CurrentHealth < MaxHealth) {
+			healthRegenAccumulator += HealthRegenPerSecond * (float)delta;
+			if (healthRegenAccumulator >= 1f) {
+				int heal = (int)healthRegenAccumulator;
+				healthRegenAccumulator -= heal;
+				Heal(heal);
+			}
+		}
 		TimeSinceLastAfterImage += (float)delta;
 		bool shouldTrail = (Input.IsActionPressed("move_down") || RemainingDashTime > 0) && !IsTouchingWall;
 		if (shouldTrail && TimeSinceLastAfterImage >= AfterImageInterval) {
@@ -167,6 +189,20 @@ public partial class Player : CharacterBody2D
 				break;
 			case BodyUpgradeType.ItemMagnet:
 				ItemMagnetMultiplier += (upgrade.Value - 1f);
+				break;
+			case BodyUpgradeType.HealthRegen:
+				HealthRegenPerSecond += upgrade.Value;
+				break;
+			case BodyUpgradeType.DashCount:
+				int extra = Mathf.Max(1, Mathf.RoundToInt(upgrade.Value));
+				MaxDashCharges += extra;
+				currentDashCharges += extra;
+				break;
+			case BodyUpgradeType.DashDistance:
+				ShortDashDistance += upgrade.Value;
+				break;
+			case BodyUpgradeType.LaserSight:
+				HasLaserSight = true;
 				break;
 		}
 	}
@@ -238,6 +274,14 @@ public partial class Player : CharacterBody2D
 		CurrentHealth -= finalDamage;
 		GetParent().GetNode<TextureProgressBar>("Health Bar").Value = CurrentHealth;
 		FlashRed();
+	}
+
+	public void Heal(int amount)
+	{
+		if (amount <= 0 || CurrentHealth <= 0) return;
+		CurrentHealth = Mathf.Min(MaxHealth, CurrentHealth + amount);
+		var hb = GetParent()?.GetNodeOrNull<TextureProgressBar>("Health Bar");
+		if (hb != null) hb.Value = CurrentHealth;
 	}
 
 	public void ApplyKnockback(Vector2 direction, float speed)
@@ -329,14 +373,21 @@ public partial class Player : CharacterBody2D
 
 		}
 		if (!IsTouchingWall) wallTouchTickTimer = 0f;
-		if (shortDashCooldownRemaining > 0) shortDashCooldownRemaining -= (float)delta;
+		if (currentDashCharges < MaxDashCharges) {
+			dashRegenTimer -= (float)delta;
+			if (dashRegenTimer <= 0f) {
+				currentDashCharges++;
+				dashRegenTimer = currentDashCharges < MaxDashCharges ? ShortDashCooldown : 0f;
+			}
+		}
 		if (Input.IsActionJustPressed("Dash") && !IsTouchingWall
-			&& shortDashCooldownRemaining <= 0 && RemainingDashTime <= 0) {
+			&& currentDashCharges > 0 && RemainingDashTime <= 0) {
 			Vector2 dashDir = Input.GetVector("move_left", "move_right", "move_up", "move_down").Normalized();
 			if (dashDir != Vector2.Zero) {
 				RemainingDashTime = ShortDashDuration;
 				DashDirection = dashDir;
-				shortDashCooldownRemaining = ShortDashCooldown;
+				currentDashCharges--;
+				if (dashRegenTimer <= 0f) dashRegenTimer = ShortDashCooldown;
 				isShortDash = true;
 			}
 		}
@@ -542,6 +593,52 @@ public partial class Player : CharacterBody2D
 		if (activeLaser != null) {
 			activeLaser.QueueFree();
 			activeLaser = null;
+		}
+	}
+
+	private void UpdateLaserSight(Vector2 aimDirection)
+	{
+		var spaceState = GetWorld2D().DirectSpaceState;
+		Vector2 from = GlobalPosition;
+		Vector2 to = from + aimDirection.Normalized() * ScreenSize.Length();
+		var query = PhysicsRayQueryParameters2D.Create(from, to);
+		query.CollideWithAreas = true;
+		query.CollideWithBodies = true;
+		query.CollisionMask = 5;
+		var excluded = new Godot.Collections.Array<Rid>();
+		Vector2 endPoint = to;
+		int safety = 32;
+		while (safety-- > 0) {
+			query.Exclude = excluded;
+			var result = spaceState.IntersectRay(query);
+			if (result.Count == 0) break;
+			var collider = result["collider"].As<Node>();
+			if (collider is Pickup pickup) {
+				excluded.Add(pickup.GetRid());
+				continue;
+			}
+			endPoint = (Vector2)result["position"];
+			break;
+		}
+		if (laserSightLine == null) {
+			laserSightLine = new Line2D();
+			laserSightLine.Width = 1.5f;
+			laserSightLine.DefaultColor = new Color(1f, 0.2f, 0.2f, 0.7f);
+			laserSightLine.ZIndex = 9;
+			laserSightLine.AddPoint(from);
+			laserSightLine.AddPoint(endPoint);
+			GetParent().AddChild(laserSightLine);
+		} else {
+			laserSightLine.SetPointPosition(0, from);
+			laserSightLine.SetPointPosition(1, endPoint);
+		}
+	}
+
+	private void ClearLaserSight()
+	{
+		if (laserSightLine != null) {
+			laserSightLine.QueueFree();
+			laserSightLine = null;
 		}
 	}
 

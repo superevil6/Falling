@@ -8,4 +8,6 @@ script = ExtResource("1_s7xub")
 Type = 2
 UpgradeImage = ExtResource("1_b3jnv")
 UpgradeName = "Bullet Plus"
+UpgradeDescription = "Fire an additional bullet each shot."
 Value = 1.0
+Rarity = 1

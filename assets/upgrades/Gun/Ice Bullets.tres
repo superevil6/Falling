@@ -9,3 +9,6 @@ Type = 14
 Element = 2
 UpgradeImage = ExtResource("1_2mr1d")
 UpgradeName = "Ice Bullets"
+UpgradeDescription = "Shoot munitions that chill enemies, causing them to move slower."
+Value = 1.0
+Rarity = 1
