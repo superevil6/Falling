@@ -10,7 +10,9 @@
 [resource]
 script = ExtResource("4_onxjb")
 MaxHealth = 5
+Armor = 5
 Gun = ExtResource("2_uvv66")
+CanMelee = false
 Melee = ExtResource("3_hiw2o")
 MovementType = 1
 SpawnMovementSpeed = 8

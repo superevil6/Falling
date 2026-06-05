@@ -5,3 +5,5 @@
 [resource]
 script = ExtResource("1_iukvx")
 type = 3
+Name = "Limbs"
+ExperiencePerLevel = 1

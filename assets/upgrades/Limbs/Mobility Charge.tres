@@ -1,11 +1,11 @@
 [gd_resource type="Resource" load_steps=2 format=3 uid="uid://d05rsd5i7gnaw"]
 
-[ext_resource type="Script" uid="uid://c16jiuasboxwv" path="res://assets/scripts/BodyUpgrade.cs" id="1_iyn6k"]
+[ext_resource type="Script" uid="uid://c16jiuasboxwv" path="res://assets/scripts/BodyUpgrade.cs" id="1_wsoq6"]
 
 [resource]
-script = ExtResource("1_iyn6k")
+script = ExtResource("1_wsoq6")
 BodyUpgradeType = 6
-BodyModType = 3
+BodyModType = 2
 UpgradeName = "Mobility Enhancer"
 UpgradeDescription = "Increase your number of availble short dashes."
-Value = 3.0
+Value = 1.0

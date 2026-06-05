@@ -1,0 +1,11 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://d2kexen6xeo87"]
+
+[ext_resource type="Script" uid="uid://c16jiuasboxwv" path="res://assets/scripts/BodyUpgrade.cs" id="1_lfmxd"]
+
+[resource]
+script = ExtResource("1_lfmxd")
+BodyUpgradeType = 14
+BodyModType = 1
+UpgradeName = "Static Guard"
+UpgradeDescription = "Decrease electric damage by half. Each module further decreases it by half."
+Rarity = 1

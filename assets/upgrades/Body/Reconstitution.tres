@@ -1,0 +1,11 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://3cbeva2g2cjc"]
+
+[ext_resource type="Script" uid="uid://c16jiuasboxwv" path="res://assets/scripts/BodyUpgrade.cs" id="1_rtocg"]
+
+[resource]
+script = ExtResource("1_rtocg")
+BodyModType = 1
+UpgradeName = "Reconstitution"
+UpgradeDescription = "Regenerate health over time."
+Value = 1.0
+Rarity = 1

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://bpoiwpdr4a1dk"]
+
+[ext_resource type="Script" uid="uid://c16jiuasboxwv" path="res://assets/scripts/BodyUpgrade.cs" id="1_8v6oq"]
+
+[resource]
+script = ExtResource("1_8v6oq")
+BodyUpgradeType = 13
+BodyModType = 1
+UpgradeName = "Ice Shield"
+UpgradeDescription = "Decrease ice damage by half. Each module further decreases it by half."
+Rarity = 1

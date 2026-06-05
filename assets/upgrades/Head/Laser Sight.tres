@@ -1,0 +1,10 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://bjk2na1lwtx53"]
+
+[ext_resource type="Script" uid="uid://c16jiuasboxwv" path="res://assets/scripts/BodyUpgrade.cs" id="1_71iju"]
+
+[resource]
+script = ExtResource("1_71iju")
+BodyUpgradeType = 8
+UpgradeName = "Laser Sight"
+UpgradeDescription = "Indicate where your shots will be fired."
+Rarity = 1

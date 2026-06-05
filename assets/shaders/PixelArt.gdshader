@@ -31,5 +31,11 @@ void fragment() {
 	}
 	color.rgb = floor(color.rgb * float(color_steps)) / float(color_steps);
 	color.rgb *= (1.0 - darkness);
-	COLOR = color;
+	vec4 base = texture(TEXTURE, UV);
+	vec4 mod_color = vec4(1.0);
+	if (base.r > 0.001) mod_color.r = COLOR.r / base.r;
+	if (base.g > 0.001) mod_color.g = COLOR.g / base.g;
+	if (base.b > 0.001) mod_color.b = COLOR.b / base.b;
+	if (base.a > 0.001) mod_color.a = COLOR.a / base.a;
+	COLOR = color * mod_color;
 }

@@ -8,5 +8,8 @@ public enum GunType
     MachineGun = 5,
     Laser = 6,
     Charge = 7,
-    MultiDirection = 8
+    MultiDirection = 8,
+    Spiral = 9,
+    Lightning = 10,
+    GrowShot = 11
 }

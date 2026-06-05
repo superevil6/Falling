@@ -1,0 +1,10 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://bl6nomigplfle"]
+
+[ext_resource type="Script" uid="uid://cjvebtbs1ft7k" path="res://assets/scripts/GunUpgrade.cs" id="2_1u2l3"]
+
+[resource]
+script = ExtResource("2_1u2l3")
+Type = 19
+UpgradeName = "Acid Rounds"
+UpgradeDescription = "Deal increased damage to enemy shields."
+Value = 1.0

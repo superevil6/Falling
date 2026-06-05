@@ -5,3 +5,5 @@
 [resource]
 script = ExtResource("1_2au4l")
 type = 1
+Name = "Body"
+ExperiencePerLevel = 1

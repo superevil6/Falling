@@ -1,0 +1,11 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://vbpfm4huhi3c"]
+
+[ext_resource type="Script" uid="uid://cjvebtbs1ft7k" path="res://assets/scripts/GunUpgrade.cs" id="1_uv4tg"]
+
+[resource]
+script = ExtResource("1_uv4tg")
+Type = 23
+UpgradeName = "Blast Radius"
+UpgradeDescription = "Exploding bullets have a larger blast radius."
+Value = 3.0
+Rarity = 1

@@ -38,11 +38,25 @@ public partial class Gun : Resource
 	[Export]
 	public bool Explode {get;set;}
 	[Export]
+	public float ExplosionRadius {get;set;} = 0f;
+	[Export]
 	public int Split {get;set;}
 	[Export]
 	public int Ricochet {get;set;}
 	[Export]
 	public float Wave {get;set;}
+	[Export]
+	public float Spiral {get;set;} = 0f;
+	[Export]
+	public bool Growth {get;set;} = false;
+	[Export]
+	public float GrowthStartSize {get;set;} = 0.3f;
+	[Export]
+	public float GrowthMaxSize {get;set;} = 2.0f;
+	[Export]
+	public float GrowthDistance {get;set;} = 600f;
+	[Export]
+	public float GrowthMinDamageRatio {get;set;} = 0.1f;
 	[Export]
 	public float SizeMultiplier {get;set;}
 	[Export]
@@ -54,6 +68,16 @@ public partial class Gun : Resource
 	[Export]
 	public bool IsLaser {get;set;}
 	[Export]
+	public bool IsLightning {get;set;}
+	[Export]
+	public float LightningRange {get;set;} = 600f;
+	[Export]
+	public float LightningChainRadius {get;set;} = 220f;
+	[Export]
+	public int LightningMaxJumps {get;set;} = 3;
+	[Export]
+	public float LightningAimConeDeg {get;set;} = 30f;
+	[Export]
 	public bool IsChargeWeapon {get;set;}
 	[Export(PropertyHint.Range, "0,1,0.01")]
 	public float CriticalChance {get;set;} = 0f;
@@ -61,6 +85,8 @@ public partial class Gun : Resource
 	public float CriticalMultiplier {get;set;} = 2f;
 	[Export]
 	public float LifeSteal {get;set;} = 0f;
+	[Export]
+	public int AcidRoundsCount {get;set;} = 0;
 	[Export]
 	public int MinDamage {get;set;} = 1;
 	[Export]
@@ -111,6 +137,7 @@ public partial class Gun : Resource
 			case GunUpgradeType.BulletLifeTime: BulletLifetime += upgrade.Value; break;
 			case GunUpgradeType.Pierce: Pierce = upgrade.Value > 0; break;
 			case GunUpgradeType.Explode: Explode = upgrade.Value > 0; break;
+			case GunUpgradeType.ExplosionRadius: ExplosionRadius += upgrade.Value; break;
 			case GunUpgradeType.Split: Split += Mathf.RoundToInt(upgrade.Value); break;
 			case GunUpgradeType.Ricochet: Ricochet += Mathf.RoundToInt(upgrade.Value); break;
 			case GunUpgradeType.Wave: Wave += upgrade.Value; break;
@@ -120,6 +147,7 @@ public partial class Gun : Resource
 			case GunUpgradeType.Element: Element = upgrade.Element; break;
 			case GunUpgradeType.BulletSize: BulletSize += upgrade.Value; break;
 			case GunUpgradeType.LifeSteal: LifeSteal += upgrade.Value; break;
+			case GunUpgradeType.AcidRounds: AcidRoundsCount++; break;
 		}
 	}
 }

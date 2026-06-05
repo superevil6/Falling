@@ -13,6 +13,15 @@ public partial class Bullet : Attack
 	public ElementType Element { get; set; }
 	public Color AuraColor {get;set;} = new Color(0, 0, 0, 0);
 	public float AuraRadius {get;set;} = 3f;
+	public Vector2 SpawnOrigin {get;set;}
+	public float SpiralRate {get;set;} = 0f;
+	private double spiralTime = 0;
+	private float spiralInitialAngle = 0f;
+	private float spiralInitialRadius = 0f;
+	private Vector2 growthBaseScale;
+	private float growthInitialDamage;
+	private float growthTraveled = 0f;
+	private Vector2 growthLastPos;
 	private int ExplosionDamage;
 	private int RemainingRicochets;
 
@@ -44,6 +53,17 @@ public partial class Bullet : Attack
 			Scale = new Vector2(Scale.X * Gun.BulletSize, Scale.Y * Gun.BulletSize);
 		}
 		RemainingRicochets = Gun.Ricochet;
+		if (SpiralRate != 0f) {
+			Vector2 offset = GlobalPosition - SpawnOrigin;
+			spiralInitialAngle = offset.Angle();
+			spiralInitialRadius = offset.Length();
+		}
+		if (Gun.Growth) {
+			growthBaseScale = Scale;
+			growthInitialDamage = Damage;
+			growthLastPos = GlobalPosition;
+			Scale = growthBaseScale * Gun.GrowthStartSize;
+		}
 	}
 
 	public override void _Draw()
@@ -60,6 +80,20 @@ public partial class Bullet : Attack
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
+		if (SpiralRate != 0f) {
+			spiralTime += delta;
+			float t = (float)spiralTime;
+			float ang = spiralInitialAngle + SpiralRate * t;
+			float r = spiralInitialRadius + BulletSpeed * t;
+			GlobalPosition = SpawnOrigin + new Vector2(Mathf.Cos(ang), Mathf.Sin(ang)) * r;
+			Vector2 motion = new Vector2(
+				BulletSpeed * Mathf.Cos(ang) - r * SpiralRate * Mathf.Sin(ang),
+				BulletSpeed * Mathf.Sin(ang) + r * SpiralRate * Mathf.Cos(ang));
+			Rotation = motion.Angle();
+			if (BulletLifetime > 0) BulletLifetime -= (float)delta;
+			else QueueFree();
+			return;
+		}
 		if (Gun != null) {
 			if (Gun.Wave > 0) {
 				time += delta;
@@ -78,6 +112,15 @@ public partial class Bullet : Attack
 			}
 		}
 		GlobalPosition = GlobalPosition + BulletSpeed * Direction.Normalized() * (float)delta;
+		if (Gun != null && Gun.Growth) {
+			growthTraveled += GlobalPosition.DistanceTo(growthLastPos);
+			growthLastPos = GlobalPosition;
+			float t = Gun.GrowthDistance > 0f ? Mathf.Clamp(growthTraveled / Gun.GrowthDistance, 0f, 1f) : 1f;
+			float sizeMult = Mathf.Lerp(Gun.GrowthStartSize, Gun.GrowthMaxSize, t);
+			Scale = growthBaseScale * sizeMult;
+			float dmgFactor = Mathf.Lerp(1f, Gun.GrowthMinDamageRatio, t);
+			Damage = Mathf.RoundToInt(growthInitialDamage * dmgFactor);
+		}
 		if (BulletLifetime > 0) {
 			BulletLifetime -= (float)delta;
 		} else {
@@ -170,6 +213,10 @@ public partial class Bullet : Attack
 		Explosion e = Explosion.Instantiate<Explosion>();
 		e.Position = Position;
 		e.Damage = Damage;
+		if (Gun != null && Gun.ExplosionRadius > 0f) {
+			float s = 1f + Gun.ExplosionRadius;
+			e.Scale = new Vector2(s, s);
+		}
 		GetParent().AddChild(e);
 	}
 }

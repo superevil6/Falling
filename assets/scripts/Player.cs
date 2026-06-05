@@ -11,6 +11,9 @@ public partial class Player : CharacterBody2D
 	public int DamageReduction;
 	public bool HasSeeEnemyHealth = true;
 	public bool HasLaserSight = false;
+	public int FireDefenseStacks = 0;
+	public int IceDefenseStacks = 0;
+	public int ElectricDefenseStacks = 0;
 	public float ItemMagnetMultiplier = 1f;
 	public float HealthRegenPerSecond = 0f;
 	private float healthRegenAccumulator = 0f;
@@ -69,6 +72,8 @@ public partial class Player : CharacterBody2D
 	private Shader afterImageShader;
 	private Line2D activeLaser;
 	private Line2D laserSightLine;
+	private Line2D activeLightning;
+	private float lightningFlashTimer = 0f;
 	private float chargeAmount = 0f;
 	private float chargePulseTime = 0f;
 	// Called when the node enters the scene tree for the first time.
@@ -115,13 +120,23 @@ public partial class Player : CharacterBody2D
 		#region Shooting
 		Vector2 aimDirection = Input.GetVector("aim_left", "aim_right", "aim_up", "aim_down");
 		bool wantsToFire = Input.IsActionPressed("gun") && aimDirection != Vector2.Zero && Gun != null;
+		if (lightningFlashTimer > 0f) {
+			lightningFlashTimer -= (float)delta;
+			if (lightningFlashTimer <= 0f) ClearLightning();
+		}
 		if (Gun != null && Gun.IsChargeWeapon) {
 			ClearLaser();
+			ClearLightning();
 			UpdateChargeState(aimDirection, (float)delta);
 		} else if (Gun != null && Gun.IsLaser && wantsToFire) {
+			ClearLightning();
 			UpdateLaserBeam(aimDirection);
+		} else if (Gun != null && Gun.IsLightning) {
+			ClearLaser();
+			if (wantsToFire) UpdateLightning(aimDirection);
 		} else {
 			ClearLaser();
+			ClearLightning();
 			if (wantsToFire && gunCoolDown <= 0) {
 				Shoot(aimDirection);
 			}
@@ -204,6 +219,15 @@ public partial class Player : CharacterBody2D
 			case BodyUpgradeType.LaserSight:
 				HasLaserSight = true;
 				break;
+			case BodyUpgradeType.FireDefense:
+				FireDefenseStacks++;
+				break;
+			case BodyUpgradeType.IceDefense:
+				IceDefenseStacks++;
+				break;
+			case BodyUpgradeType.ElectricDefense:
+				ElectricDefenseStacks++;
+				break;
 		}
 	}
 
@@ -261,18 +285,27 @@ public partial class Player : CharacterBody2D
 	}
 
 	private void _on_area_2d_area_entered(Node2D node2D){
-		GD.Print(node2D);
 		if (node2D.Name == "Bullet") {
-			TakeDamage((node2D as Attack).Damage);
+			var elem = (node2D is Bullet b) ? b.Element : ElementType.NonElemental;
+			TakeDamage((node2D as Attack).Damage, elem);
 		}
 	}
 
-	public void TakeDamage(int amount)
+	public void TakeDamage(int amount, ElementType element = ElementType.NonElemental)
 	{
 		if (CurrentHealth <= 0) return;
-		int finalDamage = Mathf.Max(0, amount - DamageReduction);
+		float dmg = amount;
+		int stacks = element switch {
+			ElementType.Fire => FireDefenseStacks,
+			ElementType.Ice => IceDefenseStacks,
+			ElementType.Electric => ElectricDefenseStacks,
+			_ => 0,
+		};
+		if (stacks > 0) dmg *= Mathf.Pow(0.5f, stacks);
+		int finalDamage = Mathf.Max(0, Mathf.RoundToInt(dmg) - DamageReduction);
 		CurrentHealth -= finalDamage;
 		GetParent().GetNode<TextureProgressBar>("Health Bar").Value = CurrentHealth;
+		if (finalDamage > 0) FloatingDamageText.Spawn(this, GlobalPosition, finalDamage, FloatingDamageText.ElementColor(element, new Color(1f, 0.4f, 0.4f)));
 		FlashRed();
 	}
 
@@ -516,10 +549,18 @@ public partial class Player : CharacterBody2D
 		float effectiveSpread = Gun.BulletSpread + StatusEffects.GetSpreadIncrease();
 		float halfSpread = effectiveSpread / 2f;
 		int n = Mathf.Max(1, Gun.BulletCount);
+		bool spiral = Gun.Spiral != 0f;
+		float baseAngle = aimDirection.Angle();
 		for (int i = 0; i < n; i++) {
 			Bullet b = Gun.BulletType.Instantiate<Bullet>();
-			float angle = n == 1 ? 0f : -halfSpread + i * (effectiveSpread / (n - 1));
-			Vector2 direction = aimDirection.Rotated(angle);
+			Vector2 direction;
+			if (spiral) {
+				float a = baseAngle + i * (Mathf.Tau / n);
+				direction = new Vector2(Mathf.Cos(a), Mathf.Sin(a));
+			} else {
+				float angle = n == 1 ? 0f : -halfSpread + i * (effectiveSpread / (n - 1));
+				direction = aimDirection.Rotated(angle);
+			}
 			bool crit = RollCrit(Gun, out int dmg, Gun.Damage);
 			b.Set("Direction", direction);
 			b.Set("Damage", dmg);
@@ -532,6 +573,10 @@ public partial class Player : CharacterBody2D
 			}
 			if (Gun.Element != ElementType.NonElemental) b.Element = Gun.Element;
 			b.AuraColor = crit ? CritAuraColor : new Color(0.3f, 0.6f, 1f, 0.8f);
+			if (spiral) {
+				b.SpawnOrigin = Position;
+				b.SpiralRate = Gun.Spiral;
+			}
 			b.Position = Position;
 			b.Rotation = direction.Angle();
 			b.SetCollisionLayerValue(4, true);
@@ -640,6 +685,82 @@ public partial class Player : CharacterBody2D
 			laserSightLine.QueueFree();
 			laserSightLine = null;
 		}
+	}
+
+	private void UpdateLightning(Vector2 aimDirection)
+	{
+		if (gunCoolDown > 0f) return;
+		Enemy primary = FindLightningTarget(aimDirection.Normalized(), Mathf.DegToRad(Gun.LightningAimConeDeg), Gun.LightningRange);
+		if (primary == null) return;
+		var chain = new List<Enemy> { primary };
+		var visited = new HashSet<Enemy> { primary };
+		Enemy current = primary;
+		for (int i = 0; i < Gun.LightningMaxJumps; i++) {
+			Enemy next = FindNearestEnemy(current.GlobalPosition, visited, Gun.LightningChainRadius);
+			if (next == null) break;
+			chain.Add(next);
+			visited.Add(next);
+			current = next;
+		}
+		if (activeLightning == null) {
+			activeLightning = new Line2D();
+			activeLightning.Width = 3f;
+			activeLightning.DefaultColor = new Color(0.6f, 0.8f, 1f, 0.95f);
+			activeLightning.ZIndex = 10;
+			GetParent().AddChild(activeLightning);
+		}
+		activeLightning.ClearPoints();
+		activeLightning.AddPoint(GlobalPosition);
+		int dmg = Gun.Damage;
+		foreach (var e in chain) {
+			activeLightning.AddPoint(e.GlobalPosition);
+			if (dmg <= 0) continue;
+			e.TakeDamage(dmg, ElementType.Electric);
+			e.StatusEffects.AddStack(StatusEffectType.ReducedFireRate);
+			dmg = dmg / 2;
+		}
+		lightningFlashTimer = 0.12f;
+		gunCoolDown = Gun.FireRate * StatusEffects.GetFireRateMultiplier();
+	}
+
+	private void ClearLightning()
+	{
+		if (activeLightning != null) {
+			activeLightning.QueueFree();
+			activeLightning = null;
+		}
+	}
+
+	private Enemy FindLightningTarget(Vector2 aimDir, float maxAngleRad, float maxDist)
+	{
+		Enemy best = null;
+		float bestScore = float.MaxValue;
+		foreach (var n in GetTree().GetNodesInGroup("Enemy")) {
+			if (n is Enemy e && e.CurrentHealth > 0) {
+				Vector2 toE = e.GlobalPosition - GlobalPosition;
+				float d = toE.Length();
+				if (d > maxDist || d < 1f) continue;
+				float ang = Mathf.Abs(toE.AngleTo(aimDir));
+				if (ang > maxAngleRad) continue;
+				float score = d + ang * 300f;
+				if (score < bestScore) { bestScore = score; best = e; }
+			}
+		}
+		return best;
+	}
+
+	private Enemy FindNearestEnemy(Vector2 from, HashSet<Enemy> visited, float maxDist)
+	{
+		Enemy best = null;
+		float bestDist = float.MaxValue;
+		foreach (var n in GetTree().GetNodesInGroup("Enemy")) {
+			if (n is Enemy e && e.CurrentHealth > 0 && !visited.Contains(e)) {
+				float d = e.GlobalPosition.DistanceTo(from);
+				if (d > maxDist) continue;
+				if (d < bestDist) { bestDist = d; best = e; }
+			}
+		}
+		return best;
 	}
 
 	private void MeleeAttack(Vector2 aimDirection) {

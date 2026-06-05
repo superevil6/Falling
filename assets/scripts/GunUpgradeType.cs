@@ -18,4 +18,9 @@ public enum GunUpgradeType
     CriticalChance = 15,
     CriticalMultiplier = 16,
     LifeSteal = 17,
+    ArmorPierce = 18,
+    AcidRounds = 19,
+    MultiDirectionalShot = 21,
+    KnockBack = 22,
+    ExplosionRadius = 23
 }

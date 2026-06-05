@@ -140,6 +140,7 @@ public partial class LevelUpMenu : CanvasLayer
 			if (!typeMatches) continue;
 			if (up.Type == GunUpgradeType.Pierce && gun.Pierce) continue;
 			if (up.Type == GunUpgradeType.Explode && gun.Explode) continue;
+			if (up.Type == GunUpgradeType.ExplosionRadius && !gun.Explode) continue;
 			if (up.Type == GunUpgradeType.Element && gun.Element != ElementType.NonElemental) continue;
 			applicable.Add(up);
 		}

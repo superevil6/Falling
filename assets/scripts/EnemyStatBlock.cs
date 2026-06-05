@@ -7,7 +7,11 @@ public partial class EnemyStatBlock : Resource
 	[Export]
 	public int DamageReduction {get;set;}
 	[Export]
+	public int Armor {get;set;}
+	[Export]
 	public Gun Gun {get;set;}
+	[Export]
+	public bool CanMelee {get;set;} = true;
 	[Export]
 	public MeleeWeapon Melee {get;set;}
 	[Export]

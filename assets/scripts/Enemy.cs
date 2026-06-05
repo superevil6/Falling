@@ -20,8 +20,6 @@ public partial class Enemy : Area2D
 	[Export]
 	public float SeparationStrength {get;set;} = 2.0f;
 	[Export]
-	public bool CanMelee {get;set;} = true;
-	[Export]
 	public float DropSpreadRadius {get;set;} = 25f;
 	private float leftWallX = 0f;
 	private float rightWallX = 0f;
@@ -66,6 +64,7 @@ public partial class Enemy : Area2D
 		animatedSprite2D = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
 		float scale = ComputeStageScale();
 		scaledMaxHealth = Mathf.RoundToInt(Stats.MaxHealth * scale);
+		currentArmor = Mathf.RoundToInt(Stats.Armor * scale);
 		scaledDamage = Stats.Gun != null ? Mathf.RoundToInt(Stats.Gun.Damage * scale) : 0;
 		scaledDamageReduction = Mathf.RoundToInt(Stats.DamageReduction * scale);
 		CurrentHealth = scaledMaxHealth;
@@ -94,6 +93,10 @@ public partial class Enemy : Area2D
 	public override void _Process(double delta)
 	{
 		if (Stats?.IsLeader == true && CurrentHealth > 0) QueueRedraw();
+		if (armorShellTimer > 0f) {
+			armorShellTimer -= (float)delta;
+			QueueRedraw();
+		}
 		if (Stats?.Gun != null && CurrentHealth > 0) {
 			if (!telegraphActive && GunCoolDown > 0f && GunCoolDown <= TelegraphLeadTime) {
 				SpawnAttackIndicator();
@@ -110,7 +113,7 @@ public partial class Enemy : Area2D
 		if (meleeCoolDown > 0) {
 			meleeCoolDown -= (float)delta;
 		}
-		if (CanMelee && Stats?.Melee != null && meleeCoolDown <= 0 && CurrentHealth > 0) {
+		if (Stats.CanMelee && Stats?.Melee != null && meleeCoolDown <= 0 && CurrentHealth > 0) {
 			TrySwingMelee();
 		}
 		int dotDamage = StatusEffects.Tick((float)delta);
@@ -132,7 +135,7 @@ public partial class Enemy : Area2D
 	}
 
 	public override void _PhysicsProcess(double delta)
-    {
+	{
 		if (CurrentHealth > 0) {
 			if (ReachedPostSpawnDestination) {
 				if (Stats.TeleportMovement) {
@@ -336,13 +339,14 @@ public partial class Enemy : Area2D
 				}
 			}
 		}
-    }
+	}
 
 	private void _on_area_entered(Node2D node2D){
 		var attack = node2D as Attack;
 		if (attack == null) return;
 		var element = (node2D is Bullet bullet) ? bullet.Element : ElementType.NonElemental;
-		TakeDamage(attack.Damage, element);
+		int acidStacks = (node2D is Bullet ab) ? (ab.Gun?.AcidRoundsCount ?? 0) : 0;
+		TakeDamage(attack.Damage, element, acidStacks);
 		if (node2D is Bullet b && b.Gun != null && b.Gun.LifeSteal > 0f) {
 			int heal = Mathf.RoundToInt(b.Gun.LifeSteal);
 			if (heal > 0) {
@@ -355,6 +359,8 @@ public partial class Enemy : Area2D
 	private bool hasBeenHit = false;
 	private bool coreDeathTriggered = false;
 	private int scaledMaxHealth;
+	private int currentArmor;
+	private float armorShellTimer = 0f;
 	private int scaledDamage;
 	private int scaledDamageReduction;
 	private float teleportTimer = 0f;
@@ -365,7 +371,7 @@ public partial class Enemy : Area2D
 	private static PackedScene bombScene;
 	private static PackedScene mineScene;
 
-	public void TakeDamage(int damage, ElementType element)
+	public void TakeDamage(int damage, ElementType element, int acidStacks = 0)
 	{
 		float dmg = damage;
 		if (element != ElementType.NonElemental) {
@@ -374,7 +380,14 @@ public partial class Enemy : Area2D
 		}
 		int boostedReduction = Mathf.RoundToInt(scaledDamageReduction * (1f + GetLeaderBoost(LeaderType.Defense)));
 		int finalDamage = Mathf.Max(0, Mathf.RoundToInt(dmg) - boostedReduction);
+		if (currentArmor > 0) {
+			finalDamage = Mathf.CeilToInt(finalDamage * 0.5f);
+			int armorDmg = finalDamage * (1 + acidStacks);
+			currentArmor = Mathf.Max(0, currentArmor - armorDmg);
+			armorShellTimer = 0.5f;
+		}
 		CurrentHealth -= finalDamage;
+		if (finalDamage > 0) FloatingDamageText.Spawn(this, GlobalPosition, finalDamage, FloatingDamageText.ElementColor(element, new Color(1f, 0.95f, 0.85f)));
 		if (CurrentHealth > 0) FlashRed();
 		hasBeenHit = true;
 		QueueRedraw();
@@ -490,12 +503,15 @@ public partial class Enemy : Area2D
 	public override void _Draw()
 	{
 		if (Stats?.IsLeader == true && CurrentHealth > 0) DrawLeaderAura();
+		if (currentArmor > 0 && armorShellTimer > 0f && CurrentHealth > 0) {
+			DrawCircle(Vector2.Zero, 100f, new Color(0.7f, 0.85f, 1f, 0.3f));
+		}
 		if (!hasBeenHit || CurrentHealth <= 0) return;
 		var p = GetParent()?.GetNodeOrNull<Player>("Player");
 		if (p == null || !p.HasSeeEnemyHealth) return;
-		float barWidth = 40f;
-		float barHeight = 6f;
-		float yOffset = -30f;
+		float barWidth = 72f;
+		float barHeight = 10f;
+		float yOffset = -42f;
 		float maxHealth = Mathf.Max(1, scaledMaxHealth);
 		float healthRatio = Mathf.Clamp((float)CurrentHealth / maxHealth, 0f, 1f);
 		Vector2 barPos = new Vector2(-barWidth / 2f, yOffset);

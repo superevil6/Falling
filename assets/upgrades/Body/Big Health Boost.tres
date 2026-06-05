@@ -7,3 +7,4 @@ script = ExtResource("1_q2exu")
 BodyModType = 1
 UpgradeName = "Big Health Boost"
 Value = 50.0
+Rarity = 2

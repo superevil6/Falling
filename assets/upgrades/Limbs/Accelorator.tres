@@ -1,11 +1,11 @@
 [gd_resource type="Resource" load_steps=2 format=3 uid="uid://gf83mfkum8wj"]
 
-[ext_resource type="Script" uid="uid://c16jiuasboxwv" path="res://assets/scripts/BodyUpgrade.cs" id="1_x22wd"]
+[ext_resource type="Script" uid="uid://c16jiuasboxwv" path="res://assets/scripts/BodyUpgrade.cs" id="1_4r66h"]
 
 [resource]
-script = ExtResource("1_x22wd")
+script = ExtResource("1_4r66h")
 BodyUpgradeType = 2
-BodyModType = 3
+BodyModType = 2
 UpgradeName = "Accelorator"
 UpgradeDescription = "Increases movement speed."
 Value = 3.0

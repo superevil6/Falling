@@ -26,7 +26,6 @@ public partial class Explosion : Area2D
 			(node2D as Player).CurrentHealth -= Damage;
 		} 
 		if (node2D.IsInGroup("Enemey")) {
-			GD.Print("IS IN GROUP WOW");
 			(node2D as Enemy).CurrentHealth -= Damage;
 		} 
 	}

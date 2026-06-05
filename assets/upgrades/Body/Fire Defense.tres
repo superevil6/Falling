@@ -1,0 +1,11 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://dfub466i0pvtk"]
+
+[ext_resource type="Script" uid="uid://c16jiuasboxwv" path="res://assets/scripts/BodyUpgrade.cs" id="1_epjc8"]
+
+[resource]
+script = ExtResource("1_epjc8")
+BodyUpgradeType = 12
+BodyModType = 1
+UpgradeName = "Flame Guard"
+UpgradeDescription = "Decrease fire damage by half. Each module further decreases it by half."
+Rarity = 1

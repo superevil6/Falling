@@ -4,3 +4,5 @@
 
 [resource]
 script = ExtResource("1_33e7b")
+Name = "Head"
+ExperiencePerLevel = 1
