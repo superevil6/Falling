@@ -1,11 +1,13 @@
-[gd_resource type="Resource" load_steps=2 format=3 uid="uid://dfub466i0pvtk"]
+[gd_resource type="Resource" load_steps=3 format=3 uid="uid://dfub466i0pvtk"]
 
+[ext_resource type="Texture2D" uid="uid://iyq6rynt257h" path="res://assets/sprites/Power Up Icons/Fire Shield.png" id="1_0uwv7"]
 [ext_resource type="Script" uid="uid://c16jiuasboxwv" path="res://assets/scripts/BodyUpgrade.cs" id="1_epjc8"]
 
 [resource]
 script = ExtResource("1_epjc8")
 BodyUpgradeType = 12
 BodyModType = 1
+UpgradeImage = ExtResource("1_0uwv7")
 UpgradeName = "Flame Guard"
 UpgradeDescription = "Decrease fire damage by half. Each module further decreases it by half."
 Rarity = 1

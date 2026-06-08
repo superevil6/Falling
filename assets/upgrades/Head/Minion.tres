@@ -1,0 +1,9 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://by7583vy07pph"]
+
+[ext_resource type="Script" uid="uid://c16jiuasboxwv" path="res://assets/scripts/BodyUpgrade.cs" id="1_ec2d0"]
+
+[resource]
+script = ExtResource("1_ec2d0")
+BodyUpgradeType = 20
+UpgradeName = "Orbital Minion"
+UpgradeDescription = "A minion orbits around you and fires bullets."

@@ -8,4 +8,4 @@ BodyUpgradeType = 7
 BodyModType = 2
 UpgradeName = "Mobility Enhancer"
 UpgradeDescription = "Increase your short dash speed."
-Value = 3.0
+Value = 100.0

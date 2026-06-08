@@ -1,9 +1,11 @@
-[gd_resource type="Resource" load_steps=2 format=3 uid="uid://dh8ih0yjngkv5"]
+[gd_resource type="Resource" load_steps=3 format=3 uid="uid://dh8ih0yjngkv5"]
 
 [ext_resource type="Script" uid="uid://c16jiuasboxwv" path="res://assets/scripts/BodyUpgrade.cs" id="1_31gmg"]
+[ext_resource type="Texture2D" uid="uid://cquhkrhwmt0h8" path="res://assets/sprites/Power Up Icons/Health Boost.png" id="1_76bbe"]
 
 [resource]
 script = ExtResource("1_31gmg")
 BodyModType = 1
+UpgradeImage = ExtResource("1_76bbe")
 UpgradeName = "Health Boost"
 Value = 20.0

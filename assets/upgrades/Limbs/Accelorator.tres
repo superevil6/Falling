@@ -8,4 +8,4 @@ BodyUpgradeType = 2
 BodyModType = 2
 UpgradeName = "Accelorator"
 UpgradeDescription = "Increases movement speed."
-Value = 3.0
+Value = 100.0

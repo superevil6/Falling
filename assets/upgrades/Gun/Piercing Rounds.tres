@@ -1,0 +1,13 @@
+[gd_resource type="Resource" load_steps=3 format=3 uid="uid://b5qi5p35ejkeq"]
+
+[ext_resource type="Texture2D" uid="uid://cd7wv5ivpkp26" path="res://assets/sprites/Power Up Icons/Piercing Bullet.png" id="1_4f6v1"]
+[ext_resource type="Script" uid="uid://cjvebtbs1ft7k" path="res://assets/scripts/GunUpgrade.cs" id="2_bt7gh"]
+
+[resource]
+script = ExtResource("2_bt7gh")
+Type = 5
+UpgradeImage = ExtResource("1_4f6v1")
+UpgradeName = "Piercing Rounds"
+UpgradeDescription = "Bullets now pierce an enemy. More piercing rounds, more enemies pierced."
+Value = 1.0
+Rarity = 2

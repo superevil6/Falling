@@ -12,6 +12,32 @@ public partial class Player : CharacterBody2D
 	public bool HasSeeEnemyHealth = true;
 	public bool HasLaserSight = false;
 	public int FireDefenseStacks = 0;
+	public int OrbitalShieldCount = 0;
+	private float orbitalAngle = 0f;
+	[Export]
+	public float OrbitalRadius {get;set;} = 90f;
+	[Export]
+	public float OrbitalRotationSpeed {get;set;} = 2.5f;
+	private readonly System.Collections.Generic.List<OrbitalShield> orbitalShields = new();
+	public int OrbitalMinionCount = 0;
+	private float orbitalMinionAngle = 0f;
+	[Export]
+	public float OrbitalMinionRadius {get;set;} = 130f;
+	[Export]
+	public float OrbitalMinionRotationSpeed {get;set;} = 1.8f;
+	[Export]
+	public PackedScene MinionBullet {get;set;}
+	[Export]
+	public int MinionDamage {get;set;} = 1;
+	[Export]
+	public float MinionFireRate {get;set;} = 1.5f;
+	[Export]
+	public float MinionRange {get;set;} = 500f;
+	[Export]
+	public float MinionBulletSpeed {get;set;} = 800f;
+	[Export]
+	public float MinionBulletLifetime {get;set;} = 1.5f;
+	private readonly System.Collections.Generic.List<OrbitalMinion> orbitalMinions = new();
 	public int IceDefenseStacks = 0;
 	public int ElectricDefenseStacks = 0;
 	public float ItemMagnetMultiplier = 1f;
@@ -165,6 +191,14 @@ public partial class Player : CharacterBody2D
 		int dotDamage = StatusEffects.Tick((float)delta);
 		if (dotDamage > 0) TakeDamage(dotDamage);
 		animatedSprite2D.SelfModulate = StatusEffects.GetTint();
+		if (orbitalShields.Count > 0) {
+			orbitalAngle += OrbitalRotationSpeed * (float)delta;
+			UpdateOrbitalShieldPositions();
+		}
+		if (orbitalMinions.Count > 0) {
+			orbitalMinionAngle += OrbitalMinionRotationSpeed * (float)delta;
+			UpdateOrbitalMinionPositions();
+		}
 		if (HealthRegenPerSecond > 0f && CurrentHealth > 0 && CurrentHealth < MaxHealth) {
 			healthRegenAccumulator += HealthRegenPerSecond * (float)delta;
 			if (healthRegenAccumulator >= 1f) {
@@ -227,6 +261,14 @@ public partial class Player : CharacterBody2D
 				break;
 			case BodyUpgradeType.ElectricDefense:
 				ElectricDefenseStacks++;
+				break;
+			case BodyUpgradeType.OrbitalShield:
+				OrbitalShieldCount++;
+				RebuildOrbitalShields();
+				break;
+			case BodyUpgradeType.OrbitalMinion:
+				OrbitalMinionCount++;
+				RebuildOrbitalMinions();
 				break;
 		}
 	}
@@ -307,6 +349,58 @@ public partial class Player : CharacterBody2D
 		GetParent().GetNode<TextureProgressBar>("Health Bar").Value = CurrentHealth;
 		if (finalDamage > 0) FloatingDamageText.Spawn(this, GlobalPosition, finalDamage, FloatingDamageText.ElementColor(element, new Color(1f, 0.4f, 0.4f)));
 		FlashRed();
+	}
+
+	private void RebuildOrbitalShields()
+	{
+		foreach (var s in orbitalShields) if (IsInstanceValid(s)) s.QueueFree();
+		orbitalShields.Clear();
+		for (int i = 0; i < OrbitalShieldCount; i++) {
+			var shield = new OrbitalShield();
+			AddChild(shield);
+			orbitalShields.Add(shield);
+		}
+		UpdateOrbitalShieldPositions();
+	}
+
+	private void UpdateOrbitalShieldPositions()
+	{
+		int n = orbitalShields.Count;
+		if (n == 0) return;
+		float step = Mathf.Tau / n;
+		for (int i = 0; i < n; i++) {
+			float a = orbitalAngle + i * step;
+			orbitalShields[i].Position = new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * OrbitalRadius;
+		}
+	}
+
+	private void RebuildOrbitalMinions()
+	{
+		foreach (var m in orbitalMinions) if (IsInstanceValid(m)) m.QueueFree();
+		orbitalMinions.Clear();
+		for (int i = 0; i < OrbitalMinionCount; i++) {
+			var minion = new OrbitalMinion();
+			minion.BulletScene = MinionBullet;
+			minion.Damage = MinionDamage;
+			minion.FireRate = MinionFireRate;
+			minion.Range = MinionRange;
+			minion.BulletSpeed = MinionBulletSpeed;
+			minion.BulletLifetime = MinionBulletLifetime;
+			AddChild(minion);
+			orbitalMinions.Add(minion);
+		}
+		UpdateOrbitalMinionPositions();
+	}
+
+	private void UpdateOrbitalMinionPositions()
+	{
+		int n = orbitalMinions.Count;
+		if (n == 0) return;
+		float step = Mathf.Tau / n;
+		for (int i = 0; i < n; i++) {
+			float a = orbitalMinionAngle + i * step;
+			orbitalMinions[i].Position = new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * OrbitalMinionRadius;
+		}
 	}
 
 	public void Heal(int amount)

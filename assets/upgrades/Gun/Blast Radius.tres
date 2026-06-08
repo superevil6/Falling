@@ -1,10 +1,12 @@
-[gd_resource type="Resource" load_steps=2 format=3 uid="uid://vbpfm4huhi3c"]
+[gd_resource type="Resource" load_steps=3 format=3 uid="uid://vbpfm4huhi3c"]
 
+[ext_resource type="Texture2D" uid="uid://ci4gtlwqswev" path="res://assets/sprites/Power Up Icons/Exploding Bullet.png" id="1_hd24y"]
 [ext_resource type="Script" uid="uid://cjvebtbs1ft7k" path="res://assets/scripts/GunUpgrade.cs" id="1_uv4tg"]
 
 [resource]
 script = ExtResource("1_uv4tg")
 Type = 23
+UpgradeImage = ExtResource("1_hd24y")
 UpgradeName = "Blast Radius"
 UpgradeDescription = "Exploding bullets have a larger blast radius."
 Value = 3.0

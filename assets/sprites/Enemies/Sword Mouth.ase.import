@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://d072v2a1vc3mg"
+path="res://.godot/imported/Sword Mouth.ase-48c1b22b8540d3b416ffd3d28ad9838e.res"
+
+[deps]
+
+source_file="res://assets/sprites/Enemies/Sword Mouth.ase"
+dest_files=["res://.godot/imported/Sword Mouth.ase-48c1b22b8540d3b416ffd3d28ad9838e.res"]
+
+[params]
+

@@ -18,5 +18,7 @@ public enum BodyUpgradeType
     BlindResistance = 15,
     BurningResistance = 16,
     SlowResistance = 17,
-    ShockResistance = 18
+    ShockResistance = 18,
+    OrbitalShield = 19,
+    OrbitalMinion = 20,
 }

@@ -1,10 +1,12 @@
-[gd_resource type="Resource" load_steps=2 format=3 uid="uid://d325lnbfktyi"]
+[gd_resource type="Resource" load_steps=3 format=3 uid="uid://d325lnbfktyi"]
 
+[ext_resource type="Texture2D" uid="uid://bw7e1ej5o8t2r" path="res://assets/sprites/Power Up Icons/Vampirism.png" id="1_4ou1b"]
 [ext_resource type="Script" uid="uid://cjvebtbs1ft7k" path="res://assets/scripts/GunUpgrade.cs" id="2_uexpm"]
 
 [resource]
 script = ExtResource("2_uexpm")
 Type = 17
+UpgradeImage = ExtResource("1_4ou1b")
 UpgradeName = "Vamprism"
 UpgradeDescription = "Bullets fired by this gun puncture enemies and release their mercury, healing you."
 Value = 1.0
