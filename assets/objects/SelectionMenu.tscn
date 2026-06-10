@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://assets/scripts/SelectionMenu.cs" id="1_select"]
 
 [node name="SelectionMenu" type="CanvasLayer"]
+layer = 10
 script = ExtResource("1_select")
 
 [node name="Panel" type="Panel" parent="."]

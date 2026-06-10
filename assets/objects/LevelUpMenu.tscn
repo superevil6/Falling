@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://assets/scripts/LevelUpMenu.cs" id="1_levelup"]
 
 [node name="LevelUpMenu" type="CanvasLayer"]
+layer = 10
 script = ExtResource("1_levelup")
 
 [node name="Panel" type="Panel" parent="."]

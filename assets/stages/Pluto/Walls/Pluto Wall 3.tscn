@@ -1,0 +1,21 @@
+[gd_scene load_steps=5 format=3 uid="uid://c27bw8m2b5dvc"]
+
+[ext_resource type="Script" uid="uid://tu36bfp3p2rn" path="res://assets/scripts/WallBody.cs" id="1_fy7ot"]
+[ext_resource type="Resource" uid="uid://jdtn34s4gvrf" path="res://assets/stages/Pluto/Walls/Pluto Wall 3.tres" id="2_fy7ot"]
+[ext_resource type="Shader" uid="uid://nej1tvi1ocse" path="res://assets/shaders/PixelArt.gdshader" id="3_faf2c"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ylusg"]
+shader = ExtResource("3_faf2c")
+shader_parameter/pixel_size = 4.0
+shader_parameter/color_steps = 8
+shader_parameter/hue_shift = 0.0
+shader_parameter/darkness = 0.0
+
+[node name="TestWall" type="StaticBody2D" groups=["Wall"]]
+script = ExtResource("1_fy7ot")
+WallData = ExtResource("2_fy7ot")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_ylusg")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]

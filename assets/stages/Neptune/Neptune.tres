@@ -1,0 +1,23 @@
+[gd_resource type="Resource" load_steps=13 format=3 uid="uid://dqqmcu777og7j"]
+
+[ext_resource type="PackedScene" uid="uid://c36mqk0tadl13" path="res://assets/stages/Neptune/Backgrounds/Neptune Background.tscn" id="1_wx81d"]
+[ext_resource type="PackedScene" uid="uid://dhyifxs4k6cfr" path="res://assets/stages/Neptune/Backgrounds/Neptune Background 2.tscn" id="2_axs76"]
+[ext_resource type="Resource" path="res://assets/enemy groups/Cross.tres" id="2_r2bec"]
+[ext_resource type="Resource" path="res://assets/enemy groups/Pentagon.tres" id="3_s7pnd"]
+[ext_resource type="Resource" path="res://assets/enemy groups/Circle Formation.tres" id="4_nxoen"]
+[ext_resource type="Resource" path="res://assets/enemy groups/Vertical Line.tres" id="5_xnw1d"]
+[ext_resource type="Resource" path="res://assets/enemy groups/V Formation.tres" id="6_uklr1"]
+[ext_resource type="Resource" path="res://assets/enemy groups/Triangle.tres" id="7_3noip"]
+[ext_resource type="PackedScene" uid="uid://b6bqvnkrgxmt7" path="res://assets/stages/Neptune/Walls/Neptune Wall.tscn" id="9_wx81d"]
+[ext_resource type="PackedScene" uid="uid://cmvrne8gbig5f" path="res://assets/stages/Neptune/Walls/Neptune Wall 2.tscn" id="10_axs76"]
+[ext_resource type="PackedScene" uid="uid://cy2nn4xphi7ja" path="res://assets/stages/Neptune/Walls/Neptune Wall 3.tscn" id="11_uc5il"]
+[ext_resource type="Script" uid="uid://byqq3mnl0fxbu" path="res://assets/scripts/Stage.cs" id="12_t7hlp"]
+
+[resource]
+script = ExtResource("12_t7hlp")
+Name = "Neptune"
+EnemyGroup = Array[Resource]([ExtResource("2_r2bec"), ExtResource("3_s7pnd"), ExtResource("4_nxoen"), ExtResource("5_xnw1d"), ExtResource("6_uklr1"), ExtResource("7_3noip")])
+Hazards = Array[PackedScene]([])
+LeftWallChunks = Array[PackedScene]([ExtResource("9_wx81d"), ExtResource("10_axs76"), ExtResource("11_uc5il")])
+RightWallChunks = Array[PackedScene]([ExtResource("9_wx81d"), ExtResource("10_axs76"), ExtResource("11_uc5il")])
+BackgroundImages = Array[PackedScene]([ExtResource("1_wx81d"), ExtResource("2_axs76")])

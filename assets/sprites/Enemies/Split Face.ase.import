@@ -1,7 +1,7 @@
 [remap]
 
-importer="aseprite_wizard.plugin.noop"
-type="PackedDataContainer"
+importer="aseprite_wizard.plugin"
+type="SpriteFrames"
 uid="uid://xuti13rygkjs"
 path="res://.godot/imported/Split Face.ase-dc38525e34656358970b8fc4af2fa1e5.res"
 
@@ -12,3 +12,7 @@ dest_files=["res://.godot/imported/Split Face.ase-dc38525e34656358970b8fc4af2fa1
 
 [params]
 
+split_layers=false
+exclude_layers_pattern=""
+only_visible_layers=false
+sheet_type="Packed"

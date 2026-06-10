@@ -14,5 +14,5 @@ BulletSpread = 0.3
 BulletType = ExtResource("1_h32k7")
 BulletLifetime = 1.0
 BulletSize = 2.0
-Element = 1
+AuraDamages = true
 GunUpgrades = null

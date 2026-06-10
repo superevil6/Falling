@@ -1,0 +1,18 @@
+[remap]
+
+importer="aseprite_wizard.plugin"
+type="SpriteFrames"
+uid="uid://bfa3p7wq3kr2y"
+path="res://.godot/imported/Rocket Bullet.aseprite-253b5456aeb43399e1165ea0ef9dc115.res"
+
+[deps]
+
+source_file="res://assets/sprites/Weapons/Rocket Bullet.aseprite"
+dest_files=["res://.godot/imported/Rocket Bullet.aseprite-253b5456aeb43399e1165ea0ef9dc115.res"]
+
+[params]
+
+split_layers=false
+exclude_layers_pattern=""
+only_visible_layers=false
+sheet_type="Packed"

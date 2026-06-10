@@ -1,0 +1,18 @@
+[remap]
+
+importer="aseprite_wizard.plugin"
+type="SpriteFrames"
+uid="uid://cdnsfh2ue3mr4"
+path="res://.godot/imported/Flame Bullet.aseprite-6921ecb3af5469bc796220e1a7a40718.res"
+
+[deps]
+
+source_file="res://assets/sprites/Weapons/Flame Bullet.aseprite"
+dest_files=["res://.godot/imported/Flame Bullet.aseprite-6921ecb3af5469bc796220e1a7a40718.res"]
+
+[params]
+
+split_layers=false
+exclude_layers_pattern=""
+only_visible_layers=false
+sheet_type="Packed"

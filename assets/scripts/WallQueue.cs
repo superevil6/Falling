@@ -24,8 +24,9 @@ public partial class WallQueue : Node2D
 		if (main == null || main.Stages == null || main.Stages.Length == 0) return;
 		var stage = main.Stages[main.CurrentStage];
 		speed = stage.ScrollSpeed;
-		if (chunks == null || chunks.Length == 0) {
-			chunks = IsRightSide ? stage.RightWallChunks : stage.LeftWallChunks;
+		var stageChunks = IsRightSide ? stage.RightWallChunks : stage.LeftWallChunks;
+		if (stageChunks != null && stageChunks.Length > 0) {
+			chunks = stageChunks;
 		}
 	}
 

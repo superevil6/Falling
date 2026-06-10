@@ -1,0 +1,18 @@
+[remap]
+
+importer="aseprite_wizard.plugin"
+type="SpriteFrames"
+uid="uid://nxppgi30gm11"
+path="res://.godot/imported/Charge Bullet.aseprite-ddbf591dfbad97cf4e0f8e3c81d2f6ed.res"
+
+[deps]
+
+source_file="res://assets/sprites/Weapons/Charge Bullet.aseprite"
+dest_files=["res://.godot/imported/Charge Bullet.aseprite-ddbf591dfbad97cf4e0f8e3c81d2f6ed.res"]
+
+[params]
+
+split_layers=false
+exclude_layers_pattern=""
+only_visible_layers=false
+sheet_type="Packed"

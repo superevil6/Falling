@@ -1,7 +1,7 @@
 [remap]
 
-importer="aseprite_wizard.plugin.noop"
-type="PackedDataContainer"
+importer="aseprite_wizard.plugin"
+type="SpriteFrames"
 uid="uid://d072v2a1vc3mg"
 path="res://.godot/imported/Sword Mouth.ase-48c1b22b8540d3b416ffd3d28ad9838e.res"
 
@@ -12,3 +12,7 @@ dest_files=["res://.godot/imported/Sword Mouth.ase-48c1b22b8540d3b416ffd3d28ad98
 
 [params]
 
+split_layers=false
+exclude_layers_pattern=""
+only_visible_layers=false
+sheet_type="Packed"

@@ -1,0 +1,18 @@
+[remap]
+
+importer="aseprite_wizard.plugin"
+type="SpriteFrames"
+uid="uid://cdteqirtl0nkv"
+path="res://.godot/imported/Spiral Bullet.aseprite-8830b5fcac2ae90c372e61cedadb2a65.res"
+
+[deps]
+
+source_file="res://assets/sprites/Weapons/Spiral Bullet.aseprite"
+dest_files=["res://.godot/imported/Spiral Bullet.aseprite-8830b5fcac2ae90c372e61cedadb2a65.res"]
+
+[params]
+
+split_layers=false
+exclude_layers_pattern=""
+only_visible_layers=false
+sheet_type="Packed"

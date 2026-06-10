@@ -19,13 +19,15 @@ public partial class BackgroundQueue : Node2D
 	{
 		var rect = GetViewportRect().Size;
 		viewportHeight = rect.Y;
-		if (TilesOverride != null && TilesOverride.Length > 0) {
+		var main = GetParent() as Main;
+		PackedScene[] stageTiles = null;
+		if (main != null && main.Stages != null && main.Stages.Length > 0) {
+			stageTiles = main.Stages[main.CurrentStage].BackgroundImages;
+		}
+		if (stageTiles != null && stageTiles.Length > 0) {
+			tiles = stageTiles;
+		} else if (TilesOverride != null && TilesOverride.Length > 0) {
 			tiles = TilesOverride;
-		} else {
-			var main = GetParent() as Main;
-			if (main != null && main.Stages != null && main.Stages.Length > 0) {
-				tiles = main.Stages[main.CurrentStage].BackgroundImages;
-			}
 		}
 		scrollSource = GetParent()?.GetNodeOrNull<WallQueue>("Left Wall Queue");
 	}

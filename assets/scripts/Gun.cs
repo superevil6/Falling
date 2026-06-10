@@ -78,6 +78,8 @@ public partial class Gun : Resource
 	[Export]
 	public float LightningAimConeDeg {get;set;} = 30f;
 	[Export]
+	public float BeamSegmentBaseLength {get;set;} = 64f;
+	[Export]
 	public bool IsChargeWeapon {get;set;}
 	[Export(PropertyHint.Range, "0,1,0.01")]
 	public float CriticalChance {get;set;} = 0f;
@@ -85,6 +87,8 @@ public partial class Gun : Resource
 	public float CriticalMultiplier {get;set;} = 2f;
 	[Export]
 	public float LifeSteal {get;set;} = 0f;
+	[Export]
+	public bool AuraDamages {get;set;} = false;
 	[Export]
 	public int AcidRoundsCount {get;set;} = 0;
 	[Export]

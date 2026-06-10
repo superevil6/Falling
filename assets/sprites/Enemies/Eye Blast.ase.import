@@ -1,7 +1,7 @@
 [remap]
 
-importer="aseprite_wizard.plugin.noop"
-type="PackedDataContainer"
+importer="aseprite_wizard.plugin"
+type="SpriteFrames"
 uid="uid://cseyl0gt8cjny"
 path="res://.godot/imported/Eye Blast.ase-cd8315bca7c1a234023846f779f82fea.res"
 
@@ -12,3 +12,7 @@ dest_files=["res://.godot/imported/Eye Blast.ase-cd8315bca7c1a234023846f779f82fe
 
 [params]
 
+split_layers=false
+exclude_layers_pattern=""
+only_visible_layers=false
+sheet_type="Packed"

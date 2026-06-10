@@ -13,6 +13,7 @@ public partial class Bullet : Attack
 	public ElementType Element { get; set; }
 	public Color AuraColor {get;set;} = new Color(0, 0, 0, 0);
 	public float AuraRadius {get;set;} = 3f;
+	private System.Collections.Generic.HashSet<ulong> auraDamagedIds = new System.Collections.Generic.HashSet<ulong>();
 	public Vector2 SpawnOrigin {get;set;}
 	public float SpiralRate {get;set;} = 0f;
 	private double spiralTime = 0;
@@ -46,6 +47,10 @@ public partial class Bullet : Attack
 			}
 		}
 		if (Gun == null) return;
+		if (Gun.BulletSpriteFrames != null) {
+			var bulletSprite = GetNodeOrNull<AnimatedSprite2D>("AnimatedSprite2D");
+			if (bulletSprite != null) bulletSprite.SpriteFrames = Gun.BulletSpriteFrames;
+		}
 		if (Gun.SizeMultiplier > 0) {
 			Scale = new Vector2(Scale.X + Gun.SizeMultiplier, Scale.Y + Gun.SizeMultiplier);
 		}
@@ -120,6 +125,22 @@ public partial class Bullet : Attack
 			Scale = growthBaseScale * sizeMult;
 			float dmgFactor = Mathf.Lerp(1f, Gun.GrowthMinDamageRatio, t);
 			Damage = Mathf.RoundToInt(growthInitialDamage * dmgFactor);
+		}
+		if (Gun != null && Gun.AuraDamages && AuraRadius > 0f && AuraColor.A > 0f) {
+			float worldRadius = AuraRadius * 1.6f * Scale.X;
+			int auraDmg = Mathf.CeilToInt(Damage / 10f);
+			if (auraDmg > 0) {
+				foreach (var n in GetTree().GetNodesInGroup("Enemy")) {
+					if (n is Enemy e && e.CurrentHealth > 0) {
+						ulong id = e.GetInstanceId();
+						if (auraDamagedIds.Contains(id)) continue;
+						if (GlobalPosition.DistanceTo(e.GlobalPosition) <= worldRadius) {
+							e.TakeDamage(auraDmg, Element);
+							auraDamagedIds.Add(id);
+						}
+					}
+				}
+			}
 		}
 		if (BulletLifetime > 0) {
 			BulletLifetime -= (float)delta;

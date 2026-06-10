@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://assets/scripts/UpgradeMenu.cs" id="1_t4vm1"]
 
 [node name="Upgrade Menu" type="CanvasLayer"]
+layer = 10
 script = ExtResource("1_t4vm1")
 
 [node name="Panel" type="Panel" parent="."]

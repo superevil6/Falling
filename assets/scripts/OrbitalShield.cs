@@ -12,6 +12,8 @@ public partial class OrbitalShield : Area2D
 		shape.Radius = ShieldRadius;
 		coll.Shape = shape;
 		AddChild(coll);
+		CollisionLayer = 0;
+		CollisionMask = 0;
 		SetCollisionLayerValue(6, true);
 		SetCollisionMaskValue(5, true);
 		AreaEntered += OnAreaEntered;

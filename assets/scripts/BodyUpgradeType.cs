@@ -21,4 +21,5 @@ public enum BodyUpgradeType
     ShockResistance = 18,
     OrbitalShield = 19,
     OrbitalMinion = 20,
+    ItemDropChanceUp = 21
 }

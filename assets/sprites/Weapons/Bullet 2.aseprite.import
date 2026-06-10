@@ -1,0 +1,18 @@
+[remap]
+
+importer="aseprite_wizard.plugin"
+type="SpriteFrames"
+uid="uid://dye6svw6maub0"
+path="res://.godot/imported/Bullet 2.aseprite-83f44256c82edfd748c2102f93508aa7.res"
+
+[deps]
+
+source_file="res://assets/sprites/Weapons/Bullet 2.aseprite"
+dest_files=["res://.godot/imported/Bullet 2.aseprite-83f44256c82edfd748c2102f93508aa7.res"]
+
+[params]
+
+split_layers=false
+exclude_layers_pattern=""
+only_visible_layers=false
+sheet_type="Packed"

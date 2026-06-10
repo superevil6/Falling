@@ -1,6 +1,6 @@
 using Godot;
 
-public partial class PauseMenu : Node2D
+public partial class PauseMenu : CanvasLayer
 {
 	private VBoxContainer gunsList;
 	private VBoxContainer modsList;
@@ -17,20 +17,34 @@ public partial class PauseMenu : Node2D
 	{
 		if (Input.IsActionJustPressed("pause"))
 		{
+			if (AnyOtherMenuOpen()) return;
 			GetTree().Paused = !GetTree().Paused;
 			if (GetTree().Paused)
 			{
 				GetNode<Button>("VBoxContainer/Unpause").GrabFocus();
 				Engine.TimeScale = 0;
 				RefreshLoadout();
-				Show();
+				Visible = true;
 			}
 			else
 			{
 				Engine.TimeScale = 1;
-				Hide();
+				Visible = false;
 			}
 		}
+	}
+
+	private bool AnyOtherMenuOpen()
+	{
+		var parent = GetParent();
+		if (parent == null) return false;
+		var lvl = parent.GetNodeOrNull<CanvasLayer>("Level Up Menu");
+		if (lvl != null && lvl.Visible) return true;
+		var upg = parent.GetNodeOrNull<CanvasLayer>("Upgrade Menu");
+		if (upg != null && upg.Visible) return true;
+		var sel = parent.GetNodeOrNull<CanvasLayer>("Selection Menu");
+		if (sel != null && sel.Visible) return true;
+		return false;
 	}
 
 	private void RefreshLoadout()
@@ -62,6 +76,7 @@ public partial class PauseMenu : Node2D
 		}
 
 		if (modsList != null && player.BodyMods != null) {
+			modsList.AddChild(BuildStatsRow(player));
 			for (int i = 0; i < player.BodyMods.Length; i++) {
 				var mod = player.BodyMods[i];
 				if (mod == null) {
@@ -72,7 +87,8 @@ public partial class PauseMenu : Node2D
 						: (!string.IsNullOrEmpty(mod.ResourcePath)
 							? System.IO.Path.GetFileNameWithoutExtension(mod.ResourcePath)
 							: "?");
-					modsList.AddChild(BuildRow(mod.ModImage, $"Slot {i + 1}: {name}"));
+					string text = $"Slot {i + 1} ({mod.type}): {name}";
+					modsList.AddChild(BuildBodyModRow(mod, text));
 				}
 			}
 		}
@@ -89,6 +105,55 @@ public partial class PauseMenu : Node2D
 			var counts = new System.Collections.Generic.Dictionary<GunUpgrade, int>();
 			var order = new System.Collections.Generic.List<GunUpgrade>();
 			foreach (var up in gun.AppliedUpgrades) {
+				if (up?.UpgradeImage == null) continue;
+				if (!counts.ContainsKey(up)) {
+					counts[up] = 0;
+					order.Add(up);
+				}
+				counts[up]++;
+			}
+			foreach (var up in order) {
+				var slot = new HBoxContainer();
+				slot.AddThemeConstantOverride("separation", 2);
+				var icon = new TextureRect();
+				icon.CustomMinimumSize = new Vector2(24f, 24f);
+				icon.ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize;
+				icon.StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered;
+				icon.TextureFilter = CanvasItem.TextureFilterEnum.Nearest;
+				icon.Texture = up.UpgradeImage;
+				slot.AddChild(icon);
+				if (counts[up] > 1) {
+					var lbl = new Label();
+					lbl.Text = $"x{counts[up]}";
+					lbl.VerticalAlignment = VerticalAlignment.Center;
+					slot.AddChild(lbl);
+				}
+				icons.AddChild(slot);
+			}
+			col.AddChild(icons);
+		}
+		return col;
+	}
+
+	private Control BuildStatsRow(Player player)
+	{
+		var label = new Label();
+		label.Text = $"Health: {player.CurrentHealth}/{player.MaxHealth}    Damage Reduction: {player.DamageReduction}\n"
+			+ $"Fire Def: {player.FireDefenseStacks}    Ice Def: {player.IceDefenseStacks}    Electric Def: {player.ElectricDefenseStacks}";
+		return label;
+	}
+
+	private Control BuildBodyModRow(BodyMod mod, string text)
+	{
+		var col = new VBoxContainer();
+		col.AddThemeConstantOverride("separation", 4);
+		col.AddChild(BuildRow(mod.ModImage, text));
+		if (mod.AppliedUpgrades != null && mod.AppliedUpgrades.Count > 0) {
+			var icons = new HBoxContainer();
+			icons.AddThemeConstantOverride("separation", 8);
+			var counts = new System.Collections.Generic.Dictionary<BodyUpgrade, int>();
+			var order = new System.Collections.Generic.List<BodyUpgrade>();
+			foreach (var up in mod.AppliedUpgrades) {
 				if (up?.UpgradeImage == null) continue;
 				if (!counts.ContainsKey(up)) {
 					counts[up] = 0;

@@ -7,7 +7,7 @@
 [ext_resource type="Resource" uid="uid://t4f5lqyn51u2" path="res://assets/weapons/Simple Sword.tres" id="3_idqgg"]
 [ext_resource type="Resource" uid="uid://1eafuo1ik2ym" path="res://assets/weapons/Spiraler.tres" id="4_34ecl"]
 [ext_resource type="Texture2D" uid="uid://dsmm5pqbthh2x" path="res://assets/objects/temp player.png" id="4_g5vn5"]
-[ext_resource type="Resource" uid="uid://bqsre2ne73xct" path="res://assets/weapons/GrowShot.tres" id="5_fg3d2"]
+[ext_resource type="Resource" uid="uid://dhxwiafwkl55" path="res://assets/weapons/Laser.tres" id="6_34ecl"]
 [ext_resource type="Resource" uid="uid://b48w24n0dq0s7" path="res://assets/body mods/head mod.tres" id="6_bkysh"]
 [ext_resource type="Shader" uid="uid://nej1tvi1ocse" path="res://assets/shaders/PixelArt.gdshader" id="7_fh75e"]
 [ext_resource type="Resource" uid="uid://dx5n6or0rm1b" path="res://assets/body mods/body mod.tres" id="7_htwuo"]
@@ -101,7 +101,7 @@ collision_mask = 17
 script = ExtResource("1_l4bou")
 MaxHealth = 100
 MinionBullet = ExtResource("2_34ecl")
-Guns = Array[Resource]([ExtResource("2_fh75e"), ExtResource("3_htwuo"), ExtResource("4_34ecl"), ExtResource("5_fg3d2")])
+Guns = Array[Resource]([ExtResource("2_fh75e"), ExtResource("3_htwuo"), ExtResource("4_34ecl"), ExtResource("6_34ecl")])
 BodyMods = Array[Resource]([ExtResource("6_bkysh"), ExtResource("7_htwuo"), ExtResource("8_34ecl")])
 Melee = ExtResource("3_idqgg")
 WallKickPriorityTime = 0.5

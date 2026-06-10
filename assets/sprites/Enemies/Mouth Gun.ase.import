@@ -1,7 +1,7 @@
 [remap]
 
-importer="aseprite_wizard.plugin.noop"
-type="PackedDataContainer"
+importer="aseprite_wizard.plugin"
+type="SpriteFrames"
 uid="uid://cf7x8v65wjwjr"
 path="res://.godot/imported/Mouth Gun.ase-ed7e5ac477d9ff75edfb4036b441648e.res"
 
@@ -12,3 +12,7 @@ dest_files=["res://.godot/imported/Mouth Gun.ase-ed7e5ac477d9ff75edfb4036b441648
 
 [params]
 
+split_layers=false
+exclude_layers_pattern=""
+only_visible_layers=false
+sheet_type="Packed"

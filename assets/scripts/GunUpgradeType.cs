@@ -22,5 +22,6 @@ public enum GunUpgradeType
     AcidRounds = 19,
     MultiDirectionalShot = 21,
     KnockBack = 22,
-    ExplosionRadius = 23
+    ExplosionRadius = 23,
+    AuraBullets = 24
 }

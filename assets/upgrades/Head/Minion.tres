@@ -7,3 +7,4 @@ script = ExtResource("1_ec2d0")
 BodyUpgradeType = 20
 UpgradeName = "Orbital Minion"
 UpgradeDescription = "A minion orbits around you and fires bullets."
+Rarity = 1

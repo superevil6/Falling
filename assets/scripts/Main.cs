@@ -62,4 +62,3 @@ public partial class Main : Node2D
 		}
 	}
 }
-//TODO Explosion are blocking bullets for some reason

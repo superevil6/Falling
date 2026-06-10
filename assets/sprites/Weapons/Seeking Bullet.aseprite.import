@@ -1,0 +1,18 @@
+[remap]
+
+importer="aseprite_wizard.plugin"
+type="SpriteFrames"
+uid="uid://btlmj76g0xc37"
+path="res://.godot/imported/Seeking Bullet.aseprite-fddd719e355e6a8be84b33331606b070.res"
+
+[deps]
+
+source_file="res://assets/sprites/Weapons/Seeking Bullet.aseprite"
+dest_files=["res://.godot/imported/Seeking Bullet.aseprite-fddd719e355e6a8be84b33331606b070.res"]
+
+[params]
+
+split_layers=false
+exclude_layers_pattern=""
+only_visible_layers=false
+sheet_type="Packed"

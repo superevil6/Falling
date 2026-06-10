@@ -11,5 +11,6 @@ public enum GunType
     MultiDirection = 8,
     Spiral = 9,
     Lightning = 10,
-    GrowShot = 11
+    GrowShot = 11,
+    HeatSeeking = 12
 }

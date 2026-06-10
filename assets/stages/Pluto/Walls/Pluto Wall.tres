@@ -1,5 +1,6 @@
-[gd_resource type="Resource" load_steps=3 format=3 uid="uid://cjq42va633uf8"]
+[gd_resource type="Resource" load_steps=4 format=3 uid="uid://cjq42va633uf8"]
 
+[ext_resource type="Texture2D" uid="uid://b0s6er0ip1vbj" path="res://assets/stages/Pluto/Walls/Pluto Wall 1.png" id="1_yhl76"]
 [ext_resource type="Script" uid="uid://bna4yt1fh0nl1" path="res://assets/scripts/Wall.cs" id="2_46a4g"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_n43am"]
@@ -8,5 +9,6 @@ size = Vector2(20, 200)
 [resource]
 script = ExtResource("2_46a4g")
 CollisionShape = SubResource("RectangleShape2D_n43am")
+Graphic = ExtResource("1_yhl76")
 Height = 200.0
 DotStacksPerTick = 5

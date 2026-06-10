@@ -1,0 +1,18 @@
+[remap]
+
+importer="aseprite_wizard.plugin"
+type="SpriteFrames"
+uid="uid://vi5cxtmr70h2"
+path="res://.godot/imported/Laser Bullet.aseprite-54518a9c4ad5a327ff89bb77a56b43b9.res"
+
+[deps]
+
+source_file="res://assets/sprites/Weapons/Laser Bullet.aseprite"
+dest_files=["res://.godot/imported/Laser Bullet.aseprite-54518a9c4ad5a327ff89bb77a56b43b9.res"]
+
+[params]
+
+split_layers=false
+exclude_layers_pattern=""
+only_visible_layers=false
+sheet_type="Packed"

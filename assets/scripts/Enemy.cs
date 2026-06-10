@@ -635,10 +635,6 @@ public partial class Enemy : Area2D
 				b.Set("BulletLifetime", Stats.Gun.BulletLifetime);
 				b.Gun = Stats.Gun;
 				if (Stats.Gun.BulletSpeed > 0) b.BulletSpeed = Stats.Gun.BulletSpeed;
-				if (Stats.Gun.BulletSpriteFrames != null) {
-					var bSprite = b.GetNodeOrNull<AnimatedSprite2D>("AnimatedSprite2D");
-					if (bSprite != null) bSprite.SpriteFrames = Stats.Gun.BulletSpriteFrames;
-				}
 				b.AuraColor = crit ? new Color(1f, 0.84f, 0.1f, 0.95f) : new Color(1f, 0.3f, 0.3f, 0.8f);
 				b.Position = Position;
 				b.Rotation = dir.Angle();

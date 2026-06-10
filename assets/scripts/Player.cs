@@ -97,8 +97,10 @@ public partial class Player : CharacterBody2D
 	private float TimeSinceLastAfterImage = 0f;
 	private Shader afterImageShader;
 	private Line2D activeLaser;
+	private readonly System.Collections.Generic.List<Node2D> laserSegments = new();
 	private Line2D laserSightLine;
 	private Line2D activeLightning;
+	private readonly System.Collections.Generic.List<Node2D> lightningSegments = new();
 	private float lightningFlashTimer = 0f;
 	private float chargeAmount = 0f;
 	private float chargePulseTime = 0f;
@@ -604,10 +606,6 @@ public partial class Player : CharacterBody2D
 			b.Set("BulletLifetime", Gun.BulletLifetime);
 			b.Gun = Gun;
 			if (Gun.BulletSpeed > 0) b.BulletSpeed = Gun.BulletSpeed;
-			if (Gun.BulletSpriteFrames != null) {
-				var bSprite = b.GetNodeOrNull<AnimatedSprite2D>("AnimatedSprite2D");
-				if (bSprite != null) bSprite.SpriteFrames = Gun.BulletSpriteFrames;
-			}
 			if (Gun.Element != ElementType.NonElemental) b.Element = Gun.Element;
 			b.AuraColor = crit ? CritAuraColor : new Color(0.3f, 0.6f, 1f, 0.8f);
 			b.Position = Position;
@@ -661,10 +659,6 @@ public partial class Player : CharacterBody2D
 			b.Set("BulletLifetime", Gun.BulletLifetime);
 			b.Gun = Gun;
 			if (Gun.BulletSpeed > 0) b.BulletSpeed = Gun.BulletSpeed;
-			if (Gun.BulletSpriteFrames != null) {
-				var bSprite = b.GetNodeOrNull<AnimatedSprite2D>("AnimatedSprite2D");
-				if (bSprite != null) bSprite.SpriteFrames = Gun.BulletSpriteFrames;
-			}
 			if (Gun.Element != ElementType.NonElemental) b.Element = Gun.Element;
 			b.AuraColor = crit ? CritAuraColor : new Color(0.3f, 0.6f, 1f, 0.8f);
 			if (spiral) {
@@ -708,17 +702,42 @@ public partial class Player : CharacterBody2D
 			else if (collider is DestructibleObstacle d) hitObstacle = d;
 			break;
 		}
-		if (activeLaser == null) {
-			activeLaser = new Line2D();
-			activeLaser.Width = 4f;
-			activeLaser.DefaultColor = new Color(1f, 0.3f, 0.3f);
-			activeLaser.ZIndex = 10;
-			activeLaser.AddPoint(from);
-			activeLaser.AddPoint(endPoint);
-			GetParent().AddChild(activeLaser);
+		if (Gun.BulletSpriteFrames != null) {
+			if (activeLaser != null) { activeLaser.QueueFree(); activeLaser = null; }
+			float texWidth = GetSpriteFrameWidth(Gun.BulletSpriteFrames);
+			AnimatedSprite2D seg = null;
+			if (laserSegments.Count > 0 && laserSegments[0] is AnimatedSprite2D existing) {
+				seg = existing;
+			} else {
+				seg = new AnimatedSprite2D();
+				seg.SpriteFrames = Gun.BulletSpriteFrames;
+				var names = Gun.BulletSpriteFrames.GetAnimationNames();
+				if (names.Length > 0) seg.Animation = names[0];
+				seg.Play();
+				seg.ZIndex = 10;
+				GetParent().AddChild(seg);
+				laserSegments.Add(seg);
+			}
+			seg.Offset = new Vector2(-texWidth / 2f, 0f);
+			Vector2 dirVec = endPoint - from;
+			seg.GlobalPosition = from;
+			seg.Rotation = (from - endPoint).Angle();
+			seg.Scale = new Vector2(dirVec.Length() / texWidth, 1f);
 		} else {
-			activeLaser.SetPointPosition(0, from);
-			activeLaser.SetPointPosition(1, endPoint);
+			foreach (var s in laserSegments) if (IsInstanceValid(s)) s.QueueFree();
+			laserSegments.Clear();
+			if (activeLaser == null) {
+				activeLaser = new Line2D();
+				activeLaser.Width = 4f;
+				activeLaser.DefaultColor = new Color(1f, 0.3f, 0.3f);
+				activeLaser.ZIndex = 10;
+				activeLaser.AddPoint(from);
+				activeLaser.AddPoint(endPoint);
+				GetParent().AddChild(activeLaser);
+			} else {
+				activeLaser.SetPointPosition(0, from);
+				activeLaser.SetPointPosition(1, endPoint);
+			}
 		}
 		if (gunCoolDown <= 0 && (hitEnemy != null || hitObstacle != null)) {
 			if (hitEnemy != null) hitEnemy.TakeDamage(Gun.Damage, ElementType.NonElemental);
@@ -733,6 +752,8 @@ public partial class Player : CharacterBody2D
 			activeLaser.QueueFree();
 			activeLaser = null;
 		}
+		foreach (var s in laserSegments) if (IsInstanceValid(s)) s.QueueFree();
+		laserSegments.Clear();
 	}
 
 	private void UpdateLaserSight(Vector2 aimDirection)
@@ -796,18 +817,21 @@ public partial class Player : CharacterBody2D
 			visited.Add(next);
 			current = next;
 		}
-		if (activeLightning == null) {
+		var points = new List<Vector2> { GlobalPosition };
+		foreach (var e in chain) points.Add(e.GlobalPosition);
+		ClearLightning();
+		if (Gun.BulletSpriteFrames != null) {
+			BuildAnimatedBeamSegments(points, Gun.BulletSpriteFrames, Gun.BeamSegmentBaseLength, lightningSegments);
+		} else {
 			activeLightning = new Line2D();
 			activeLightning.Width = 3f;
 			activeLightning.DefaultColor = new Color(0.6f, 0.8f, 1f, 0.95f);
 			activeLightning.ZIndex = 10;
+			foreach (var p in points) activeLightning.AddPoint(p);
 			GetParent().AddChild(activeLightning);
 		}
-		activeLightning.ClearPoints();
-		activeLightning.AddPoint(GlobalPosition);
 		int dmg = Gun.Damage;
 		foreach (var e in chain) {
-			activeLightning.AddPoint(e.GlobalPosition);
 			if (dmg <= 0) continue;
 			e.TakeDamage(dmg, ElementType.Electric);
 			e.StatusEffects.AddStack(StatusEffectType.ReducedFireRate);
@@ -817,12 +841,46 @@ public partial class Player : CharacterBody2D
 		gunCoolDown = Gun.FireRate * StatusEffects.GetFireRateMultiplier();
 	}
 
+	private void BuildAnimatedBeamSegments(List<Vector2> points, SpriteFrames frames, float baseLength, List<Node2D> track)
+	{
+		var animNames = frames.GetAnimationNames();
+		string animName = animNames.Length > 0 ? animNames[0] : "default";
+		float texWidth = GetSpriteFrameWidth(frames);
+		for (int i = 0; i < points.Count - 1; i++) {
+			var seg = new AnimatedSprite2D();
+			seg.SpriteFrames = frames;
+			if (frames.HasAnimation(animName)) seg.Animation = animName;
+			seg.Play();
+			seg.Offset = new Vector2(-texWidth / 2f, 0f);
+			float len = points[i].DistanceTo(points[i + 1]);
+			seg.GlobalPosition = points[i];
+			seg.Rotation = (points[i] - points[i + 1]).Angle();
+			seg.Scale = new Vector2(len / texWidth, 1f);
+			seg.ZIndex = 10;
+			GetParent().AddChild(seg);
+			track.Add(seg);
+		}
+	}
+
+	private static float GetSpriteFrameWidth(SpriteFrames frames)
+	{
+		if (frames == null) return 64f;
+		var names = frames.GetAnimationNames();
+		if (names.Length == 0) return 64f;
+		var animName = names[0];
+		if (frames.GetFrameCount(animName) == 0) return 64f;
+		var tex = frames.GetFrameTexture(animName, 0);
+		return tex != null && tex.GetWidth() > 0 ? tex.GetWidth() : 64f;
+	}
+
 	private void ClearLightning()
 	{
 		if (activeLightning != null) {
 			activeLightning.QueueFree();
 			activeLightning = null;
 		}
+		foreach (var s in lightningSegments) if (IsInstanceValid(s)) s.QueueFree();
+		lightningSegments.Clear();
 	}
 
 	private Enemy FindLightningTarget(Vector2 aimDir, float maxAngleRad, float maxDist)

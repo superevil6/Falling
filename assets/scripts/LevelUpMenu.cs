@@ -69,6 +69,7 @@ public partial class LevelUpMenu : CanvasLayer
 				&& selectedIndex >= 0 && selectedIndex < currentBodyUpgrades.Length) {
 				var player = GetTree().CurrentScene?.GetNodeOrNull<Player>("Player");
 				player?.ApplyBodyUpgrade(currentBodyUpgrades[selectedIndex]);
+				currentBodyMod.AppliedUpgrades.Add(currentBodyUpgrades[selectedIndex]);
 			}
 			EmitSignal(SignalName.UpgradeChosen, selectedIndex, currentEntityName);
 			if (pendingLevelUps.Count > 0) {
@@ -172,10 +173,16 @@ public partial class LevelUpMenu : CanvasLayer
 			currentBodyUpgrades = null;
 			return;
 		}
+		var player = GetTree().CurrentScene?.GetNodeOrNull<Player>("Player");
 		var applicable = new List<BodyUpgrade>();
 		foreach (var up in main.PossibleBodyUpgrades) {
 			if (up == null) continue;
-			if (up.BodyModType == mod.type) applicable.Add(up);
+			if (up.BodyModType != mod.type) continue;
+			if (player != null) {
+				if (up.BodyUpgradeType == BodyUpgradeType.LaserSight && player.HasLaserSight) continue;
+				if (up.BodyUpgradeType == BodyUpgradeType.SeeEnemyHealth && player.HasSeeEnemyHealth) continue;
+			}
+			applicable.Add(up);
 		}
 		if (applicable.Count == 0) {
 			currentBodyUpgrades = null;

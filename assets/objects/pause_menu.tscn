@@ -2,8 +2,9 @@
 
 [ext_resource type="Script" path="res://assets/scripts/PauseMenu.cs" id="1_e7mqj"]
 
-[node name="Pause Menu" type="Node2D"]
+[node name="Pause Menu" type="CanvasLayer"]
 process_mode = 3
+layer = 10
 script = ExtResource("1_e7mqj")
 
 [node name="GunsPanel" type="Panel" parent="."]

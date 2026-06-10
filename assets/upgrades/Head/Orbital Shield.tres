@@ -7,3 +7,4 @@ script = ExtResource("1_0enr6")
 BodyUpgradeType = 19
 UpgradeName = "Orbital Shield"
 UpgradeDescription = "A shield orbits around you and destroys bullets it comes in contact with."
+Rarity = 1

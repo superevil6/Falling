@@ -17,6 +17,8 @@ public partial class Stage : Resource
 	[Export]
 	public PackedScene[] BackgroundImages {get;set;}
 	[Export]
+	public PackedScene[] Background2Images {get;set;}
+	[Export]
 	public AudioStream BGM {get;set;}
 
 }
