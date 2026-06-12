@@ -281,16 +281,36 @@ public partial class Player : CharacterBody2D
 		if (Gun == null) {
 			GetParent().GetNode<Label>("Gun Label").Text = "Gun: -";
 			if (gunImage != null) gunImage.Texture = null;
-			return;
+		} else {
+			string gunName = !string.IsNullOrEmpty(Gun.SourceName)
+				? Gun.SourceName
+				: (!string.IsNullOrEmpty(Gun.ResourcePath)
+					? System.IO.Path.GetFileNameWithoutExtension(Gun.ResourcePath)
+					: "-");
+			GetParent().GetNode<Label>("Gun Label").Text =
+				$"Gun: {gunName}  Lv{Gun.CurrentLevel}  XP {Gun.CurrentExperience}/{Gun.ExperiencePerLevel}";
+			if (gunImage != null) gunImage.Texture = Gun.GunImage;
 		}
-		string gunName = !string.IsNullOrEmpty(Gun.SourceName)
-			? Gun.SourceName
-			: (!string.IsNullOrEmpty(Gun.ResourcePath)
-				? System.IO.Path.GetFileNameWithoutExtension(Gun.ResourcePath)
-				: "-");
-		GetParent().GetNode<Label>("Gun Label").Text =
-			$"Gun: {gunName}  Lv{Gun.CurrentLevel}  XP {Gun.CurrentExperience}/{Gun.ExperiencePerLevel}";
-		if (gunImage != null) gunImage.Texture = Gun.GunImage;
+		SetGunSlot("Gun Slot Top", 0);
+		SetGunSlot("Gun Slot Right", 1);
+		SetGunSlot("Gun Slot Bottom", 2);
+		SetGunSlot("Gun Slot Left", 3);
+	}
+
+	private void SetGunSlot(string nodeName, int idx)
+	{
+		var slot = GetParent().GetNodeOrNull<TextureRect>(nodeName);
+		if (slot == null) return;
+		Gun g = (Guns != null && idx < Guns.Length) ? Guns[idx] : null;
+		if (g == null || g.GunImage == null) {
+			slot.Texture = null;
+			slot.Modulate = new Color(1f, 1f, 1f, 0.3f);
+		} else {
+			slot.Texture = g.GunImage;
+			slot.Modulate = (idx == currentGunIndex)
+				? Colors.White
+				: new Color(1f, 1f, 1f, 0.5f);
+		}
 	}
 
 	private void SpawnAfterImage()
@@ -599,6 +619,9 @@ public partial class Player : CharacterBody2D
 		float dirStep = Mathf.DegToRad(Gun.DirectionalAngle);
 		for (int d = 0; d < dirCount; d++) {
 			Vector2 dir = aimDirection.Rotated(dirStep * d).Normalized();
+			if (Gun.BulletSpread > 0f) {
+				dir = dir.Rotated(Mathf.DegToRad(rng.RandfRange(0f, Gun.BulletSpread)));
+			}
 			bool crit = RollCrit(Gun, out int damage, baseDamage);
 			Bullet b = Gun.BulletType.Instantiate<Bullet>();
 			b.Set("Direction", dir);
@@ -626,6 +649,26 @@ public partial class Player : CharacterBody2D
 		return crit;
 	}
 
+	private void ApplyGunHit(Enemy e, int baseDamage, Gun gun) {
+		if (e == null || gun == null) return;
+		RollCrit(gun, out int damage, baseDamage);
+		e.TakeDamage(damage, gun.Element, gun.AcidRoundsCount);
+		if (gun.DotStacksPerHit > 0) e.StatusEffects.AddStacks(StatusEffectType.DamageOverTime, gun.DotStacksPerHit);
+		if (gun.SlowStacksPerHit > 0) e.StatusEffects.AddStacks(StatusEffectType.Slow, gun.SlowStacksPerHit);
+		if (gun.FireRateStacksPerHit > 0) e.StatusEffects.AddStacks(StatusEffectType.ReducedFireRate, gun.FireRateStacksPerHit);
+		if (gun.BlindStacksPerHit > 0) e.StatusEffects.AddStacks(StatusEffectType.Blind, gun.BlindStacksPerHit);
+		if (gun.LifeSteal > 0f) {
+			int heal = Mathf.RoundToInt(gun.LifeSteal);
+			if (heal > 0) Heal(heal);
+		}
+	}
+
+	private float BeamThickness(Gun gun) {
+		float t = 1f + Mathf.Max(0f, gun.SizeMultiplier);
+		if (gun.BulletSize > 0f) t *= gun.BulletSize;
+		return t;
+	}
+
 	private void Shoot(Vector2 aimDirection) {
 		animatedSprite2D.Animation = "Shooting";
 		int dirCount = Mathf.Max(1, Gun.DirectionalCount);
@@ -638,7 +681,7 @@ public partial class Player : CharacterBody2D
 	}
 
 	private void SpawnBulletSpread(Vector2 aimDirection) {
-		float effectiveSpread = Gun.BulletSpread + StatusEffects.GetSpreadIncrease();
+		float effectiveSpread = Gun.MultiBulletAngle + StatusEffects.GetSpreadIncrease();
 		float halfSpread = effectiveSpread / 2f;
 		int n = Mathf.Max(1, Gun.BulletCount);
 		bool spiral = Gun.Spiral != 0f;
@@ -653,6 +696,9 @@ public partial class Player : CharacterBody2D
 				float angle = n == 1 ? 0f : -halfSpread + i * (effectiveSpread / (n - 1));
 				direction = aimDirection.Rotated(angle);
 			}
+			if (Gun.BulletSpread > 0f) {
+				direction = direction.Rotated(Mathf.DegToRad(rng.RandfRange(0f, Gun.BulletSpread)));
+			}
 			bool crit = RollCrit(Gun, out int dmg, Gun.Damage);
 			b.Set("Direction", direction);
 			b.Set("Damage", dmg);
@@ -664,6 +710,15 @@ public partial class Player : CharacterBody2D
 			if (spiral) {
 				b.SpawnOrigin = Position;
 				b.SpiralRate = Gun.Spiral;
+			}
+			if (Gun.IsBoomerang) {
+				b.IsBoomerang = true;
+				b.BoomerangOrigin = this;
+				b.BoomerangMaxRadius = Gun.BoomerangMaxRadius;
+				b.BoomerangDuration = Gun.BoomerangDuration;
+				b.BoomerangOutwardTime = Gun.BoomerangOutwardTime;
+				b.BoomerangArcDirection = Gun.BoomerangArcDirection;
+				b.SpawnOrigin = Position;
 			}
 			b.Position = Position;
 			b.Rotation = direction.Angle();
@@ -678,70 +733,113 @@ public partial class Player : CharacterBody2D
 	{
 		var spaceState = GetWorld2D().DirectSpaceState;
 		Vector2 from = GlobalPosition;
-		Vector2 to = from + aimDirection.Normalized() * ScreenSize.Length();
-		var query = PhysicsRayQueryParameters2D.Create(from, to);
-		query.CollideWithAreas = true;
-		query.CollideWithBodies = true;
-		query.CollisionMask = 5;
-		var excluded = new Godot.Collections.Array<Rid>();
-		Vector2 endPoint = to;
-		Enemy hitEnemy = null;
-		DestructibleObstacle hitObstacle = null;
-		int safety = 32;
-		while (safety-- > 0) {
-			query.Exclude = excluded;
-			var result = spaceState.IntersectRay(query);
-			if (result.Count == 0) break;
-			var collider = result["collider"].As<Node>();
-			if (collider is Pickup pickup) {
-				excluded.Add(pickup.GetRid());
-				continue;
+		int beamCount = Mathf.Max(1, Gun.BulletCount);
+		float effectiveSpread = Gun.MultiBulletAngle + StatusEffects.GetSpreadIncrease();
+		float halfSpread = effectiveSpread / 2f;
+		var allPaths = new List<List<Vector2>>();
+		var hitEnemies = new List<Enemy>();
+		var hitObstacles = new List<DestructibleObstacle>();
+		for (int beam = 0; beam < beamCount; beam++) {
+			float beamAngle = beamCount == 1 ? 0f : -halfSpread + beam * (effectiveSpread / (beamCount - 1));
+			Vector2 beamDir = aimDirection.Normalized().Rotated(beamAngle);
+			Vector2 currentFrom = from;
+			Vector2 currentDir = beamDir;
+			var path = new List<Vector2> { from };
+			int bouncesLeft = Mathf.Max(0, Gun.Ricochet);
+			while (true) {
+				Vector2 to = currentFrom + currentDir * ScreenSize.Length();
+				var query = PhysicsRayQueryParameters2D.Create(currentFrom, to);
+				query.CollideWithAreas = true;
+				query.CollideWithBodies = true;
+				query.CollisionMask = 5;
+				var excluded = new Godot.Collections.Array<Rid>();
+				Vector2 endPoint = to;
+				Vector2 hitNormal = Vector2.Zero;
+				Enemy hitEnemy = null;
+				DestructibleObstacle hitObstacle = null;
+				int safety = 32;
+				while (safety-- > 0) {
+					query.Exclude = excluded;
+					var result = spaceState.IntersectRay(query);
+					if (result.Count == 0) break;
+					var collider = result["collider"].As<Node>();
+					if (collider is Pickup pickup) {
+						excluded.Add(pickup.GetRid());
+						continue;
+					}
+					endPoint = (Vector2)result["position"];
+					hitNormal = (Vector2)result["normal"];
+					if (collider is Enemy e) hitEnemy = e;
+					else if (collider is DestructibleObstacle d) hitObstacle = d;
+					break;
+				}
+				path.Add(endPoint);
+				if (hitEnemy != null) hitEnemies.Add(hitEnemy);
+				if (hitObstacle != null) hitObstacles.Add(hitObstacle);
+				if (bouncesLeft <= 0 || hitNormal == Vector2.Zero || endPoint.DistanceSquaredTo(currentFrom) < 1f) break;
+				currentDir = (currentDir - 2f * currentDir.Dot(hitNormal) * hitNormal).Normalized();
+				currentFrom = endPoint + currentDir * 1f;
+				bouncesLeft--;
 			}
-			endPoint = (Vector2)result["position"];
-			if (collider is Enemy e) hitEnemy = e;
-			else if (collider is DestructibleObstacle d) hitObstacle = d;
-			break;
+			allPaths.Add(path);
 		}
+		int totalSegments = 0;
+		foreach (var p in allPaths) totalSegments += p.Count - 1;
 		if (Gun.BulletSpriteFrames != null) {
 			if (activeLaser != null) { activeLaser.QueueFree(); activeLaser = null; }
 			float texWidth = GetSpriteFrameWidth(Gun.BulletSpriteFrames);
-			AnimatedSprite2D seg = null;
-			if (laserSegments.Count > 0 && laserSegments[0] is AnimatedSprite2D existing) {
-				seg = existing;
-			} else {
-				seg = new AnimatedSprite2D();
+			while (laserSegments.Count > totalSegments) {
+				var last = laserSegments[laserSegments.Count - 1];
+				if (IsInstanceValid(last)) last.QueueFree();
+				laserSegments.RemoveAt(laserSegments.Count - 1);
+			}
+			while (laserSegments.Count < totalSegments) {
+				var seg = new AnimatedSprite2D();
 				seg.SpriteFrames = Gun.BulletSpriteFrames;
 				var names = Gun.BulletSpriteFrames.GetAnimationNames();
 				if (names.Length > 0) seg.Animation = names[0];
 				seg.Play();
+				seg.Offset = new Vector2(-texWidth / 2f, 0f);
 				seg.ZIndex = 10;
 				GetParent().AddChild(seg);
 				laserSegments.Add(seg);
 			}
-			seg.Offset = new Vector2(-texWidth / 2f, 0f);
-			Vector2 dirVec = endPoint - from;
-			seg.GlobalPosition = from;
-			seg.Rotation = (from - endPoint).Angle();
-			seg.Scale = new Vector2(dirVec.Length() / texWidth, 1f);
+			float thickness = BeamThickness(Gun);
+			int segIdx = 0;
+			foreach (var path in allPaths) {
+				for (int i = 0; i < path.Count - 1; i++) {
+					if (laserSegments[segIdx] is AnimatedSprite2D s) {
+						Vector2 a = path[i];
+						Vector2 b = path[i + 1];
+						Vector2 d = b - a;
+						s.Offset = new Vector2(-texWidth / 2f, 0f);
+						s.GlobalPosition = a;
+						s.Rotation = (a - b).Angle();
+						s.Scale = new Vector2(d.Length() / texWidth, thickness);
+					}
+					segIdx++;
+				}
+			}
 		} else {
 			foreach (var s in laserSegments) if (IsInstanceValid(s)) s.QueueFree();
 			laserSegments.Clear();
 			if (activeLaser == null) {
 				activeLaser = new Line2D();
-				activeLaser.Width = 4f;
+				activeLaser.Width = 4f * BeamThickness(Gun);
 				activeLaser.DefaultColor = new Color(1f, 0.3f, 0.3f);
 				activeLaser.ZIndex = 10;
-				activeLaser.AddPoint(from);
-				activeLaser.AddPoint(endPoint);
 				GetParent().AddChild(activeLaser);
-			} else {
-				activeLaser.SetPointPosition(0, from);
-				activeLaser.SetPointPosition(1, endPoint);
+			}
+			activeLaser.ClearPoints();
+			foreach (var path in allPaths) {
+				for (int i = 0; i < path.Count; i++) {
+					activeLaser.AddPoint(path[i]);
+				}
 			}
 		}
-		if (gunCoolDown <= 0 && (hitEnemy != null || hitObstacle != null)) {
-			if (hitEnemy != null) hitEnemy.TakeDamage(Gun.Damage, ElementType.NonElemental);
-			if (hitObstacle != null) hitObstacle.TakeDamage(Gun.Damage);
+		if (gunCoolDown <= 0 && (hitEnemies.Count > 0 || hitObstacles.Count > 0)) {
+			foreach (var e in hitEnemies) ApplyGunHit(e, Gun.Damage, Gun);
+			foreach (var o in hitObstacles) o.TakeDamage(Gun.Damage);
 			gunCoolDown = Gun.FireRate * StatusEffects.GetFireRateMultiplier();
 		}
 	}
@@ -821,10 +919,10 @@ public partial class Player : CharacterBody2D
 		foreach (var e in chain) points.Add(e.GlobalPosition);
 		ClearLightning();
 		if (Gun.BulletSpriteFrames != null) {
-			BuildAnimatedBeamSegments(points, Gun.BulletSpriteFrames, Gun.BeamSegmentBaseLength, lightningSegments);
+			BuildAnimatedBeamSegments(points, Gun.BulletSpriteFrames, Gun.BeamSegmentBaseLength, lightningSegments, BeamThickness(Gun));
 		} else {
 			activeLightning = new Line2D();
-			activeLightning.Width = 3f;
+			activeLightning.Width = 3f * BeamThickness(Gun);
 			activeLightning.DefaultColor = new Color(0.6f, 0.8f, 1f, 0.95f);
 			activeLightning.ZIndex = 10;
 			foreach (var p in points) activeLightning.AddPoint(p);
@@ -833,15 +931,14 @@ public partial class Player : CharacterBody2D
 		int dmg = Gun.Damage;
 		foreach (var e in chain) {
 			if (dmg <= 0) continue;
-			e.TakeDamage(dmg, ElementType.Electric);
-			e.StatusEffects.AddStack(StatusEffectType.ReducedFireRate);
+			ApplyGunHit(e, dmg, Gun);
 			dmg = dmg / 2;
 		}
 		lightningFlashTimer = 0.12f;
 		gunCoolDown = Gun.FireRate * StatusEffects.GetFireRateMultiplier();
 	}
 
-	private void BuildAnimatedBeamSegments(List<Vector2> points, SpriteFrames frames, float baseLength, List<Node2D> track)
+	private void BuildAnimatedBeamSegments(List<Vector2> points, SpriteFrames frames, float baseLength, List<Node2D> track, float thickness)
 	{
 		var animNames = frames.GetAnimationNames();
 		string animName = animNames.Length > 0 ? animNames[0] : "default";
@@ -855,7 +952,7 @@ public partial class Player : CharacterBody2D
 			float len = points[i].DistanceTo(points[i + 1]);
 			seg.GlobalPosition = points[i];
 			seg.Rotation = (points[i] - points[i + 1]).Angle();
-			seg.Scale = new Vector2(len / texWidth, 1f);
+			seg.Scale = new Vector2(len / texWidth, thickness);
 			seg.ZIndex = 10;
 			GetParent().AddChild(seg);
 			track.Add(seg);

@@ -12,5 +12,6 @@ public enum GunType
     Spiral = 9,
     Lightning = 10,
     GrowShot = 11,
-    HeatSeeking = 12
+    HeatSeeking = 12,
+    Boomerang = 13
 }

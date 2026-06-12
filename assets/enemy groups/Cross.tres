@@ -1,11 +1,11 @@
-[gd_resource type="Resource" load_steps=3 format=3]
+[gd_resource type="Resource" format=3 uid="uid://cxkaq23wodoq8"]
 
-[ext_resource type="PackedScene" uid="uid://tng40x5blnrr" path="res://assets/enemies/ball_enemy.tscn" id="1_enemy"]
-[ext_resource type="Script" path="res://assets/scripts/EnemyGroup.cs" id="2_group"]
+[ext_resource type="PackedScene" uid="uid://rwdplcylr5en" path="res://assets/enemies/NoseFlame.tscn" id="1_daa03"]
+[ext_resource type="Script" uid="uid://co2yygdrwkshm" path="res://assets/scripts/EnemyGroup.cs" id="2_group"]
 
 [resource]
 script = ExtResource("2_group")
-Enemies = Array[PackedScene]([ExtResource("1_enemy"), ExtResource("1_enemy"), ExtResource("1_enemy"), ExtResource("1_enemy"), ExtResource("1_enemy")])
+Enemies = Array[PackedScene]([ExtResource("1_daa03"), ExtResource("1_daa03"), ExtResource("1_daa03"), ExtResource("1_daa03"), ExtResource("1_daa03")])
 SpawnLocations = PackedVector2Array(570, -50, 570, -50, 570, -50, 450, -50, 690, -50)
 PostSpawnDestination = PackedVector2Array(570, 300, 570, 180, 570, 420, 450, 300, 690, 300)
 TimeBetweenSpawns = 0.25

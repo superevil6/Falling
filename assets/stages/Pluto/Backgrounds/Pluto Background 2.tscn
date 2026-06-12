@@ -8,7 +8,7 @@ shader = ExtResource("1_s7hrc")
 shader_parameter/pixel_size = 4.0
 shader_parameter/color_steps = 8
 shader_parameter/hue_shift = 0.0
-shader_parameter/darkness = 0.400000019
+shader_parameter/darkness = 0.6430000305425
 
 [node name="TestBackground" type="Node2D"]
 

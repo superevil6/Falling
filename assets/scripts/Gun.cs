@@ -22,7 +22,9 @@ public partial class Gun : Resource
 	[Export]
 	public float DirectionalAngle {get;set;} = 0f;
 	[Export]
-	public float BulletSpread {get;set;}
+	public float MultiBulletAngle {get;set;}
+	[Export]
+	public float BulletSpread {get;set;} = 0f;
 	[Export]
 	public PackedScene BulletType {get;set;}
 	[Export]
@@ -47,6 +49,16 @@ public partial class Gun : Resource
 	public float Wave {get;set;}
 	[Export]
 	public float Spiral {get;set;} = 0f;
+	[Export]
+	public bool IsBoomerang {get;set;} = false;
+	[Export]
+	public float BoomerangMaxRadius {get;set;} = 200f;
+	[Export]
+	public float BoomerangDuration {get;set;} = 1.0f;
+	[Export]
+	public float BoomerangOutwardTime {get;set;} = 0.3f;
+	[Export]
+	public int BoomerangArcDirection {get;set;} = 1;
 	[Export]
 	public bool Growth {get;set;} = false;
 	[Export]
@@ -136,8 +148,13 @@ public partial class Gun : Resource
 		switch (upgrade.Type) {
 			case GunUpgradeType.Damage: Damage += Mathf.RoundToInt(upgrade.Value); break;
 			case GunUpgradeType.FireRate: FireRate += upgrade.Value; break;
-			case GunUpgradeType.BulletCount: BulletCount += Mathf.RoundToInt(upgrade.Value); break;
-			case GunUpgradeType.BulletSpread: BulletSpread += upgrade.Value; break;
+			case GunUpgradeType.BulletCount: {
+				int prev = BulletCount;
+				BulletCount += Mathf.RoundToInt(upgrade.Value);
+				if (IsLaser && prev <= 1 && BulletCount > 1) MultiBulletAngle += 100f;
+				break;
+			}
+			case GunUpgradeType.MultiBulletAngle: MultiBulletAngle += upgrade.Value; break;
 			case GunUpgradeType.BulletLifeTime: BulletLifetime += upgrade.Value; break;
 			case GunUpgradeType.Pierce: Pierce = upgrade.Value > 0; break;
 			case GunUpgradeType.Explode: Explode = upgrade.Value > 0; break;
@@ -148,7 +165,15 @@ public partial class Gun : Resource
 			case GunUpgradeType.SizeMultiplier: SizeMultiplier += upgrade.Value; break;
 			case GunUpgradeType.HeatSeeking: HeatSeeking += upgrade.Value; break;
 			case GunUpgradeType.Slowing: Slowing += upgrade.Value; break;
-			case GunUpgradeType.Element: Element = upgrade.Element; break;
+			case GunUpgradeType.Element:
+				Element = upgrade.Element;
+				switch (upgrade.Element) {
+					case ElementType.Fire: DotStacksPerHit += 1; break;
+					case ElementType.Ice: SlowStacksPerHit += 1; break;
+					case ElementType.Electric: FireRateStacksPerHit += 1; break;
+				}
+				GD.Print($"Gun '{SourceName}' applied Element upgrade → Element {Element}, DoT/Slow/FireRate per hit: {DotStacksPerHit}/{SlowStacksPerHit}/{FireRateStacksPerHit}");
+				break;
 			case GunUpgradeType.BulletSize: BulletSize += upgrade.Value; break;
 			case GunUpgradeType.LifeSteal: LifeSteal += upgrade.Value; break;
 			case GunUpgradeType.AcidRounds: AcidRoundsCount++; break;

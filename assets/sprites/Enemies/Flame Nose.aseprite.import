@@ -1,0 +1,18 @@
+[remap]
+
+importer="aseprite_wizard.plugin"
+type="SpriteFrames"
+uid="uid://cr2mxt0cverj2"
+path="res://.godot/imported/Flame Nose.aseprite-fad2a3dafa97814bb287059fe6e27c67.res"
+
+[deps]
+
+source_file="res://assets/sprites/Enemies/Flame Nose.aseprite"
+dest_files=["res://.godot/imported/Flame Nose.aseprite-fad2a3dafa97814bb287059fe6e27c67.res"]
+
+[params]
+
+split_layers=false
+exclude_layers_pattern=""
+only_visible_layers=false
+sheet_type="Packed"

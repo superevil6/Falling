@@ -16,6 +16,14 @@ public partial class Bullet : Attack
 	private System.Collections.Generic.HashSet<ulong> auraDamagedIds = new System.Collections.Generic.HashSet<ulong>();
 	public Vector2 SpawnOrigin {get;set;}
 	public float SpiralRate {get;set;} = 0f;
+	public bool IsBoomerang {get;set;} = false;
+	public Node2D BoomerangOrigin {get;set;}
+	public float BoomerangMaxRadius {get;set;} = 200f;
+	public float BoomerangDuration {get;set;} = 1.0f;
+	public float BoomerangOutwardTime {get;set;} = 0.3f;
+	public int BoomerangArcDirection {get;set;} = 1;
+	private float boomerangTime = 0f;
+	private float boomerangBaseAngle = 0f;
 	private double spiralTime = 0;
 	private float spiralInitialAngle = 0f;
 	private float spiralInitialRadius = 0f;
@@ -69,6 +77,9 @@ public partial class Bullet : Attack
 			growthLastPos = GlobalPosition;
 			Scale = growthBaseScale * Gun.GrowthStartSize;
 		}
+		if (IsBoomerang) {
+			boomerangBaseAngle = Direction.Angle();
+		}
 	}
 
 	public override void _Draw()
@@ -85,6 +96,29 @@ public partial class Bullet : Attack
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
+		if (IsBoomerang) {
+			boomerangTime += (float)delta;
+			if (boomerangTime >= BoomerangDuration) {
+				QueueFree();
+				return;
+			}
+			Vector2 originPos = (BoomerangOrigin != null && IsInstanceValid(BoomerangOrigin))
+				? BoomerangOrigin.GlobalPosition
+				: SpawnOrigin;
+			Vector2 forward = new Vector2(Mathf.Cos(boomerangBaseAngle), Mathf.Sin(boomerangBaseAngle));
+			Vector2 side = new Vector2(-forward.Y, forward.X) * BoomerangArcDirection;
+			float t = boomerangTime / Mathf.Max(0.0001f, BoomerangDuration);
+			float theta = Mathf.Pi * t;
+			float sinTheta = Mathf.Sin(theta);
+			float forwardOffset = BoomerangMaxRadius * sinTheta * sinTheta;
+			float sideOffset = BoomerangMaxRadius * 0.5f * Mathf.Sin(2f * theta);
+			GlobalPosition = originPos + forward * forwardOffset + side * sideOffset;
+			float fwdVel = BoomerangMaxRadius * Mathf.Sin(2f * theta);
+			float sideVel = BoomerangMaxRadius * Mathf.Cos(2f * theta);
+			Vector2 vel = forward * fwdVel + side * sideVel;
+			if (vel != Vector2.Zero) Rotation = vel.Angle();
+			return;
+		}
 		if (SpiralRate != 0f) {
 			spiralTime += delta;
 			float t = (float)spiralTime;
@@ -152,20 +186,30 @@ public partial class Bullet : Attack
 	private void _on_area_entered(Node2D node) {
 		if (node is Pickup) return;
 		if (Gun != null && node is Enemy e) {
-			if (Gun.DotStacksPerHit > 0) e.StatusEffects.AddStacks(StatusEffectType.DamageOverTime, Gun.DotStacksPerHit);
-			if (Gun.SlowStacksPerHit > 0) e.StatusEffects.AddStacks(StatusEffectType.Slow, Gun.SlowStacksPerHit);
-			if (Gun.FireRateStacksPerHit > 0) e.StatusEffects.AddStacks(StatusEffectType.ReducedFireRate, Gun.FireRateStacksPerHit);
-			if (Gun.BlindStacksPerHit > 0) e.StatusEffects.AddStacks(StatusEffectType.Blind, Gun.BlindStacksPerHit);
-			switch (Element) {
-				case ElementType.Fire: e.StatusEffects.AddStack(StatusEffectType.DamageOverTime); break;
-				case ElementType.Ice: e.StatusEffects.AddStack(StatusEffectType.Slow); break;
-				case ElementType.Electric: e.StatusEffects.AddStack(StatusEffectType.ReducedFireRate); break;
-				case ElementType.Poison: e.StatusEffects.AddStack(StatusEffectType.DamageOverTime); break;
+			if (Gun.DotStacksPerHit > 0) {
+				e.StatusEffects.AddStacks(StatusEffectType.DamageOverTime, Gun.DotStacksPerHit);
+				GD.Print($"Bullet → {e.Name}: +{Gun.DotStacksPerHit} DoT (total {e.StatusEffects.GetStackCount(StatusEffectType.DamageOverTime)})");
+			}
+			if (Gun.SlowStacksPerHit > 0) {
+				e.StatusEffects.AddStacks(StatusEffectType.Slow, Gun.SlowStacksPerHit);
+				GD.Print($"Bullet → {e.Name}: +{Gun.SlowStacksPerHit} Slow (total {e.StatusEffects.GetStackCount(StatusEffectType.Slow)})");
+			}
+			if (Gun.FireRateStacksPerHit > 0) {
+				e.StatusEffects.AddStacks(StatusEffectType.ReducedFireRate, Gun.FireRateStacksPerHit);
+				GD.Print($"Bullet → {e.Name}: +{Gun.FireRateStacksPerHit} FireRate (total {e.StatusEffects.GetStackCount(StatusEffectType.ReducedFireRate)})");
+			}
+			if (Gun.BlindStacksPerHit > 0) {
+				e.StatusEffects.AddStacks(StatusEffectType.Blind, Gun.BlindStacksPerHit);
+				GD.Print($"Bullet → {e.Name}: +{Gun.BlindStacksPerHit} Blind (total {e.StatusEffects.GetStackCount(StatusEffectType.Blind)})");
 			}
 		}
+		if (IsBoomerang) return;
 		HandleHit(true);
 	}
-	private void _on_body_entered(Node2D node) => HandleHit(false);
+	private void _on_body_entered(Node2D node) {
+		if (IsBoomerang) return;
+		HandleHit(false);
+	}
 
 	private void HandleHit(bool hitEnemy) {
 		if (Gun == null) {
@@ -231,6 +275,7 @@ public partial class Bullet : Attack
 	}
 
 	private void GenerateExplosion() {
+		if (!global::Explosion.CanSpawn()) return;
 		Explosion e = Explosion.Instantiate<Explosion>();
 		e.Position = Position;
 		e.Damage = Damage;

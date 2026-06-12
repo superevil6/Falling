@@ -3,7 +3,7 @@ public enum GunUpgradeType
     Damage = 0,
     FireRate = 1,
     BulletCount = 2,
-    BulletSpread = 3,
+    MultiBulletAngle = 3,
     BulletLifeTime = 4,
     Pierce = 5,
     Explode = 6,

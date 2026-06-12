@@ -102,7 +102,7 @@ public partial class DestructibleObstacle : Area2D
 			&& p.GlobalPosition.DistanceTo(GlobalPosition) <= ExplosionRadius) {
 			p.TakeDamage(ExplosionDamage);
 		}
-		if (explosionScene != null) {
+		if (explosionScene != null && Explosion.CanSpawn()) {
 			var ex = explosionScene.Instantiate<Explosion>();
 			ex.GlobalPosition = GlobalPosition;
 			ex.Damage = ExplosionDamage;

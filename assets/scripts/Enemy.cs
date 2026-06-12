@@ -6,7 +6,67 @@ using Godot;
 public partial class Enemy : Area2D
 {
 	[Export]
-	public EnemyStatBlock Stats {get;set;}
+	public int MaxHealth {get;set;}
+	[Export]
+	public int DamageReduction {get;set;}
+	[Export]
+	public int Armor {get;set;}
+	[Export]
+	public Gun Gun {get;set;}
+	[Export]
+	public bool CanMelee {get;set;} = true;
+	[Export]
+	public MeleeWeapon Melee {get;set;}
+	[Export]
+	public float MeleeRange {get;set;} = 120f;
+	[Export]
+	public float MeleeCooldown {get;set;} = 1.5f;
+	[Export]
+	public MovementType MovementType {get;set;}
+	[Export]
+	public int SpawnMovementSpeed { get; set; } = 5;
+	[Export]
+	public bool InstantSpawn { get; set; } = false;
+	[Export]
+	public float MovementSpeed {get;set;}
+	[Export]
+	public float MovementLimit {get;set;}
+	[Export]
+	public float Size {get;set;}
+	[Export]
+	public Texture2D EnemySprite {get;set;}
+	[Export]
+	public AttackDirection AttackDirection {get; set;}
+	[Export]
+	public ItemDrop[] ItemDrops {get;set;}
+	[Export]
+	public bool IsBoss { get; set; }
+	[Export]
+	public bool IsCore { get; set; }
+	[Export]
+	public bool IsLeader { get; set; }
+	[Export]
+	public LeaderType LeaderType { get; set; }
+	[Export]
+	public float LeaderBoostPercentage { get; set; } = 25f;
+	[Export]
+	public bool TeleportMovement {get;set;} = false;
+	[Export]
+	public float TeleportHesitationTime {get;set;} = 0.5f;
+	[Export]
+	public bool DropsBombs {get;set;} = false;
+	[Export]
+	public int BombDamage {get;set;} = 5;
+	[Export]
+	public float BombRadius {get;set;} = 100f;
+	[Export]
+	public float BombFuseTime {get;set;} = 2f;
+	[Export]
+	public float BombCooldown {get;set;} = 5f;
+	[Export]
+	public int BombMaxCount {get;set;} = 3;
+	[Export]
+	public bool UsesMines {get;set;} = false;
 	[Export]
 	public float InputDriftSpeed {get;set;} = 50f;
 	[Export]
@@ -63,15 +123,15 @@ public partial class Enemy : Area2D
 	{
 		animatedSprite2D = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
 		float scale = ComputeStageScale();
-		scaledMaxHealth = Mathf.RoundToInt(Stats.MaxHealth * scale);
-		currentArmor = Mathf.RoundToInt(Stats.Armor * scale);
-		scaledDamage = Stats.Gun != null ? Mathf.RoundToInt(Stats.Gun.Damage * scale) : 0;
-		scaledDamageReduction = Mathf.RoundToInt(Stats.DamageReduction * scale);
+		scaledMaxHealth = Mathf.RoundToInt(this.MaxHealth * scale);
+		currentArmor = Mathf.RoundToInt(this.Armor * scale);
+		scaledDamage = this.Gun != null ? Mathf.RoundToInt(this.Gun.Damage * scale) : 0;
+		scaledDamageReduction = Mathf.RoundToInt(this.DamageReduction * scale);
 		CurrentHealth = scaledMaxHealth;
 		rng.Randomize();
-		if (Stats.Gun != null) GunCoolDown = TelegraphLeadTime;
-		if (Stats.TeleportMovement) {
-			teleportTimer = Stats.TeleportHesitationTime;
+		if (this.Gun != null) GunCoolDown = TelegraphLeadTime;
+		if (this.TeleportMovement) {
+			teleportTimer = this.TeleportHesitationTime;
 		}
 		var leftQ = GetParent()?.GetNodeOrNull<Node2D>("Left Wall Queue");
 		var rightQ = GetParent()?.GetNodeOrNull<Node2D>("Right Wall Queue");
@@ -92,12 +152,12 @@ public partial class Enemy : Area2D
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
-		if (Stats?.IsLeader == true && CurrentHealth > 0) QueueRedraw();
+		if (this.IsLeader == true && CurrentHealth > 0) QueueRedraw();
 		if (armorShellTimer > 0f) {
 			armorShellTimer -= (float)delta;
 			QueueRedraw();
 		}
-		if (Stats?.Gun != null && CurrentHealth > 0) {
+		if (this.Gun != null && CurrentHealth > 0) {
 			if (!telegraphActive && GunCoolDown > 0f && GunCoolDown <= TelegraphLeadTime) {
 				SpawnAttackIndicator();
 				telegraphActive = true;
@@ -113,24 +173,29 @@ public partial class Enemy : Area2D
 		if (meleeCoolDown > 0) {
 			meleeCoolDown -= (float)delta;
 		}
-		if (Stats.CanMelee && Stats?.Melee != null && meleeCoolDown <= 0 && CurrentHealth > 0) {
+		if (this.CanMelee && this.Melee != null && meleeCoolDown <= 0 && CurrentHealth > 0) {
 			TrySwingMelee();
 		}
 		int dotDamage = StatusEffects.Tick((float)delta);
 		if (dotDamage > 0) TakeDamage(dotDamage, ElementType.NonElemental);
 		if (animatedSprite2D != null) animatedSprite2D.SelfModulate = StatusEffects.GetTint();
-		if (Stats != null && (Stats.DropsBombs || Stats.UsesMines) && CurrentHealth > 0) {
+		if ((this.DropsBombs || this.UsesMines) && CurrentHealth > 0) {
 			activeDeployables.RemoveAll(d => !IsInstanceValid(d));
 			bombCooldownRemaining -= (float)delta;
-			if (bombCooldownRemaining <= 0f && activeDeployables.Count < Stats.BombMaxCount) {
-				if (Stats.UsesMines) PlaceMine();
+			if (bombCooldownRemaining <= 0f && activeDeployables.Count < this.BombMaxCount) {
+				if (this.UsesMines) PlaceMine();
 				else PlaceBomb();
-				bombCooldownRemaining = Stats.BombCooldown;
+				bombCooldownRemaining = this.BombCooldown;
 			}
 		}
-		if (CurrentHealth <= 0) {
-			animatedSprite2D.Animation = "Death";
-			animatedSprite2D.Play();
+		if (CurrentHealth <= 0 && !isDying) {
+			StartDying();
+		}
+		if (isDying && !deathHandled) {
+			deathAnimTimer -= (float)delta;
+			if (deathAnimTimer <= 0f) {
+				HandleDeathFinished();
+			}
 		}
 	}
 
@@ -138,22 +203,22 @@ public partial class Enemy : Area2D
 	{
 		if (CurrentHealth > 0) {
 			if (ReachedPostSpawnDestination) {
-				if (Stats.TeleportMovement) {
+				if (this.TeleportMovement) {
 					teleportTimer -= (float)delta;
 					if (teleportTimer <= 1f && teleportTimer > 0f && !isPhasing) {
 						ApplyPhasingShader();
 						isPhasing = true;
 					}
 					if (teleportTimer > 0f) return;
-					teleportTimer = Stats.TeleportHesitationTime;
-					delta = Stats.TeleportHesitationTime;
+					teleportTimer = this.TeleportHesitationTime;
+					delta = this.TeleportHesitationTime;
 					if (isPhasing) {
 						RemovePhasingShader();
 						isPhasing = false;
 					}
 				}
 				var playerLocation = ((GetParent().GetNode("Player") as Node2D).GlobalPosition - GlobalPosition).Normalized();
-				switch (Stats.MovementType)
+				switch (this.MovementType)
 				{
 					case MovementType.Stationary:
 					break;
@@ -299,7 +364,7 @@ public partial class Enemy : Area2D
 					}
 					break;
 				}
-				if (Stats.MovementType != MovementType.WallOnly) {
+				if (this.MovementType != MovementType.WallOnly) {
 					if (player == null) player = GetParent()?.GetNodeOrNull<Player>("Player");
 					if (player != null) {
 						var main = GetParent() as Main;
@@ -325,16 +390,30 @@ public partial class Enemy : Area2D
 				}
 			}
 			else {
-				if (Stats.InstantSpawn) {
+				var frames = animatedSprite2D?.SpriteFrames;
+				if (frames != null && frames.HasAnimation("prespawn") && animatedSprite2D.Animation != "prespawn") {
+					animatedSprite2D.Animation = "prespawn";
+					animatedSprite2D.Play();
+				}
+				if (this.InstantSpawn) {
 					Position = PostSpawnDestination;
 					ReachedPostSpawnDestination = true;
 				} else {
 					Vector2 toDestination = PostSpawnDestination - Position;
-					if (toDestination.Length() <= Stats.SpawnMovementSpeed) {
+					if (toDestination.Length() <= this.SpawnMovementSpeed) {
 						Position = PostSpawnDestination;
 						ReachedPostSpawnDestination = true;
 					} else {
-						Position += toDestination.Normalized() * Stats.SpawnMovementSpeed;
+						Position += toDestination.Normalized() * this.SpawnMovementSpeed;
+					}
+				}
+				if (ReachedPostSpawnDestination && animatedSprite2D != null) {
+					if (frames != null && frames.HasAnimation("Spawn") && animatedSprite2D.Animation != "Spawn") {
+						animatedSprite2D.Animation = "Spawn";
+						animatedSprite2D.Play();
+					} else if (animatedSprite2D.Animation == "prespawn" && frames != null && frames.HasAnimation("Idle")) {
+						animatedSprite2D.Animation = "Idle";
+						animatedSprite2D.Play();
 					}
 				}
 			}
@@ -358,6 +437,9 @@ public partial class Enemy : Area2D
 
 	private bool hasBeenHit = false;
 	private bool coreDeathTriggered = false;
+	private bool isDying = false;
+	private bool deathHandled = false;
+	private float deathAnimTimer = 0f;
 	private int scaledMaxHealth;
 	private int currentArmor;
 	private float armorShellTimer = 0f;
@@ -391,7 +473,7 @@ public partial class Enemy : Area2D
 		if (CurrentHealth > 0) FlashRed();
 		hasBeenHit = true;
 		QueueRedraw();
-		if (Stats?.IsCore == true && CurrentHealth <= 0 && !coreDeathTriggered) {
+		if (this.IsCore == true && CurrentHealth <= 0 && !coreDeathTriggered) {
 			coreDeathTriggered = true;
 			TriggerCoreDeath();
 		}
@@ -420,14 +502,14 @@ public partial class Enemy : Area2D
 		float total = 0f;
 		foreach (var n in GetTree().GetNodesInGroup("Enemy")) {
 			if (n is Enemy e && e != this && e.CurrentHealth > 0
-				&& e.Stats?.IsLeader == true && e.Stats.LeaderType == type) {
-				total += e.Stats.LeaderBoostPercentage;
+				&& e.IsLeader == true && e.LeaderType == type) {
+				total += e.LeaderBoostPercentage;
 			}
 		}
 		return total / 100f;
 	}
 
-	private float EffectiveMovementSpeed => Stats.MovementSpeed
+	private float EffectiveMovementSpeed => this.MovementSpeed
 		* StatusEffects.GetSpeedMultiplier()
 		* (1f + GetLeaderBoost(LeaderType.Speed));
 
@@ -436,12 +518,42 @@ public partial class Enemy : Area2D
 		foreach (var n in GetTree().GetNodesInGroup("Enemy")) {
 			if (n is Enemy e && e != this && e.CurrentHealth > 0) {
 				e.CurrentHealth = 0;
-				if (e.animatedSprite2D != null) {
-					e.animatedSprite2D.Animation = "Death";
-					e.animatedSprite2D.Play();
-				}
+				e.StartDying();
 			}
 		}
+	}
+
+	public void StartDying()
+	{
+		if (isDying) return;
+		isDying = true;
+		PlayDeathAnimation(animatedSprite2D);
+		var frames = animatedSprite2D?.SpriteFrames;
+		string anim = animatedSprite2D?.Animation;
+		if (frames != null && !string.IsNullOrEmpty(anim) && frames.HasAnimation(anim)) {
+			int frameCount = frames.GetFrameCount(anim);
+			float fps = (float)frames.GetAnimationSpeed(anim);
+			if (fps > 0f) deathAnimTimer = frameCount / fps;
+		}
+		if (deathAnimTimer <= 0f) deathAnimTimer = 0.5f;
+	}
+
+	private void HandleDeathFinished()
+	{
+		if (deathHandled) return;
+		deathHandled = true;
+		DropItems();
+		if (this.IsBoss) {
+			var menu = GetParent()?.GetNodeOrNull<SelectionMenu>("Selection Menu");
+			menu?.Open();
+		}
+		int othersAlive = GetParent().GetChildren()
+			.Where(child => child != this && child is Enemy other && other.CurrentHealth > 0)
+			.Count();
+		if (othersAlive == 0) {
+			GetParent<Main>().CallDeferred(nameof(Main.SpawnEnemyGroup));
+		}
+		QueueFree();
 	}
 
 	private float ComputeStageScale()
@@ -459,9 +571,9 @@ public partial class Enemy : Area2D
 		if (bombScene == null) return;
 		var bomb = bombScene.Instantiate<Bomb>();
 		bomb.GlobalPosition = GlobalPosition;
-		bomb.Damage = Stats.BombDamage;
-		bomb.Radius = Stats.BombRadius;
-		bomb.FuseTime = Stats.BombFuseTime;
+		bomb.Damage = this.BombDamage;
+		bomb.Radius = this.BombRadius;
+		bomb.FuseTime = this.BombFuseTime;
 		bomb.TargetsEnemy = false;
 		bomb.TargetsPlayer = true;
 		GetParent().AddChild(bomb);
@@ -476,8 +588,8 @@ public partial class Enemy : Area2D
 		if (mineScene == null) return;
 		var mine = mineScene.Instantiate<Mine>();
 		mine.GlobalPosition = GlobalPosition;
-		mine.Damage = Stats.BombDamage;
-		mine.Radius = Stats.BombRadius;
+		mine.Damage = this.BombDamage;
+		mine.Radius = this.BombRadius;
 		mine.TargetsEnemy = false;
 		mine.TargetsPlayer = true;
 		GetParent().AddChild(mine);
@@ -502,7 +614,7 @@ public partial class Enemy : Area2D
 
 	public override void _Draw()
 	{
-		if (Stats?.IsLeader == true && CurrentHealth > 0) DrawLeaderAura();
+		if (this.IsLeader == true && CurrentHealth > 0) DrawLeaderAura();
 		if (currentArmor > 0 && armorShellTimer > 0f && CurrentHealth > 0) {
 			DrawCircle(Vector2.Zero, 100f, new Color(0.7f, 0.85f, 1f, 0.3f));
 		}
@@ -522,7 +634,7 @@ public partial class Enemy : Area2D
 
 	private void DrawLeaderAura()
 	{
-		Color c = Stats.LeaderType switch {
+		Color c = this.LeaderType switch {
 			LeaderType.Attack => new Color(1f, 0.2f, 0.2f),
 			LeaderType.Defense => new Color(0.3f, 0.5f, 1f),
 			LeaderType.FireRate => new Color(1f, 0.9f, 0.2f),
@@ -549,30 +661,27 @@ public partial class Enemy : Area2D
 
 	private void _on_animated_sprite_2d_animation_finished() {
 		switch (animatedSprite2D.Animation) {
+			case "Explode":
 			case "Death":
-			DropItems();
-			if (Stats != null && Stats.IsBoss) {
-				var menu = GetParent()?.GetNodeOrNull<SelectionMenu>("Selection Menu");
-				menu?.Open();
-			}
-			int othersAlive = GetParent().GetChildren()
-				.Where(child => child != this && child is Enemy other && other.CurrentHealth > 0)
-				.Count();
-			if (othersAlive == 0) {
-				GetParent<Main>().CallDeferred(nameof(Main.SpawnEnemyGroup));
-			}
-			QueueFree();
+			HandleDeathFinished();
 			break;
 			case "Shoot":
 			animatedSprite2D.Animation = "Idle";
 			animatedSprite2D.Play();
 			break;
-			
+			case "Spawn":
+			animatedSprite2D.Animation = "Idle";
+			animatedSprite2D.Play();
+			break;
+			case "Fire":
+			animatedSprite2D.Animation = "Idle";
+			animatedSprite2D.Play();
+			break;
 		}
 	}
 	private void DropItems() {
-		if (Stats?.ItemDrops == null) return;
-		foreach (var drop in Stats.ItemDrops) {
+		if (this.ItemDrops == null) return;
+		foreach (var drop in this.ItemDrops) {
 			if (drop?.Item == null) continue;
 			if (GD.Randf() < drop.Chance) {
 				var item = drop.Item.Instantiate<Node2D>();
@@ -599,42 +708,70 @@ public partial class Enemy : Area2D
 	}
 
 	private void TrySwingMelee() {
-		if (Stats.Melee.Attack == null) return;
+		if (this.Melee.Attack == null) return;
 		var p = GetParent()?.GetNodeOrNull<Player>("Player");
 		if (p == null) return;
 		Vector2 toPlayer = p.GlobalPosition - GlobalPosition;
-		if (toPlayer.Length() > Stats.MeleeRange) return;
-		MeleeAttack a = Stats.Melee.Attack.Instantiate<MeleeAttack>();
+		if (toPlayer.Length() > this.MeleeRange) return;
+		MeleeAttack a = this.Melee.Attack.Instantiate<MeleeAttack>();
 		a.Direction = toPlayer.Normalized();
-		a.Damage = Mathf.Max(1, Mathf.RoundToInt(Stats.Melee.Damage * ComputeStageScale()));
-		a.SwingDuration = Stats.Melee.SwingDuration;
-		a.SwingArc = Stats.Melee.SwingArc;
-		a.OffsetDistance = Stats.Melee.OffsetDistance;
+		a.Damage = Mathf.Max(1, Mathf.RoundToInt(this.Melee.Damage * ComputeStageScale()));
+		a.SwingDuration = this.Melee.SwingDuration;
+		a.SwingArc = this.Melee.SwingArc;
+		a.OffsetDistance = this.Melee.OffsetDistance;
 		a.SetCollisionLayerValue(5, true);
 		a.SetCollisionMaskValue(2, true);
 		AddChild(a);
-		meleeCoolDown = Stats.MeleeCooldown;
+		PlayAttackAnimation();
+		animatedSprite2D?.Play();
+		meleeCoolDown = this.MeleeCooldown;
+	}
+
+	private static void PlayDeathAnimation(AnimatedSprite2D sprite)
+	{
+		if (sprite == null) return;
+		var frames = sprite.SpriteFrames;
+		if (frames != null && frames.HasAnimation("Explode")) {
+			sprite.Animation = "Explode";
+		} else if (frames != null && frames.HasAnimation("Death")) {
+			sprite.Animation = "Death";
+		}
+		sprite.Play();
+	}
+
+	private void PlayAttackAnimation()
+	{
+		if (animatedSprite2D == null) return;
+		var frames = animatedSprite2D.SpriteFrames;
+		if (frames != null && frames.HasAnimation("Fire")) {
+			animatedSprite2D.Animation = "Fire";
+		} else if (frames != null && frames.HasAnimation("Shoot")) {
+			animatedSprite2D.Animation = "Shoot";
+		}
 	}
 
 	private void Shoot() {
 		int boostedDamage = Mathf.RoundToInt(scaledDamage * (1f + GetLeaderBoost(LeaderType.Attack)));
 		var playerLocation = ((GetParent().GetNode("Player") as Node2D).GlobalPosition - GlobalPosition).Normalized();
-		animatedSprite2D.Animation = "Shoot";
+		PlayAttackAnimation();
 		animatedSprite2D.LookAt(playerLocation);
 		animatedSprite2D.Play();
-		int dirCount = Mathf.Max(1, Stats.Gun.DirectionalCount);
-		float dirStep = Mathf.DegToRad(Stats.Gun.DirectionalAngle);
+		int dirCount = Mathf.Max(1, this.Gun.DirectionalCount);
+		float dirStep = Mathf.DegToRad(this.Gun.DirectionalAngle);
 		for (int d = 0; d < dirCount; d++) {
 			Vector2 dir = playerLocation.Rotated(dirStep * d);
-			for (int i = 0; i < Stats.Gun.BulletCount; i++) {
-				bool crit = Stats.Gun.CriticalChance > 0f && rng.Randf() < Stats.Gun.CriticalChance;
-				int dmg = crit ? Mathf.RoundToInt(boostedDamage * Stats.Gun.CriticalMultiplier) : boostedDamage;
-				Bullet b = Stats.Gun.BulletType.Instantiate<Bullet>();
+			if (this.Gun.BulletSpread > 0f) {
+				dir = dir.Rotated(Mathf.DegToRad(rng.RandfRange(0f, this.Gun.BulletSpread)));
+			}
+			for (int i = 0; i < this.Gun.BulletCount; i++) {
+				bool crit = this.Gun.CriticalChance > 0f && rng.Randf() < this.Gun.CriticalChance;
+				int dmg = crit ? Mathf.RoundToInt(boostedDamage * this.Gun.CriticalMultiplier) : boostedDamage;
+				Bullet b = this.Gun.BulletType.Instantiate<Bullet>();
 				b.Set("Direction", dir);
 				b.Set("Damage", dmg);
-				b.Set("BulletLifetime", Stats.Gun.BulletLifetime);
-				b.Gun = Stats.Gun;
-				if (Stats.Gun.BulletSpeed > 0) b.BulletSpeed = Stats.Gun.BulletSpeed;
+				b.Set("BulletLifetime", this.Gun.BulletLifetime);
+				b.Gun = this.Gun;
+				if (this.Gun.BulletSpeed > 0) b.BulletSpeed = this.Gun.BulletSpeed;
 				b.AuraColor = crit ? new Color(1f, 0.84f, 0.1f, 0.95f) : new Color(1f, 0.3f, 0.3f, 0.8f);
 				b.Position = Position;
 				b.Rotation = dir.Angle();
@@ -643,6 +780,6 @@ public partial class Enemy : Area2D
 				GetParent().AddChild(b);
 			}
 		}
-		GunCoolDown = Stats.Gun.FireRate * StatusEffects.GetFireRateMultiplier() / (1f + GetLeaderBoost(LeaderType.FireRate));
+		GunCoolDown = this.Gun.FireRate * StatusEffects.GetFireRateMultiplier() / (1f + GetLeaderBoost(LeaderType.FireRate));
 	}
 }

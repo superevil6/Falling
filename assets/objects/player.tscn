@@ -1,12 +1,12 @@
-[gd_scene load_steps=24 format=3 uid="uid://cfanc3brtl3ux"]
+[gd_scene format=3 uid="uid://cfanc3brtl3ux"]
 
 [ext_resource type="Script" uid="uid://dhriy820co01m" path="res://assets/scripts/Player.cs" id="1_l4bou"]
 [ext_resource type="PackedScene" uid="uid://cf1pg2x8l8lpf" path="res://assets/objects/bullet.tscn" id="2_34ecl"]
-[ext_resource type="Resource" uid="uid://cc5s5y6gpiagm" path="res://assets/weapons/Pistol.tres" id="2_fh75e"]
-[ext_resource type="Resource" uid="uid://bp6mqrys7v0op" path="res://assets/weapons/Tesla Coil.tres" id="3_htwuo"]
+[ext_resource type="Resource" uid="uid://cc5s5y6gpiagm" path="res://assets/weapons/Pistol.tres" id="3_34ecl"]
 [ext_resource type="Resource" uid="uid://t4f5lqyn51u2" path="res://assets/weapons/Simple Sword.tres" id="3_idqgg"]
-[ext_resource type="Resource" uid="uid://1eafuo1ik2ym" path="res://assets/weapons/Spiraler.tres" id="4_34ecl"]
+[ext_resource type="Resource" uid="uid://dib52vs6i4eql" path="res://assets/weapons/Bubbler.tres" id="4_34ecl"]
 [ext_resource type="Texture2D" uid="uid://dsmm5pqbthh2x" path="res://assets/objects/temp player.png" id="4_g5vn5"]
+[ext_resource type="Resource" uid="uid://c8b2ycj85fkc5" path="res://assets/weapons/Slicer.tres" id="5_34ecl"]
 [ext_resource type="Resource" uid="uid://dhxwiafwkl55" path="res://assets/weapons/Laser.tres" id="6_34ecl"]
 [ext_resource type="Resource" uid="uid://b48w24n0dq0s7" path="res://assets/body mods/head mod.tres" id="6_bkysh"]
 [ext_resource type="Shader" uid="uid://nej1tvi1ocse" path="res://assets/shaders/PixelArt.gdshader" id="7_fh75e"]
@@ -93,7 +93,7 @@ size = Vector2(133, 187)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_asm2o"]
 size = Vector2(66.5639, 187.5)
 
-[node name="Player" type="CharacterBody2D"]
+[node name="Player" type="CharacterBody2D" unique_id=431171586]
 position = Vector2(0, -2)
 scale = Vector2(0.405625, 0.4)
 collision_layer = 2
@@ -101,14 +101,14 @@ collision_mask = 17
 script = ExtResource("1_l4bou")
 MaxHealth = 100
 MinionBullet = ExtResource("2_34ecl")
-Guns = Array[Resource]([ExtResource("2_fh75e"), ExtResource("3_htwuo"), ExtResource("4_34ecl"), ExtResource("6_34ecl")])
-BodyMods = Array[Resource]([ExtResource("6_bkysh"), ExtResource("7_htwuo"), ExtResource("8_34ecl")])
+Guns = [ExtResource("3_34ecl"), ExtResource("4_34ecl"), ExtResource("5_34ecl"), ExtResource("6_34ecl")]
+BodyMods = [ExtResource("6_bkysh"), ExtResource("7_htwuo"), ExtResource("8_34ecl")]
 Melee = ExtResource("3_idqgg")
 WallKickPriorityTime = 0.5
 DashDuration = 0.5
 metadata/_edit_group_ = true
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=943954774]
 texture_filter = 1
 material = SubResource("ShaderMaterial_bkysh")
 sprite_frames = SubResource("SpriteFrames_w8w64")
@@ -129,17 +129,17 @@ metadata/_aseprite_wizard_interface_config_ = {
 }
 metadata/_aseprite_wizard_source_file_hash_ = "8ec8c1d577a51456f697d5231e2d25c2"
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2089939790]
 position = Vector2(3.80202, -10.5)
 scale = Vector2(0.506937, 1)
 shape = SubResource("RectangleShape2D_eevfn")
 
-[node name="Area2D" type="Area2D" parent="."]
+[node name="Area2D" type="Area2D" parent="." unique_id=699907666]
 scale = Vector2(1, 0.957405)
 collision_layer = 2
 collision_mask = 16
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=1419025172]
 position = Vector2(3.698, -11.25)
 scale = Vector2(1.00272, 1)
 shape = SubResource("RectangleShape2D_asm2o")

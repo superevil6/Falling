@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://cnvy0b3n2lfkf"]
 
 [ext_resource type="Script" uid="uid://tu36bfp3p2rn" path="res://assets/scripts/WallBody.cs" id="1_a0cvk"]
-[ext_resource type="Resource" uid="uid://btwqiyob025kj" path="res://assets/stages/Stage One/Walls/Test Wall.tres" id="2_exfhx"]
+[ext_resource type="Resource" uid="uid://cjq42va633uf8" path="res://assets/stages/Pluto/Walls/Pluto Wall.tres" id="2_uqbgm"]
 [ext_resource type="Shader" uid="uid://nej1tvi1ocse" path="res://assets/shaders/PixelArt.gdshader" id="3_r5dmg"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ylusg"]
@@ -13,7 +13,7 @@ shader_parameter/darkness = 0.0
 
 [node name="TestWall" type="StaticBody2D" groups=["Wall"]]
 script = ExtResource("1_a0cvk")
-WallData = ExtResource("2_exfhx")
+WallData = ExtResource("2_uqbgm")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 material = SubResource("ShaderMaterial_ylusg")

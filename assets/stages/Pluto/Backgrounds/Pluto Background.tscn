@@ -8,7 +8,7 @@ shader = ExtResource("1_jp2a4")
 shader_parameter/pixel_size = 4.0
 shader_parameter/color_steps = 8
 shader_parameter/hue_shift = 0.0
-shader_parameter/darkness = 0.400000019
+shader_parameter/darkness = 0.5930000281675
 
 [node name="TestBackground" type="Node2D"]
 

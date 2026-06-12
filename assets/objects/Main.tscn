@@ -1,4 +1,4 @@
-[gd_scene load_steps=68 format=3 uid="uid://3wov1sd2nxg5"]
+[gd_scene format=3 uid="uid://3wov1sd2nxg5"]
 
 [ext_resource type="Script" uid="uid://hfchjcen7ado" path="res://assets/scripts/Main.cs" id="1_yeolr"]
 [ext_resource type="Resource" uid="uid://drxdwiakxfced" path="res://assets/stages/Stage One/Test Stage.tres" id="2_0q0aj"]
@@ -71,40 +71,40 @@
 script = ExtResource("37_k1tc0")
 type = 2
 
-[node name="Main" type="Node2D"]
+[node name="Main" type="Node2D" unique_id=1790341003]
 script = ExtResource("1_yeolr")
 Stages = Array[Resource]([ExtResource("2_0q0aj"), ExtResource("3_fqi5e"), ExtResource("4_kdnkw")])
-CurrentStage = 2
+CurrentStage = 1
 EnemyInputDriftSpeed = 500.0
 Player = ExtResource("2_s1fia")
 PossibleGunUpgrades = Array[Resource]([ExtResource("9_v7bso"), ExtResource("4_8ru6o"), ExtResource("5_k6r8o"), ExtResource("6_ls1xt"), ExtResource("7_37xpp"), ExtResource("8_f63cm"), ExtResource("10_v7bso"), ExtResource("11_3axhc"), ExtResource("12_6wb3h"), ExtResource("13_5u4eo"), ExtResource("14_5u4eo"), ExtResource("15_0rsmt"), ExtResource("16_e2dss"), ExtResource("17_pje3t"), ExtResource("18_o0s6g"), ExtResource("19_jlmw8"), ExtResource("20_5bm0m"), ExtResource("21_gndpi"), ExtResource("22_w6tnj"), ExtResource("23_afvbr"), ExtResource("24_afvbr")])
 PossibleBodyUpgrades = Array[Resource]([ExtResource("8_xkqye"), ExtResource("9_37xpp"), ExtResource("11_f63cm"), ExtResource("20_5u4eo"), ExtResource("23_8dkcs"), ExtResource("28_k1tc0"), ExtResource("29_h8ve5"), ExtResource("30_wp461"), ExtResource("31_4vp71"), ExtResource("32_h8ve5"), ExtResource("35_icdfd"), ExtResource("36_fqi5e"), ExtResource("37_kdnkw"), ExtResource("38_afvbr"), ExtResource("39_icdfd")])
 
-[node name="Upgrade Menu" parent="." instance=ExtResource("4_uq32a")]
+[node name="Upgrade Menu" parent="." unique_id=1389884953 instance=ExtResource("4_uq32a")]
 visible = false
 
-[node name="Pause Menu" parent="." instance=ExtResource("4_11s3y")]
+[node name="Pause Menu" parent="." unique_id=181467722 instance=ExtResource("4_11s3y")]
 visible = false
 
-[node name="Selection Menu" parent="." instance=ExtResource("11_select")]
+[node name="Selection Menu" parent="." unique_id=106583061 instance=ExtResource("11_select")]
 BodyMods = Array[Resource]([ExtResource("7_xuisg"), ExtResource("8_0x35d"), SubResource("Resource_h8ve5"), ExtResource("10_3yxs6")])
 Guns = Array[Resource]([ExtResource("7_g572a"), ExtResource("8_gvlvn"), ExtResource("9_arsnc"), ExtResource("10_dyp24")])
 
-[node name="Level Up Menu" parent="." instance=ExtResource("12_levelup")]
+[node name="Level Up Menu" parent="." unique_id=1390674379 instance=ExtResource("12_levelup")]
 PickCount = 5
 
-[node name="Left Wall Queue" type="Node2D" parent="."]
+[node name="Left Wall Queue" type="Node2D" parent="." unique_id=1105723926]
 position = Vector2(104, 0)
 script = ExtResource("9_wallqueue")
 chunks = Array[PackedScene]([ExtResource("7_2iqqg"), ExtResource("38_0rsmt"), ExtResource("36_4eblj")])
 
-[node name="Right Wall Queue" type="Node2D" parent="."]
+[node name="Right Wall Queue" type="Node2D" parent="." unique_id=1277546490]
 position = Vector2(1417, 0)
 script = ExtResource("9_wallqueue")
 IsRightSide = true
 chunks = Array[PackedScene]([ExtResource("7_2iqqg"), ExtResource("38_0rsmt"), ExtResource("36_4eblj")])
 
-[node name="Health Bar" type="TextureProgressBar" parent="."]
+[node name="Health Bar" type="TextureProgressBar" parent="." unique_id=1306952032]
 offset_left = 15.000001
 offset_top = 3.0
 offset_right = 527.0
@@ -114,21 +114,21 @@ max_value = 5.0
 texture_under = ExtResource("5_hutc6")
 texture_progress = ExtResource("6_7tnf3")
 
-[node name="Experience Counter" type="Label" parent="."]
+[node name="Experience Counter" type="Label" parent="." unique_id=1236483702]
 offset_left = 254.0
 offset_top = 17.0
 offset_right = 394.0
 offset_bottom = 41.0
 text = "XP: 0"
 
-[node name="Gun Label" type="Label" parent="."]
+[node name="Gun Label" type="Label" parent="." unique_id=793208112]
 offset_left = 400.0
 offset_top = 17.0
 offset_right = 600.0
 offset_bottom = 41.0
 text = "Gun: -"
 
-[node name="Gun Image" type="TextureRect" parent="."]
+[node name="Gun Image" type="TextureRect" parent="." unique_id=1504056015]
 texture_filter = 1
 offset_left = 400.0
 offset_top = 44.0
@@ -137,29 +137,67 @@ offset_bottom = 92.0
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Background Queue Left" type="Node2D" parent="."]
+[node name="Gun Slot Top" type="TextureRect" parent="." unique_id=584514366]
+texture_filter = 1
+offset_left = 62.0
+offset_top = 470.0
+offset_right = 118.0
+offset_bottom = 526.0
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Gun Slot Right" type="TextureRect" parent="." unique_id=718825576]
+texture_filter = 1
+offset_left = 122.0
+offset_top = 530.0
+offset_right = 178.0
+offset_bottom = 586.0
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Gun Slot Bottom" type="TextureRect" parent="." unique_id=1971045045]
+texture_filter = 1
+offset_left = 62.0
+offset_top = 590.0
+offset_right = 118.0
+offset_bottom = 646.0
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Gun Slot Left" type="TextureRect" parent="." unique_id=728131531]
+texture_filter = 1
+offset_left = 2.0
+offset_top = 530.0
+offset_right = 58.0
+offset_bottom = 586.0
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Background Queue Left" type="Node2D" parent="." unique_id=723266638]
 z_index = -10
 position = Vector2(104, 0)
 script = ExtResource("13_bgqueue")
 TilesOverride = Array[PackedScene]([ExtResource("39_6wugn")])
 
-[node name="Background Queue Middle" type="Node2D" parent="."]
+[node name="Background Queue Middle" type="Node2D" parent="." unique_id=1429981300]
 z_index = -10
 position = Vector2(629, 0)
 script = ExtResource("13_bgqueue")
+QueuePosition = 1
 TilesOverride = Array[PackedScene]([ExtResource("39_5evvb")])
 ScrollSpeedMultiplier = 0.4
 
-[node name="Background Queue Right" type="Node2D" parent="."]
+[node name="Background Queue Right" type="Node2D" parent="." unique_id=533042715]
 z_index = -10
 position = Vector2(1417, 0)
 script = ExtResource("13_bgqueue")
+QueuePosition = 2
 TilesOverride = Array[PackedScene]([ExtResource("39_6wugn")])
 
-[node name="OffScreenEnemyIndicator" type="Node2D" parent="."]
+[node name="OffScreenEnemyIndicator" type="Node2D" parent="." unique_id=1495166836]
 script = ExtResource("50_offscr")
 
-[node name="ObstacleSpawner" parent="." instance=ExtResource("42_xlgnj")]
+[node name="ObstacleSpawner" parent="." unique_id=203779792 instance=ExtResource("42_xlgnj")]
 position = Vector2(836, 817.00006)
 scale = Vector2(-4.2207904, 13.964333)
 Obstacles = Array[PackedScene]([ExtResource("43_gxs0a"), ExtResource("44_jkqdi")])

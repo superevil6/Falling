@@ -1,0 +1,67 @@
+[gd_scene format=3 uid="uid://c2cg3nutk80bf"]
+
+[ext_resource type="Script" uid="uid://b3od7f8efylhu" path="res://assets/scripts/Enemy.cs" id="1_5vbsj"]
+[ext_resource type="Resource" uid="uid://dq3psdjhaotip" path="res://assets/weapons/Multi-Direction Blaster.tres" id="2_5vbsj"]
+[ext_resource type="Resource" uid="uid://t4f5lqyn51u2" path="res://assets/weapons/Simple Sword.tres" id="3_5vfmq"]
+[ext_resource type="Resource" uid="uid://yinsm4qyoywv" path="res://assets/pickups/Health Pickup.tres" id="5_3ocab"]
+[ext_resource type="Resource" uid="uid://bpi2u85b8oi7t" path="res://assets/pickups/Small EXP Pickup.tres" id="6_jupw6"]
+[ext_resource type="Shader" uid="uid://nej1tvi1ocse" path="res://assets/shaders/PixelArt.gdshader" id="7_ewf01"]
+[ext_resource type="SpriteFrames" uid="uid://xuti13rygkjs" path="res://assets/sprites/Enemies/Split Face.ase" id="8_ijrc5"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_kihfr"]
+radius = 6.50781
+height = 23.0873
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_58uc7"]
+shader = ExtResource("7_ewf01")
+shader_parameter/pixel_size = 4.0
+shader_parameter/color_steps = 8
+shader_parameter/hue_shift = 0.0
+shader_parameter/darkness = 0.0
+
+[node name="Split Face" type="Area2D" unique_id=11958279 groups=["Enemy"]]
+position = Vector2(2, -1)
+scale = Vector2(0.284348, 0.288126)
+collision_layer = 4
+collision_mask = 8
+script = ExtResource("1_5vbsj")
+MaxHealth = 10
+Armor = 5
+Gun = ExtResource("2_5vbsj")
+CanMelee = false
+Melee = ExtResource("3_5vfmq")
+MovementType = 1
+SpawnMovementSpeed = 8
+MovementSpeed = 150.0
+Size = 2.0
+ItemDrops = Array[Resource]([ExtResource("5_3ocab"), ExtResource("6_jupw6")])
+TeleportHesitationTime = 2.0
+metadata/Enemy = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1418455854]
+scale = Vector2(11.2173, 8.11782)
+shape = SubResource("CapsuleShape2D_kihfr")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1063147249]
+texture_filter = 1
+material = SubResource("ShaderMaterial_58uc7")
+sprite_frames = ExtResource("8_ijrc5")
+animation = &"Explode"
+metadata/_aseprite_wizard_config_ = {
+"layer": "",
+"o_ex_p": "",
+"o_folder": "",
+"o_name": "",
+"only_visible": false,
+"slice": "",
+"source": "res://assets/sprites/Ball Enemy.aseprite"
+}
+metadata/_aseprite_wizard_source_file_hash_ = "50dde8af9d7688233b8f7db3e27ef890"
+metadata/_aseprite_wizard_interface_config_ = {
+"layer_section": false,
+"output_section": false,
+"slice_section": false
+}
+
+[connection signal="area_entered" from="." to="." method="_on_area_entered"]
+[connection signal="animation_finished" from="AnimatedSprite2D" to="." method="_on_animated_sprite_2d_animation_finished"]

@@ -1,12 +1,9 @@
-[gd_resource type="Resource" load_steps=13 format=3 uid="uid://blj7cvw1dm7qh"]
+[gd_resource type="Resource" format=3 uid="uid://blj7cvw1dm7qh"]
 
 [ext_resource type="PackedScene" uid="uid://deefktfo0kkhg" path="res://assets/stages/Pluto/Backgrounds/Pluto Background.tscn" id="1_f0cpc"]
-[ext_resource type="Resource" path="res://assets/enemy groups/Cross.tres" id="2_6o3ty"]
-[ext_resource type="Resource" path="res://assets/enemy groups/Pentagon.tres" id="3_f2opl"]
-[ext_resource type="Resource" path="res://assets/enemy groups/Circle Formation.tres" id="4_bstuk"]
-[ext_resource type="Resource" path="res://assets/enemy groups/Vertical Line.tres" id="5_c84yv"]
-[ext_resource type="Resource" path="res://assets/enemy groups/V Formation.tres" id="6_mufi5"]
-[ext_resource type="Resource" path="res://assets/enemy groups/Triangle.tres" id="7_s1mfs"]
+[ext_resource type="PackedScene" uid="uid://ddupwal2epbso" path="res://assets/stages/Pluto/Backgrounds/Pluto Background 2.tscn" id="1_tfj1p"]
+[ext_resource type="Resource" uid="uid://cxkaq23wodoq8" path="res://assets/enemy groups/Cross.tres" id="2_6o3ty"]
+[ext_resource type="Resource" uid="uid://mmk3j3hqqdt8" path="res://assets/enemy groups/Triangle.tres" id="7_s1mfs"]
 [ext_resource type="PackedScene" uid="uid://cnvy0b3n2lfkf" path="res://assets/stages/Pluto/Walls/Pluto Wall.tscn" id="8_e7417"]
 [ext_resource type="PackedScene" uid="uid://b2b1iguvcpy" path="res://assets/stages/Pluto/Walls/Pluto Wall 2.tscn" id="9_tfj1p"]
 [ext_resource type="PackedScene" uid="uid://c27bw8m2b5dvc" path="res://assets/stages/Pluto/Walls/Pluto Wall 3.tscn" id="10_3wwq1"]
@@ -16,8 +13,9 @@
 [resource]
 script = ExtResource("11_fyero")
 Name = "Pluto"
-EnemyGroup = Array[Resource]([ExtResource("2_6o3ty"), ExtResource("3_f2opl"), ExtResource("4_bstuk"), ExtResource("5_c84yv"), ExtResource("6_mufi5"), ExtResource("7_s1mfs")])
+EnemyGroup = Array[Resource]([ExtResource("2_6o3ty"), ExtResource("7_s1mfs")])
 Hazards = Array[PackedScene]([])
 LeftWallChunks = Array[PackedScene]([ExtResource("8_e7417"), ExtResource("9_tfj1p"), ExtResource("10_3wwq1"), ExtResource("11_kfmdv")])
 RightWallChunks = Array[PackedScene]([ExtResource("8_e7417"), ExtResource("9_tfj1p"), ExtResource("10_3wwq1"), ExtResource("11_kfmdv")])
-BackgroundImages = Array[PackedScene]([ExtResource("1_f0cpc")])
+BackgroundImages = Array[PackedScene]([ExtResource("1_tfj1p")])
+Background2Images = Array[PackedScene]([ExtResource("1_f0cpc")])

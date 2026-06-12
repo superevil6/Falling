@@ -1,7 +1,9 @@
-[gd_scene load_steps=9 format=3 uid="uid://dq5bq4jsc66se"]
+[gd_scene format=3 uid="uid://dq5bq4jsc66se"]
 
-[ext_resource type="Script" path="res://assets/scripts/Explosion.cs" id="1_4ls75"]
+[ext_resource type="Script" uid="uid://ctkb62e0hfxfp" path="res://assets/scripts/Explosion.cs" id="1_4ls75"]
 [ext_resource type="Texture2D" uid="uid://cieip1ta7fmp2" path="res://assets/objects/Explosion.png" id="2_thphd"]
+[ext_resource type="SpriteFrames" uid="uid://cjd1uoh5hi1j5" path="res://assets/sprites/Explosion.aseprite" id="2_vwy0c"]
+[ext_resource type="SpriteFrames" uid="uid://nq33cq75y236" path="res://assets/sprites/Explosion 2.aseprite" id="3_qvnt1"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_w3guw"]
 radius = 3.0
@@ -42,15 +44,18 @@ animations = [{
 "speed": 10.0
 }]
 
-[node name="Explosion" type="Area2D"]
+[node name="Explosion" type="Area2D" unique_id=1090162845]
 scale = Vector2(12.16, 12.16)
 script = ExtResource("1_4ls75")
+Radius = 10.0
+BaseRadius = 10.0
+ExplosionAnimations = Array[SpriteFrames]([ExtResource("2_vwy0c"), ExtResource("3_qvnt1")])
 metadata/_edit_group_ = true
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1342880331]
 shape = SubResource("CircleShape2D_w3guw")
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1269536189]
 texture_filter = 1
 position = Vector2(-1.90735e-06, 1.90735e-06)
 scale = Vector2(0.0244141, 0.0261759)

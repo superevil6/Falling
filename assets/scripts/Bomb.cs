@@ -48,7 +48,7 @@ public partial class Bomb : Node2D
 				p.TakeDamage(Damage);
 			}
 		}
-		if (explosionScene != null) {
+		if (explosionScene != null && Explosion.CanSpawn()) {
 			var ex = explosionScene.Instantiate<Explosion>();
 			ex.GlobalPosition = GlobalPosition;
 			ex.Damage = Damage;
