@@ -1,0 +1,11 @@
+[gd_resource type="Resource" format=3 uid="uid://cjdgwmdwlob5u"]
+
+[ext_resource type="Script" uid="uid://b32g0nhhixpqq" path="res://assets/scripts/StageEvent.cs" id="1_0lctv"]
+
+[resource]
+script = ExtResource("1_0lctv")
+WarningDuration = 2.0
+Side = 2
+ContractFraction = 0.15
+HoldDuration = 5.0
+ObstacleScenes = null

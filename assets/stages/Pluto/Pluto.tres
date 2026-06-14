@@ -3,19 +3,31 @@
 [ext_resource type="PackedScene" uid="uid://deefktfo0kkhg" path="res://assets/stages/Pluto/Backgrounds/Pluto Background.tscn" id="1_f0cpc"]
 [ext_resource type="PackedScene" uid="uid://ddupwal2epbso" path="res://assets/stages/Pluto/Backgrounds/Pluto Background 2.tscn" id="1_tfj1p"]
 [ext_resource type="Resource" uid="uid://cxkaq23wodoq8" path="res://assets/enemy groups/Cross.tres" id="2_6o3ty"]
+[ext_resource type="AudioStream" uid="uid://bmxihk5k1s1n4" path="res://assets/Test Music/Final of Puyo Puyo.mp3" id="3_f0cpc"]
+[ext_resource type="Resource" uid="uid://dctl74u585md3" path="res://assets/enemy groups/Test Boss.tres" id="6_e7417"]
 [ext_resource type="Resource" uid="uid://mmk3j3hqqdt8" path="res://assets/enemy groups/Triangle.tres" id="7_s1mfs"]
 [ext_resource type="PackedScene" uid="uid://cnvy0b3n2lfkf" path="res://assets/stages/Pluto/Walls/Pluto Wall.tscn" id="8_e7417"]
 [ext_resource type="PackedScene" uid="uid://b2b1iguvcpy" path="res://assets/stages/Pluto/Walls/Pluto Wall 2.tscn" id="9_tfj1p"]
 [ext_resource type="PackedScene" uid="uid://c27bw8m2b5dvc" path="res://assets/stages/Pluto/Walls/Pluto Wall 3.tscn" id="10_3wwq1"]
+[ext_resource type="AudioStream" uid="uid://dslbshgdy5r1j" path="res://assets/Test Music/Blaze Heatnix.mp3" id="10_e7417"]
 [ext_resource type="Script" uid="uid://byqq3mnl0fxbu" path="res://assets/scripts/Stage.cs" id="11_fyero"]
 [ext_resource type="PackedScene" uid="uid://bpeh656wmwak3" path="res://assets/stages/Pluto/Walls/Pluto Wall 4.tscn" id="11_kfmdv"]
+[ext_resource type="Resource" uid="uid://cjdgwmdwlob5u" path="res://assets/stage event/Both Wall Contract 30.tres" id="11_tfj1p"]
+[ext_resource type="Resource" uid="uid://cgjm6phgjv7pg" path="res://assets/stage event/Left Wall Contract 30.tres" id="12_kfmdv"]
+[ext_resource type="Resource" uid="uid://cn22x3e8ni2jj" path="res://assets/stage event/Right Wall Contract 30.tres" id="13_r76eu"]
 
 [resource]
 script = ExtResource("11_fyero")
 Name = "Pluto"
-EnemyGroup = Array[Resource]([ExtResource("2_6o3ty"), ExtResource("7_s1mfs")])
+EnemyGroup = Array[Resource]([ExtResource("2_6o3ty"), ExtResource("7_s1mfs"), ExtResource("6_e7417")])
 Hazards = Array[PackedScene]([])
 LeftWallChunks = Array[PackedScene]([ExtResource("8_e7417"), ExtResource("9_tfj1p"), ExtResource("10_3wwq1"), ExtResource("11_kfmdv")])
 RightWallChunks = Array[PackedScene]([ExtResource("8_e7417"), ExtResource("9_tfj1p"), ExtResource("10_3wwq1"), ExtResource("11_kfmdv")])
+ScrollSpeed = 300.0
 BackgroundImages = Array[PackedScene]([ExtResource("1_tfj1p")])
 Background2Images = Array[PackedScene]([ExtResource("1_f0cpc")])
+StageEvents = Array[Resource]([ExtResource("11_tfj1p"), ExtResource("12_kfmdv"), ExtResource("13_r76eu")])
+EventInterval = 5.0
+DisableEventsDuringBoss = false
+StageMusic = ExtResource("10_e7417")
+BossMusic = ExtResource("3_f0cpc")

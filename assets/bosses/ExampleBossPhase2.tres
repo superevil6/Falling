@@ -1,0 +1,38 @@
+[gd_resource type="Resource" format=3 uid="uid://68b5221as0ej"]
+
+[ext_resource type="Script" uid="uid://bfgt7nxol2r7g" path="res://assets/scripts/BossPhase.cs" id="1"]
+[ext_resource type="Script" uid="uid://kw4e1fehbgul" path="res://assets/scripts/BossAction.cs" id="2"]
+[ext_resource type="Resource" uid="uid://dq3psdjhaotip" path="res://assets/weapons/Multi-Direction Blaster.tres" id="3"]
+[ext_resource type="Resource" uid="uid://dhxwiafwkl55" path="res://assets/weapons/Laser.tres" id="3_nt8ty"]
+
+[sub_resource type="Resource" id="BossAction_telegraph"]
+script = ExtResource("2")
+Type = 1
+Duration = 0.8
+SummonScenes = null
+
+[sub_resource type="Resource" id="BossAction_special"]
+script = ExtResource("2")
+Duration = 0.6
+OverrideGun = ExtResource("3")
+SummonScenes = null
+
+[sub_resource type="Resource" id="BossAction_fire"]
+script = ExtResource("2")
+OverrideGun = ExtResource("3_nt8ty")
+AimOffsetDegrees = -15.0
+SummonScenes = null
+
+[sub_resource type="Resource" id="BossAction_wait"]
+script = ExtResource("2")
+Type = 4
+Duration = 0.4
+SummonScenes = null
+
+[resource]
+script = ExtResource("1")
+HealthThreshold = 0.5
+OverrideMovement = true
+MovementType = 6
+MovementSpeed = 120.0
+Actions = Array[Resource]([SubResource("BossAction_telegraph"), SubResource("BossAction_special"), SubResource("BossAction_fire"), SubResource("BossAction_wait")])

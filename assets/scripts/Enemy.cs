@@ -81,8 +81,13 @@ public partial class Enemy : Area2D
 	public float SeparationStrength {get;set;} = 2.0f;
 	[Export]
 	public float DropSpreadRadius {get;set;} = 25f;
-	private float leftWallX = 0f;
-	private float rightWallX = 0f;
+	private Node2D leftWallNode;
+	private Node2D rightWallNode;
+	private float fallbackRightWallX;
+	// Read the wall boundaries live so enemies respect walls that move at runtime
+	// (e.g. stage wall-contraction events) rather than a value cached at spawn.
+	private float LeftWallX => leftWallNode != null ? leftWallNode.Position.X : 0f;
+	private float RightWallX => rightWallNode != null ? rightWallNode.Position.X : fallbackRightWallX;
 	private Vector2 randomDirection = Vector2.Zero;
 	private float randomDirectionTimer = 0f;
 	private RandomNumberGenerator rng = new RandomNumberGenerator();
@@ -115,6 +120,12 @@ public partial class Enemy : Area2D
 	public AnimatedSprite2D animatedSprite2D;
 	public Vector2 PostSpawnDestination {get;set;}
 	private bool ReachedPostSpawnDestination = false;
+	private bool spawnComplete = false;
+	// When true, the enemy stops firing/meleeing on its own — an external driver
+	// (e.g. BossController) is responsible for triggering attacks.
+	public bool ExternalAttackControl {get;set;} = false;
+	public bool SpawnComplete => spawnComplete;
+	public float HealthFraction => scaledMaxHealth > 0 ? (float)CurrentHealth / scaledMaxHealth : 0f;
 	private Player player;
 	public StatusEffectController StatusEffects = new StatusEffectController();
 
@@ -122,6 +133,7 @@ public partial class Enemy : Area2D
 	public override void _Ready()
 	{
 		animatedSprite2D = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
+		ForceOneShotAnimations(animatedSprite2D?.SpriteFrames);
 		float scale = ComputeStageScale();
 		scaledMaxHealth = Mathf.RoundToInt(this.MaxHealth * scale);
 		currentArmor = Mathf.RoundToInt(this.Armor * scale);
@@ -133,11 +145,22 @@ public partial class Enemy : Area2D
 		if (this.TeleportMovement) {
 			teleportTimer = this.TeleportHesitationTime;
 		}
-		var leftQ = GetParent()?.GetNodeOrNull<Node2D>("Left Wall Queue");
-		var rightQ = GetParent()?.GetNodeOrNull<Node2D>("Right Wall Queue");
-		leftWallX = leftQ != null ? leftQ.Position.X : 0f;
-		rightWallX = rightQ != null ? rightQ.Position.X : GetViewportRect().Size.X;
+		leftWallNode = GetParent()?.GetNodeOrNull<Node2D>("Left Wall Queue");
+		rightWallNode = GetParent()?.GetNodeOrNull<Node2D>("Right Wall Queue");
+		fallbackRightWallX = GetViewportRect().Size.X;
 		SpawnDestinationIndicator();
+	}
+
+	// Aseprite imports these one-shot animations with loop=true, which stops
+	// AnimationFinished from ever firing — so Spawn/Fire/Death never transition
+	// back to Idle (and the spawn gate would never release). Force them non-looping.
+	private static readonly string[] OneShotAnimations = {"Spawn", "Fire", "Shoot", "Death", "Explode"};
+	private static void ForceOneShotAnimations(SpriteFrames frames)
+	{
+		if (frames == null) return;
+		foreach (var anim in OneShotAnimations) {
+			if (frames.HasAnimation(anim)) frames.SetAnimationLoop(anim, false);
+		}
 	}
 
 	private void SpawnDestinationIndicator()
@@ -157,23 +180,23 @@ public partial class Enemy : Area2D
 			armorShellTimer -= (float)delta;
 			QueueRedraw();
 		}
-		if (this.Gun != null && CurrentHealth > 0) {
+		if (this.Gun != null && CurrentHealth > 0 && spawnComplete && !ExternalAttackControl) {
 			if (!telegraphActive && GunCoolDown > 0f && GunCoolDown <= TelegraphLeadTime) {
-				SpawnAttackIndicator();
+				SpawnAttackIndicator(TelegraphLeadTime);
 				telegraphActive = true;
 			}
 			if (GunCoolDown <= 0f) {
 				Shoot();
 				telegraphActive = false;
 			}
-		}
-		if (GunCoolDown > 0) {
-			GunCoolDown -= (float)delta;
+			if (GunCoolDown > 0) {
+				GunCoolDown -= (float)delta;
+			}
 		}
 		if (meleeCoolDown > 0) {
 			meleeCoolDown -= (float)delta;
 		}
-		if (this.CanMelee && this.Melee != null && meleeCoolDown <= 0 && CurrentHealth > 0) {
+		if (this.CanMelee && this.Melee != null && meleeCoolDown <= 0 && CurrentHealth > 0 && spawnComplete && !ExternalAttackControl) {
 			TrySwingMelee();
 		}
 		int dotDamage = StatusEffects.Tick((float)delta);
@@ -234,7 +257,7 @@ public partial class Enemy : Area2D
 					Position += away;
 					var screen = GetViewportRect().Size;
 					Position = new Vector2(
-						Mathf.Clamp(Position.X, leftWallX + WallMargin, rightWallX - WallMargin),
+						Mathf.Clamp(Position.X, LeftWallX + WallMargin, RightWallX - WallMargin),
 						Mathf.Clamp(Position.Y, 0f, screen.Y)
 					);
 					break;
@@ -384,15 +407,15 @@ public partial class Enemy : Area2D
 						Position += new Vector2(0, driftY * (float)delta);
 					}
 					Position = new Vector2(
-						Mathf.Clamp(Position.X, leftWallX + WallMargin, rightWallX - WallMargin),
+						Mathf.Clamp(Position.X, LeftWallX + WallMargin, RightWallX - WallMargin),
 						Position.Y
 					);
 				}
 			}
 			else {
 				var frames = animatedSprite2D?.SpriteFrames;
-				if (frames != null && frames.HasAnimation("prespawn") && animatedSprite2D.Animation != "prespawn") {
-					animatedSprite2D.Animation = "prespawn";
+				if (frames != null && frames.HasAnimation("PreSpawn") && animatedSprite2D.Animation != "PreSpawn") {
+					animatedSprite2D.Animation = "PreSpawn";
 					animatedSprite2D.Play();
 				}
 				if (this.InstantSpawn) {
@@ -407,13 +430,17 @@ public partial class Enemy : Area2D
 						Position += toDestination.Normalized() * this.SpawnMovementSpeed;
 					}
 				}
-				if (ReachedPostSpawnDestination && animatedSprite2D != null) {
-					if (frames != null && frames.HasAnimation("Spawn") && animatedSprite2D.Animation != "Spawn") {
+				if (ReachedPostSpawnDestination) {
+					bool hasSpawn = animatedSprite2D != null && frames != null && frames.HasAnimation("Spawn");
+					if (hasSpawn && animatedSprite2D.Animation != "Spawn") {
 						animatedSprite2D.Animation = "Spawn";
 						animatedSprite2D.Play();
-					} else if (animatedSprite2D.Animation == "prespawn" && frames != null && frames.HasAnimation("Idle")) {
-						animatedSprite2D.Animation = "Idle";
-						animatedSprite2D.Play();
+					} else {
+						if (animatedSprite2D != null && animatedSprite2D.Animation == "PreSpawn" && frames != null && frames.HasAnimation("Idle")) {
+							animatedSprite2D.Animation = "Idle";
+							animatedSprite2D.Play();
+						}
+						spawnComplete = true;
 					}
 				}
 			}
@@ -544,6 +571,7 @@ public partial class Enemy : Area2D
 		deathHandled = true;
 		DropItems();
 		if (this.IsBoss) {
+			(GetParent() as Main)?.OnBossDefeated();
 			var menu = GetParent()?.GetNodeOrNull<SelectionMenu>("Selection Menu");
 			menu?.Open();
 		}
@@ -670,6 +698,7 @@ public partial class Enemy : Area2D
 			animatedSprite2D.Play();
 			break;
 			case "Spawn":
+			spawnComplete = true;
 			animatedSprite2D.Animation = "Idle";
 			animatedSprite2D.Play();
 			break;
@@ -694,14 +723,14 @@ public partial class Enemy : Area2D
 		}
 	}
 
-	private void SpawnAttackIndicator() {
+	private void SpawnAttackIndicator(float duration) {
 		var p = GetParent()?.GetNodeOrNull<Player>("Player");
 		if (p == null) return;
 		Vector2 dir = (p.GlobalPosition - GlobalPosition).Normalized();
 		if (dir == Vector2.Zero) return;
 		var ind = new AttackIndicator();
 		ind.Anchor = this;
-		ind.Duration = TelegraphLeadTime;
+		ind.Duration = duration;
 		ind.GlobalPosition = GlobalPosition;
 		ind.Rotation = dir.Angle();
 		GetParent().AddChild(ind);
@@ -751,27 +780,39 @@ public partial class Enemy : Area2D
 	}
 
 	private void Shoot() {
-		int boostedDamage = Mathf.RoundToInt(scaledDamage * (1f + GetLeaderBoost(LeaderType.Attack)));
-		var playerLocation = ((GetParent().GetNode("Player") as Node2D).GlobalPosition - GlobalPosition).Normalized();
+		FireGun(this.Gun);
+		GunCoolDown = this.Gun.FireRate * StatusEffects.GetFireRateMultiplier() / (1f + GetLeaderBoost(LeaderType.FireRate));
+	}
+
+	// Fires a single volley of the given gun aimed at the player, plus an optional
+	// angular offset (degrees). Public so a BossController can drive scripted
+	// attack patterns with alternate guns/angles. Does not touch GunCoolDown.
+	public void FireGun(Gun gun, float aimOffsetDegrees = 0f) {
+		if (gun == null || gun.BulletType == null || animatedSprite2D == null) return;
+		Vector2 aim = AimAtPlayerDirection();
+		if (aim == Vector2.Zero) return;
+		aim = aim.Rotated(Mathf.DegToRad(aimOffsetDegrees));
+		int baseDamage = Mathf.RoundToInt(gun.Damage * ComputeStageScale());
+		int boostedDamage = Mathf.RoundToInt(baseDamage * (1f + GetLeaderBoost(LeaderType.Attack)));
 		PlayAttackAnimation();
-		animatedSprite2D.LookAt(playerLocation);
+		animatedSprite2D.LookAt(aim);
 		animatedSprite2D.Play();
-		int dirCount = Mathf.Max(1, this.Gun.DirectionalCount);
-		float dirStep = Mathf.DegToRad(this.Gun.DirectionalAngle);
+		int dirCount = Mathf.Max(1, gun.DirectionalCount);
+		float dirStep = Mathf.DegToRad(gun.DirectionalAngle);
 		for (int d = 0; d < dirCount; d++) {
-			Vector2 dir = playerLocation.Rotated(dirStep * d);
-			if (this.Gun.BulletSpread > 0f) {
-				dir = dir.Rotated(Mathf.DegToRad(rng.RandfRange(0f, this.Gun.BulletSpread)));
+			Vector2 dir = aim.Rotated(dirStep * d);
+			if (gun.BulletSpread > 0f) {
+				dir = dir.Rotated(Mathf.DegToRad(rng.RandfRange(0f, gun.BulletSpread)));
 			}
-			for (int i = 0; i < this.Gun.BulletCount; i++) {
-				bool crit = this.Gun.CriticalChance > 0f && rng.Randf() < this.Gun.CriticalChance;
-				int dmg = crit ? Mathf.RoundToInt(boostedDamage * this.Gun.CriticalMultiplier) : boostedDamage;
-				Bullet b = this.Gun.BulletType.Instantiate<Bullet>();
+			for (int i = 0; i < gun.BulletCount; i++) {
+				bool crit = gun.CriticalChance > 0f && rng.Randf() < gun.CriticalChance;
+				int dmg = crit ? Mathf.RoundToInt(boostedDamage * gun.CriticalMultiplier) : boostedDamage;
+				Bullet b = gun.BulletType.Instantiate<Bullet>();
 				b.Set("Direction", dir);
 				b.Set("Damage", dmg);
-				b.Set("BulletLifetime", this.Gun.BulletLifetime);
-				b.Gun = this.Gun;
-				if (this.Gun.BulletSpeed > 0) b.BulletSpeed = this.Gun.BulletSpeed;
+				b.Set("BulletLifetime", gun.BulletLifetime);
+				b.Gun = gun;
+				if (gun.BulletSpeed > 0) b.BulletSpeed = gun.BulletSpeed;
 				b.AuraColor = crit ? new Color(1f, 0.84f, 0.1f, 0.95f) : new Color(1f, 0.3f, 0.3f, 0.8f);
 				b.Position = Position;
 				b.Rotation = dir.Angle();
@@ -780,6 +821,27 @@ public partial class Enemy : Area2D
 				GetParent().AddChild(b);
 			}
 		}
-		GunCoolDown = this.Gun.FireRate * StatusEffects.GetFireRateMultiplier() / (1f + GetLeaderBoost(LeaderType.FireRate));
+	}
+
+	// Direction from this enemy to the player (zero if no player is found).
+	public Vector2 AimAtPlayerDirection() {
+		var p = GetParent()?.GetNodeOrNull<Node2D>("Player");
+		if (p == null) return Vector2.Zero;
+		return (p.GlobalPosition - GlobalPosition).Normalized();
+	}
+
+	// Shows an attack-warning indicator for the given lead time. Public so bosses
+	// can telegraph special attacks before they land.
+	public void ShowTelegraph(float duration) => SpawnAttackIndicator(duration);
+
+	// Spawns a minion at this enemy's position that walks out to Position + offset
+	// using the normal spawn-animation flow. Returns the spawned enemy.
+	public Enemy SummonMinion(PackedScene scene, Vector2 offset) {
+		if (scene == null) return null;
+		Enemy minion = scene.Instantiate<Enemy>();
+		minion.Position = Position;
+		minion.PostSpawnDestination = Position + offset;
+		GetParent().AddChild(minion);
+		return minion;
 	}
 }

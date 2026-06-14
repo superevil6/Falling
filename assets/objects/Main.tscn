@@ -96,11 +96,13 @@ PickCount = 5
 [node name="Left Wall Queue" type="Node2D" parent="." unique_id=1105723926]
 position = Vector2(104, 0)
 script = ExtResource("9_wallqueue")
+EdgeOffset = 104.0
 chunks = Array[PackedScene]([ExtResource("7_2iqqg"), ExtResource("38_0rsmt"), ExtResource("36_4eblj")])
 
 [node name="Right Wall Queue" type="Node2D" parent="." unique_id=1277546490]
-position = Vector2(1417, 0)
+position = Vector2(1816, 0)
 script = ExtResource("9_wallqueue")
+EdgeOffset = 104.0
 IsRightSide = true
 chunks = Array[PackedScene]([ExtResource("7_2iqqg"), ExtResource("38_0rsmt"), ExtResource("36_4eblj")])
 

@@ -1,0 +1,26 @@
+[gd_resource type="Resource" format=3 uid="uid://c88c6ur5cpbi"]
+
+[ext_resource type="Script" uid="uid://bfgt7nxol2r7g" path="res://assets/scripts/BossPhase.cs" id="1"]
+[ext_resource type="Script" uid="uid://kw4e1fehbgul" path="res://assets/scripts/BossAction.cs" id="2"]
+[ext_resource type="PackedScene" uid="uid://tng40x5blnrr" path="res://assets/enemies/ball_enemy.tscn" id="3"]
+
+[sub_resource type="Resource" id="BossAction_a"]
+script = ExtResource("2")
+Duration = 1.0
+SummonScenes = null
+
+[sub_resource type="Resource" id="BossAction_b"]
+script = ExtResource("2")
+Duration = 1.0
+AimOffsetDegrees = 20.0
+SummonScenes = null
+
+[sub_resource type="Resource" id="BossAction_c"]
+script = ExtResource("2")
+Type = 2
+Duration = 3.0
+SummonScenes = Array[PackedScene]([ExtResource("3")])
+
+[resource]
+script = ExtResource("1")
+Actions = Array[Resource]([SubResource("BossAction_a"), SubResource("BossAction_b"), SubResource("BossAction_c")])
