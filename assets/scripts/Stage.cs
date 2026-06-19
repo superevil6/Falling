@@ -12,6 +12,19 @@ public partial class Stage : Resource
 	public PackedScene[] LeftWallChunks {get;set;}
 	[Export]
 	public PackedScene[] RightWallChunks {get;set;}
+	// Tiles used to fill the area exposed behind a wall when it contracts inward.
+	// The fill is a randomized, vertically-scrolling grid drawn from these textures.
+	[Export]
+	public Texture2D[] WallFillTiles {get;set;}
+	[Export]
+	public float WallFillTileSize {get;set;} = 64f;
+	// The wall sprite is centred on its queue position and the wall graphic is drawn
+	// from the texture's left edge, so the graphic's outer edge sits half a sprite
+	// width out from the boundary. The fill stops at that edge (not at the boundary)
+	// so it butts against the visible wall instead of spilling into the corridor.
+	// Set this to half the wall sprite's width.
+	[Export]
+	public float WallSpriteHalfWidth {get;set;} = 128f;
 	[Export]
 	public float ScrollSpeed {get;set;} = 200f;
 	[Export]

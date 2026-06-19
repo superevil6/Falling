@@ -1,5 +1,6 @@
 using Godot;
 using System.Linq;
+using System.Threading.Tasks;
 
 public partial class Main : Node2D
 {
@@ -51,10 +52,43 @@ public partial class Main : Node2D
 		bossCount = Mathf.Max(0, bossCount - 1);
 	}
 
+	// Fades out the stage music and flashes a red WARNING across the screen, then
+	// starts the boss music. Awaited just before a boss is spawned.
+	private async Task BossWarningSequence()
+	{
+		music?.FadeOut(1.5f);
+		CanvasLayer warning = ShowBossWarning();
+		await ToSignal(GetTree().CreateTimer(5.0f), "timeout");
+		warning?.QueueFree();
+		var stage = CurrentStageData();
+		if (stage != null && music != null) music.PlayMusic(stage.BossIntroMusic, stage.BossMusic);
+	}
+
+	private CanvasLayer ShowBossWarning()
+	{
+		var layer = new CanvasLayer { Layer = 100 };
+		var label = new Label { Text = "WARNING" };
+		label.SetAnchorsPreset(Control.LayoutPreset.FullRect);
+		label.HorizontalAlignment = HorizontalAlignment.Center;
+		label.VerticalAlignment = VerticalAlignment.Center;
+		label.AddThemeColorOverride("font_color", new Color(1f, 0f, 0f));
+		label.AddThemeColorOverride("font_outline_color", new Color(0f, 0f, 0f));
+		label.AddThemeConstantOverride("outline_size", 12);
+		label.AddThemeFontSizeOverride("font_size", 140);
+		layer.AddChild(label);
+		AddChild(layer);
+		// Blink the text for the duration of the warning.
+		Tween tween = label.CreateTween();
+		tween.SetLoops();
+		tween.TweenProperty(label, "modulate:a", 0.15f, 0.35f);
+		tween.TweenProperty(label, "modulate:a", 1.0f, 0.35f);
+		return layer;
+	}
+
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
-		
+
 
 	}
 
@@ -78,12 +112,11 @@ public partial class Main : Node2D
 				Enemy e = group.Enemies[i].Instantiate<Enemy>();
 				e.Position = group.SpawnLocations[i];
 				e.Set("PostSpawnDestination", group.PostSpawnDestination[i]);
-				AddChild(e);
 				if (e.IsBoss) {
+					await BossWarningSequence();
 					bossCount++;
-					var stage = CurrentStageData();
-					if (stage != null && music != null) music.PlayMusic(stage.BossIntroMusic, stage.BossMusic);
 				}
+				AddChild(e);
 				await ToSignal(GetTree().CreateTimer(group.TimeBetweenSpawns), "timeout");
 			}
 		} finally {

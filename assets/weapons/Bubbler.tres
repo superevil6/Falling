@@ -1,12 +1,12 @@
 [gd_resource type="Resource" format=3 uid="uid://dib52vs6i4eql"]
 
 [ext_resource type="PackedScene" uid="uid://cf1pg2x8l8lpf" path="res://assets/objects/bullet.tscn" id="1_8h1db"]
-[ext_resource type="Texture2D" uid="uid://7n64wdqvmtd5" path="res://assets/sprites/Weapons/Handgun.png" id="2_bs2kg"]
+[ext_resource type="Texture2D" uid="uid://cxbpisoqsbtdm" path="res://assets/sprites/Weapons/Bubbler.png" id="2_8h1db"]
 [ext_resource type="Script" uid="uid://cvu57cdie1j01" path="res://assets/scripts/Gun.cs" id="3_mykm7"]
 
 [resource]
 script = ExtResource("3_mykm7")
-GunImage = ExtResource("2_bs2kg")
+GunImage = ExtResource("2_8h1db")
 GunDescription = "Blows a swathe of bubble like bullets. Short range and slow moving, but large quantity."
 FireRate = 0.1
 Damage = 1

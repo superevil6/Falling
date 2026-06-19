@@ -33,12 +33,16 @@ public partial class Bullet : Attack
 	private Vector2 growthLastPos;
 	private int ExplosionDamage;
 	private int RemainingRicochets;
+	private ulong spawnPhysicsFrame;
+	private double subBulletTime;
+	private float subBulletSpinAccum;
 
 	//for wave movement
 	private double time;
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		spawnPhysicsFrame = Engine.GetPhysicsFrames();
 		string shaderPath = Element switch {
 			ElementType.Fire => "res://assets/shaders/Fire.gdshader",
 			ElementType.Ice => "res://assets/shaders/Ice.gdshader",
@@ -176,11 +180,45 @@ public partial class Bullet : Attack
 				}
 			}
 		}
+		if (Gun != null && Gun.BulletShootsBullets) {
+			subBulletTime += delta;
+			if (subBulletTime >= Mathf.Max(0.02f, Gun.SubBulletInterval)) {
+				subBulletTime = 0;
+				EmitSubBullets();
+			}
+		}
 		if (BulletLifetime > 0) {
 			BulletLifetime -= (float)delta;
 		} else {
 			QueueFree();
 		}
+	}
+
+	// Fires sub-bullets radially (with a per-burst spin) that deal half this bullet's
+	// damage. Sub-bullets carry no Gun, so they don't sub-shoot or explode themselves.
+	private void EmitSubBullets() {
+		PackedScene scene = Gun.SubBulletType ?? Gun.BulletType;
+		var parent = GetParent();
+		if (scene == null || parent == null) return;
+		int subDamage = Mathf.Max(1, Mathf.RoundToInt(Damage * 0.5f));
+		int count = Mathf.Max(1, Gun.SubBulletCount);
+		float speed = Gun.SubBulletSpeed > 0f ? Gun.SubBulletSpeed : Mathf.Max(200f, BulletSpeed * 0.6f);
+		for (int i = 0; i < count; i++) {
+			float angle = subBulletSpinAccum + i * (Mathf.Tau / count);
+			Vector2 dir = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
+			var b = scene.Instantiate<Bullet>();
+			b.Direction = dir;
+			b.Damage = subDamage;
+			b.BulletLifetime = Gun.BulletLifetime > 0f ? Gun.BulletLifetime : 1.5f;
+			b.BulletSpeed = speed;
+			b.Element = Element;
+			b.Position = Position;
+			b.Rotation = dir.Angle();
+			b.CollisionLayer = CollisionLayer;
+			b.CollisionMask = CollisionMask;
+			parent.CallDeferred("add_child", b);
+		}
+		subBulletSpinAccum += Mathf.DegToRad(Gun.SubBulletSpinDegrees);
 	}
 
 	private void _on_area_entered(Node2D node) {
@@ -208,6 +246,10 @@ public partial class Bullet : Attack
 	}
 	private void _on_body_entered(Node2D node) {
 		if (IsBoomerang) return;
+		// Ignore the wall the bullet spawned inside (e.g. the player shooting while
+		// pressed against a wall) so exploding bullets don't detonate on spawn. Walls
+		// hit later, after the bullet has travelled, still trigger normally.
+		if (Engine.GetPhysicsFrames() <= spawnPhysicsFrame + 1) return;
 		HandleHit(false);
 	}
 

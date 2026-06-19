@@ -1,10 +1,12 @@
-[gd_resource type="Resource" load_steps=2 format=3 uid="uid://d3w6mhn1ra0ll"]
+[gd_resource type="Resource" format=3 uid="uid://d3w6mhn1ra0ll"]
 
+[ext_resource type="Texture2D" uid="uid://b0w5pf3ejgtpk" path="res://assets/sprites/Power Up Icons/Armor Piercing Rounds.png" id="1_rb7jo"]
 [ext_resource type="Script" uid="uid://cjvebtbs1ft7k" path="res://assets/scripts/GunUpgrade.cs" id="2_xruud"]
 
 [resource]
 script = ExtResource("2_xruud")
 Type = 18
+UpgradeImage = ExtResource("1_rb7jo")
 UpgradeName = "Armor Piercing Rounds"
 UpgradeDescription = "A bullet now pierces an enemies shield, and no longer does reduced damage while an enemy is shielded."
 Rarity = 2

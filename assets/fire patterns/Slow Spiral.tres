@@ -1,0 +1,11 @@
+[gd_resource type="Resource" format=3 uid="uid://d2spiralxk4ps0"]
+
+[ext_resource type="Script" uid="uid://diq7ylg5d37mf" path="res://assets/scripts/FirePattern.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+Type = 3
+AimAtPlayer = false
+FixedAngleDegrees = 90.0
+Count = 1
+SpinDegrees = 11.0

@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://b3od7f8efylhu" path="res://assets/scripts/Enemy.cs" id="1"]
 [ext_resource type="Script" uid="uid://bspw55irr0s5c" path="res://assets/scripts/BossController.cs" id="2"]
-[ext_resource type="Resource" uid="uid://dpbu2nab2atvi" path="res://assets/weapons/Basic Slow Enemy Shot.tres" id="3"]
+[ext_resource type="Resource" uid="uid://djf7mu16ymf8a" path="res://assets/weapons/Enemy Weapons/Grow Shot Ring.tres" id="2_1a4dq"]
 [ext_resource type="SpriteFrames" uid="uid://cr2mxt0cverj2" path="res://assets/sprites/Enemies/Flame Nose.aseprite" id="4"]
 [ext_resource type="Resource" uid="uid://c88c6ur5cpbi" path="res://assets/bosses/ExampleBossPhase1.tres" id="5"]
 [ext_resource type="Resource" uid="uid://68b5221as0ej" path="res://assets/bosses/ExampleBossPhase2.tres" id="6"]
@@ -15,7 +15,7 @@ collision_layer = 4
 collision_mask = 8
 script = ExtResource("1")
 MaxHealth = 300
-Gun = ExtResource("3")
+Gun = ExtResource("2_1a4dq")
 CanMelee = false
 MovementType = 1
 SpawnMovementSpeed = 8

@@ -9,14 +9,26 @@ public partial class MusicPlayer : AudioStreamPlayer
 {
 	private AudioStream pendingLoop;
 	private AudioStream activeLoop;
+	private Tween fadeTween;
 
 	public override void _Ready()
 	{
 		Finished += OnFinished;
 	}
 
+	// Fades the current track to silence over `duration` seconds.
+	public void FadeOut(float duration)
+	{
+		fadeTween?.Kill();
+		fadeTween = CreateTween();
+		fadeTween.TweenProperty(this, "volume_db", -60f, duration);
+	}
+
 	public void PlayMusic(AudioStream intro, AudioStream loop)
 	{
+		// Cancel any in-progress fade and restore full volume for the new track.
+		fadeTween?.Kill();
+		VolumeDb = 0f;
 		pendingLoop = null;
 		activeLoop = loop;
 		if (loop != null) SetStreamLoop(loop, true);

@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://ct6lxbpknk118"
+path="res://.godot/imported/Dichotomyoptic.aseprite-294ae2ef4a0cc4513be9c990b01e37e3.res"
+
+[deps]
+
+source_file="res://assets/sprites/Enemies/Dichotomyoptic.aseprite"
+dest_files=["res://.godot/imported/Dichotomyoptic.aseprite-294ae2ef4a0cc4513be9c990b01e37e3.res"]
+
+[params]
+

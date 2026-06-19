@@ -36,6 +36,13 @@ public partial class WallQueue : Node2D
 		if (stageChunks != null && stageChunks.Length > 0) {
 			chunks = stageChunks;
 		}
+		if (stage.WallFillTiles != null && stage.WallFillTiles.Length > 0) {
+			var fill = new WallFill();
+			fill.ZIndex = -5; // behind the wall chunks and gameplay, above the background
+			fill.Initialize(this, stage.WallFillTiles, stage.WallFillTileSize, stage.WallSpriteHalfWidth);
+			// Deferred: this runs during Main's own _Ready, when AddChild is rejected.
+			GetParent().CallDeferred(Node.MethodName.AddChild, fill);
+		}
 	}
 
 	// The resting inset this wall returns to (after a temporary contraction) and the

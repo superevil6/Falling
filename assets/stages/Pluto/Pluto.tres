@@ -15,6 +15,7 @@
 [ext_resource type="Resource" uid="uid://cjdgwmdwlob5u" path="res://assets/stage event/Both Wall Contract 30.tres" id="11_tfj1p"]
 [ext_resource type="Resource" uid="uid://cgjm6phgjv7pg" path="res://assets/stage event/Left Wall Contract 30.tres" id="12_kfmdv"]
 [ext_resource type="Resource" uid="uid://cn22x3e8ni2jj" path="res://assets/stage event/Right Wall Contract 30.tres" id="13_r76eu"]
+[ext_resource type="Texture2D" uid="uid://c2cdk30xq4fxe" path="res://assets/stages/Pluto/Backgrounds/Pluto background 2.png" id="15_da7gc"]
 
 [resource]
 script = ExtResource("11_fyero")
@@ -23,6 +24,7 @@ EnemyGroup = Array[Resource]([ExtResource("2_6o3ty"), ExtResource("7_s1mfs"), Ex
 Hazards = Array[PackedScene]([])
 LeftWallChunks = Array[PackedScene]([ExtResource("8_e7417"), ExtResource("9_tfj1p"), ExtResource("10_3wwq1"), ExtResource("11_kfmdv")])
 RightWallChunks = Array[PackedScene]([ExtResource("8_e7417"), ExtResource("9_tfj1p"), ExtResource("10_3wwq1"), ExtResource("11_kfmdv")])
+WallFillTiles = Array[Texture2D]([ExtResource("15_da7gc")])
 ScrollSpeed = 300.0
 BackgroundImages = Array[PackedScene]([ExtResource("1_tfj1p")])
 Background2Images = Array[PackedScene]([ExtResource("1_f0cpc")])

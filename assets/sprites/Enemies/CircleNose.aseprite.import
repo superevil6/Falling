@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://cr44jnpcn837y"
+path="res://.godot/imported/CircleNose.aseprite-6e4ec08768f2df332ec58bf1643fe67c.res"
+
+[deps]
+
+source_file="res://assets/sprites/Enemies/CircleNose.aseprite"
+dest_files=["res://.godot/imported/CircleNose.aseprite-6e4ec08768f2df332ec58bf1643fe67c.res"]
+
+[params]
+

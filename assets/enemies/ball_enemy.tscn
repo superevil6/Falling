@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://tng40x5blnrr"]
 
 [ext_resource type="Script" uid="uid://b3od7f8efylhu" path="res://assets/scripts/Enemy.cs" id="1_bhc83"]
-[ext_resource type="Resource" uid="uid://dpbu2nab2atvi" path="res://assets/weapons/Basic Slow Enemy Shot.tres" id="2_uvv66"]
+[ext_resource type="Resource" uid="uid://dpbu2nab2atvi" path="res://assets/weapons/Enemy Weapons/Basic Slow Enemy Shot.tres" id="2_uvv66"]
 [ext_resource type="Resource" uid="uid://t4f5lqyn51u2" path="res://assets/weapons/Simple Sword.tres" id="3_hiw2o"]
 [ext_resource type="Shader" uid="uid://nej1tvi1ocse" path="res://assets/shaders/PixelArt.gdshader" id="3_kirwa"]
 [ext_resource type="Texture2D" uid="uid://cum2gpblsuglx" path="res://assets/enemies/Ball Enemy.png" id="3_m04ux"]
@@ -93,9 +93,9 @@ animations = [{
 "speed": 10.0
 }]
 
-[node name="Ball Enemy" type="Area2D" groups=["Enemy"]]
+[node name="Ball Enemy" type="Area2D" unique_id=526864984 groups=["Enemy"]]
 position = Vector2(2, -1)
-scale = Vector2(0.284348, 0.288126)
+scale = Vector2(0.60434794, 0.6081258)
 collision_layer = 4
 collision_mask = 8
 script = ExtResource("1_bhc83")
@@ -113,11 +113,11 @@ ItemDrops = Array[Resource]([ExtResource("3_ntv5x"), ExtResource("4_ebkm7")])
 TeleportHesitationTime = 2.0
 metadata/Enemy = false
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=631487845]
 scale = Vector2(11.2173, 8.11782)
 shape = SubResource("CapsuleShape2D_kihfr")
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=198878853]
 texture_filter = 1
 material = SubResource("ShaderMaterial_58uc7")
 sprite_frames = SubResource("SpriteFrames_5sjef")

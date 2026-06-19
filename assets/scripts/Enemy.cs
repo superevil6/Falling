@@ -115,6 +115,7 @@ public partial class Enemy : Area2D
 	public int CurrentHealth {get;set;}
 	private float GunCoolDown;
 	private float meleeCoolDown;
+	private float firePatternAngle = 0f; // accumulates for Spiral fire patterns
 	private bool telegraphActive = false;
 	private const float TelegraphLeadTime = 0.5f;
 	public AnimatedSprite2D animatedSprite2D;
@@ -789,18 +790,22 @@ public partial class Enemy : Area2D
 	// attack patterns with alternate guns/angles. Does not touch GunCoolDown.
 	public void FireGun(Gun gun, float aimOffsetDegrees = 0f) {
 		if (gun == null || gun.BulletType == null || animatedSprite2D == null) return;
-		Vector2 aim = AimAtPlayerDirection();
-		if (aim == Vector2.Zero) return;
-		aim = aim.Rotated(Mathf.DegToRad(aimOffsetDegrees));
+		FirePattern pattern = gun.FirePattern;
+		Vector2 baseDir;
+		if (pattern != null && !pattern.AimAtPlayer) {
+			baseDir = Vector2.Right.Rotated(Mathf.DegToRad(pattern.FixedAngleDegrees));
+		} else {
+			baseDir = AimAtPlayerDirection();
+			if (baseDir == Vector2.Zero) return;
+		}
+		baseDir = baseDir.Rotated(Mathf.DegToRad(aimOffsetDegrees));
 		int baseDamage = Mathf.RoundToInt(gun.Damage * ComputeStageScale());
 		int boostedDamage = Mathf.RoundToInt(baseDamage * (1f + GetLeaderBoost(LeaderType.Attack)));
 		PlayAttackAnimation();
-		animatedSprite2D.LookAt(aim);
+		animatedSprite2D.LookAt(baseDir);
 		animatedSprite2D.Play();
-		int dirCount = Mathf.Max(1, gun.DirectionalCount);
-		float dirStep = Mathf.DegToRad(gun.DirectionalAngle);
-		for (int d = 0; d < dirCount; d++) {
-			Vector2 dir = aim.Rotated(dirStep * d);
+		foreach (Vector2 baseDirection in BuildPatternDirections(gun, pattern, baseDir)) {
+			Vector2 dir = baseDirection;
 			if (gun.BulletSpread > 0f) {
 				dir = dir.Rotated(Mathf.DegToRad(rng.RandfRange(0f, gun.BulletSpread)));
 			}
@@ -821,6 +826,44 @@ public partial class Enemy : Area2D
 				GetParent().AddChild(b);
 			}
 		}
+	}
+
+	// Builds the base directions for one shot from the gun's FirePattern. With no
+	// pattern it falls back to the legacy DirectionalCount/DirectionalAngle fan.
+	private List<Vector2> BuildPatternDirections(Gun gun, FirePattern pattern, Vector2 baseDir) {
+		var dirs = new List<Vector2>();
+		if (pattern == null) {
+			int dc = Mathf.Max(1, gun.DirectionalCount);
+			float step = Mathf.DegToRad(gun.DirectionalAngle);
+			for (int d = 0; d < dc; d++) dirs.Add(baseDir.Rotated(step * d));
+			return dirs;
+		}
+		int count = Mathf.Max(1, pattern.Count);
+		switch (pattern.Type) {
+			case FirePatternType.Spread:
+				if (count == 1) { dirs.Add(baseDir); break; }
+				float arc = Mathf.DegToRad(pattern.ArcDegrees);
+				float spreadStart = -arc / 2f;
+				float spreadStep = arc / (count - 1);
+				for (int i = 0; i < count; i++) dirs.Add(baseDir.Rotated(spreadStart + spreadStep * i));
+				break;
+			case FirePatternType.Ring:
+				float ringStep = Mathf.Tau / count;
+				for (int i = 0; i < count; i++) dirs.Add(baseDir.Rotated(ringStep * i));
+				break;
+			case FirePatternType.Spiral:
+				// Advance the aim a step each shot so successive shots trace a circle.
+				Vector2 spun = baseDir.Rotated(Mathf.DegToRad(firePatternAngle));
+				firePatternAngle = (firePatternAngle + pattern.SpinDegrees) % 360f;
+				if (count == 1) { dirs.Add(spun); break; }
+				float armStep = Mathf.Tau / count;
+				for (int i = 0; i < count; i++) dirs.Add(spun.Rotated(armStep * i));
+				break;
+			default: // Targeted
+				dirs.Add(baseDir);
+				break;
+		}
+		return dirs;
 	}
 
 	// Direction from this enemy to the player (zero if no player is found).

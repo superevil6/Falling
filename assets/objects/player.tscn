@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dhriy820co01m" path="res://assets/scripts/Player.cs" id="1_l4bou"]
 [ext_resource type="PackedScene" uid="uid://cf1pg2x8l8lpf" path="res://assets/objects/bullet.tscn" id="2_34ecl"]
-[ext_resource type="Resource" uid="uid://cc5s5y6gpiagm" path="res://assets/weapons/Pistol.tres" id="3_34ecl"]
+[ext_resource type="Resource" uid="uid://svn642061r6v" path="res://assets/weapons/Swarm Cannon.tres" id="3_34ecl"]
 [ext_resource type="Resource" uid="uid://t4f5lqyn51u2" path="res://assets/weapons/Simple Sword.tres" id="3_idqgg"]
 [ext_resource type="Resource" uid="uid://dib52vs6i4eql" path="res://assets/weapons/Bubbler.tres" id="4_34ecl"]
 [ext_resource type="Texture2D" uid="uid://dsmm5pqbthh2x" path="res://assets/objects/temp player.png" id="4_g5vn5"]
@@ -95,7 +95,7 @@ size = Vector2(66.5639, 187.5)
 
 [node name="Player" type="CharacterBody2D" unique_id=431171586]
 position = Vector2(0, -2)
-scale = Vector2(0.405625, 0.4)
+scale = Vector2(0.6056269, 0.66635567)
 collision_layer = 2
 collision_mask = 17
 script = ExtResource("1_l4bou")

@@ -1,0 +1,8 @@
+[gd_resource type="Resource" format=3 uid="uid://b7ring16xk2mq"]
+
+[ext_resource type="Script" uid="uid://diq7ylg5d37mf" path="res://assets/scripts/FirePattern.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+Type = 2
+Count = 16

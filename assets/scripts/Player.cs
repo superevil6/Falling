@@ -98,6 +98,7 @@ public partial class Player : CharacterBody2D
 	private Shader afterImageShader;
 	private Line2D activeLaser;
 	private readonly System.Collections.Generic.List<Node2D> laserSegments = new();
+	private double laserWaveTime; // advances the wavy-laser animation (Wave upgrade)
 	private Line2D laserSightLine;
 	private Line2D activeLightning;
 	private readonly System.Collections.Generic.List<Node2D> lightningSegments = new();
@@ -742,46 +743,58 @@ public partial class Player : CharacterBody2D
 		for (int beam = 0; beam < beamCount; beam++) {
 			float beamAngle = beamCount == 1 ? 0f : -halfSpread + beam * (effectiveSpread / (beamCount - 1));
 			Vector2 beamDir = aimDirection.Normalized().Rotated(beamAngle);
-			Vector2 currentFrom = from;
-			Vector2 currentDir = beamDir;
-			var path = new List<Vector2> { from };
-			int bouncesLeft = Mathf.Max(0, Gun.Ricochet);
-			while (true) {
-				Vector2 to = currentFrom + currentDir * ScreenSize.Length();
-				var query = PhysicsRayQueryParameters2D.Create(currentFrom, to);
-				query.CollideWithAreas = true;
-				query.CollideWithBodies = true;
-				query.CollisionMask = 5;
-				var excluded = new Godot.Collections.Array<Rid>();
-				Vector2 endPoint = to;
-				Vector2 hitNormal = Vector2.Zero;
-				Enemy hitEnemy = null;
-				DestructibleObstacle hitObstacle = null;
-				int safety = 32;
-				while (safety-- > 0) {
-					query.Exclude = excluded;
-					var result = spaceState.IntersectRay(query);
-					if (result.Count == 0) break;
-					var collider = result["collider"].As<Node>();
-					if (collider is Pickup pickup) {
-						excluded.Add(pickup.GetRid());
-						continue;
+			List<Vector2> path;
+			if (Gun.HeatSeeking > 0f) {
+				// Heat-seeking: march a curving beam toward the nearest enemy.
+				path = BuildHeatSeekBeam(from, beamDir, spaceState, hitEnemies, hitObstacles);
+			} else {
+				Vector2 currentFrom = from;
+				Vector2 currentDir = beamDir;
+				path = new List<Vector2> { from };
+				int bouncesLeft = Mathf.Max(0, Gun.Ricochet);
+				while (true) {
+					Vector2 to = currentFrom + currentDir * ScreenSize.Length();
+					var query = PhysicsRayQueryParameters2D.Create(currentFrom, to);
+					query.CollideWithAreas = true;
+					query.CollideWithBodies = true;
+					query.CollisionMask = 5;
+					var excluded = new Godot.Collections.Array<Rid>();
+					Vector2 endPoint = to;
+					Vector2 hitNormal = Vector2.Zero;
+					Enemy hitEnemy = null;
+					DestructibleObstacle hitObstacle = null;
+					int safety = 32;
+					while (safety-- > 0) {
+						query.Exclude = excluded;
+						var result = spaceState.IntersectRay(query);
+						if (result.Count == 0) break;
+						var collider = result["collider"].As<Node>();
+						if (collider is Pickup pickup) {
+							excluded.Add(pickup.GetRid());
+							continue;
+						}
+						endPoint = (Vector2)result["position"];
+						hitNormal = (Vector2)result["normal"];
+						if (collider is Enemy e) hitEnemy = e;
+						else if (collider is DestructibleObstacle d) hitObstacle = d;
+						break;
 					}
-					endPoint = (Vector2)result["position"];
-					hitNormal = (Vector2)result["normal"];
-					if (collider is Enemy e) hitEnemy = e;
-					else if (collider is DestructibleObstacle d) hitObstacle = d;
-					break;
+					path.Add(endPoint);
+					if (hitEnemy != null) hitEnemies.Add(hitEnemy);
+					if (hitObstacle != null) hitObstacles.Add(hitObstacle);
+					if (bouncesLeft <= 0 || hitNormal == Vector2.Zero || endPoint.DistanceSquaredTo(currentFrom) < 1f) break;
+					currentDir = (currentDir - 2f * currentDir.Dot(hitNormal) * hitNormal).Normalized();
+					currentFrom = endPoint + currentDir * 1f;
+					bouncesLeft--;
 				}
-				path.Add(endPoint);
-				if (hitEnemy != null) hitEnemies.Add(hitEnemy);
-				if (hitObstacle != null) hitObstacles.Add(hitObstacle);
-				if (bouncesLeft <= 0 || hitNormal == Vector2.Zero || endPoint.DistanceSquaredTo(currentFrom) < 1f) break;
-				currentDir = (currentDir - 2f * currentDir.Dot(hitNormal) * hitNormal).Normalized();
-				currentFrom = endPoint + currentDir * 1f;
-				bouncesLeft--;
 			}
 			allPaths.Add(path);
+		}
+		// Wave upgrade: undulate the rendered beam. Hit detection above stays along
+		// the straight ray, so the beam still damages along its aimed axis.
+		if (Gun.Wave > 0f) {
+			laserWaveTime += GetProcessDeltaTime();
+			for (int i = 0; i < allPaths.Count; i++) allPaths[i] = MakeWavyPath(allPaths[i]);
 		}
 		int totalSegments = 0;
 		foreach (var p in allPaths) totalSegments += p.Count - 1;
@@ -842,6 +855,92 @@ public partial class Player : CharacterBody2D
 			foreach (var o in hitObstacles) o.TakeDamage(Gun.Damage);
 			gunCoolDown = Gun.FireRate * StatusEffects.GetFireRateMultiplier();
 		}
+	}
+
+	// Heat-seeking laser: marches the beam outward in short steps, steering each step
+	// toward the nearest enemy so it curves to home in. Stops at the first thing hit;
+	// records the hit enemy/obstacle. Frequency of the curve scales with Gun.HeatSeeking.
+	private System.Collections.Generic.List<Vector2> BuildHeatSeekBeam(
+		Vector2 from, Vector2 dir, PhysicsDirectSpaceState2D spaceState,
+		List<Enemy> hitEnemies, List<DestructibleObstacle> hitObstacles)
+	{
+		var path = new System.Collections.Generic.List<Vector2> { from };
+		var noVisited = new HashSet<Enemy>();
+		Vector2 pos = from;
+		dir = dir.Normalized();
+		float stepLen = 22f;
+		float maxLen = ScreenSize.Length();
+		float traveled = 0f;
+		float turn = Mathf.Clamp(Gun.HeatSeeking * 0.05f, 0f, 0.5f);
+		int safety = 256;
+		while (traveled < maxLen && safety-- > 0) {
+			Enemy target = FindNearestEnemy(pos, noVisited, maxLen);
+			if (target != null) {
+				Vector2 toTarget = (target.GlobalPosition - pos).Normalized();
+				if (toTarget != Vector2.Zero) dir = dir.Slerp(toTarget, turn).Normalized();
+			}
+			Vector2 next = pos + dir * stepLen;
+			var query = PhysicsRayQueryParameters2D.Create(pos, next);
+			query.CollideWithAreas = true;
+			query.CollideWithBodies = true;
+			query.CollisionMask = 5;
+			var excluded = new Godot.Collections.Array<Rid>();
+			Vector2 endPoint = next;
+			bool hit = false;
+			int safety2 = 8;
+			while (safety2-- > 0) {
+				query.Exclude = excluded;
+				var result = spaceState.IntersectRay(query);
+				if (result.Count == 0) break;
+				var collider = result["collider"].As<Node>();
+				if (collider is Pickup pickup) { excluded.Add(pickup.GetRid()); continue; }
+				endPoint = (Vector2)result["position"];
+				if (collider is Enemy e) hitEnemies.Add(e);
+				else if (collider is DestructibleObstacle d) hitObstacles.Add(d);
+				hit = true;
+				break;
+			}
+			if (hit) { path.Add(endPoint); break; }
+			path.Add(next);
+			pos = next;
+			traveled += stepLen;
+		}
+		return path;
+	}
+
+	// Rebuilds a straight beam polyline as a sine wave: each point is displaced
+	// perpendicular by amplitude that peaks mid-beam (so the muzzle and the hit point
+	// stay anchored) and scrolls outward over time. Frequency scales with Gun.Wave.
+	private System.Collections.Generic.List<Vector2> MakeWavyPath(System.Collections.Generic.List<Vector2> straight)
+	{
+		if (straight.Count < 2) return straight;
+		float totalLen = 0f;
+		for (int i = 0; i < straight.Count - 1; i++) totalLen += straight[i].DistanceTo(straight[i + 1]);
+		if (totalLen < 1f) return straight;
+		float amp = 24f * BeamThickness(Gun);
+		float k = Gun.Wave * 0.03f;
+		float phase = (float)(laserWaveTime * Gun.Wave * 3f);
+		var result = new System.Collections.Generic.List<Vector2> { straight[0] };
+		float distAccum = 0f;
+		for (int i = 0; i < straight.Count - 1; i++) {
+			Vector2 a = straight[i];
+			Vector2 b = straight[i + 1];
+			Vector2 seg = b - a;
+			float segLen = seg.Length();
+			if (segLen < 0.001f) { result.Add(b); continue; }
+			Vector2 dir = seg / segLen;
+			Vector2 perp = new Vector2(-dir.Y, dir.X);
+			int steps = Mathf.Max(1, Mathf.RoundToInt(segLen / 14f));
+			for (int s = 1; s <= steps; s++) {
+				float along = segLen * ((float)s / steps);
+				float d = distAccum + along;
+				float envelope = Mathf.Sin(Mathf.Pi * d / totalLen);
+				float disp = amp * envelope * Mathf.Sin(d * k - phase);
+				result.Add(a + dir * along + perp * disp);
+			}
+			distAccum += segLen;
+		}
+		return result;
 	}
 
 	private void ClearLaser()

@@ -21,6 +21,10 @@ public partial class Gun : Resource
 	public int DirectionalCount {get;set;} = 1;
 	[Export]
 	public float DirectionalAngle {get;set;} = 0f;
+	// Optional shot-shape for enemy/boss fire (cone, ring, spiral, fixed direction).
+	// Null keeps the legacy DirectionalCount/DirectionalAngle fan.
+	[Export]
+	public FirePattern FirePattern {get;set;}
 	[Export]
 	public float MultiBulletAngle {get;set;}
 	[Export]
@@ -43,6 +47,23 @@ public partial class Gun : Resource
 	public float ExplosionRadius {get;set;} = 0f;
 	[Export]
 	public int Split {get;set;}
+	// "Carrier" bullet: while alive it periodically fires sub-bullets that deal half
+	// its damage. Sub-bullets don't carry the gun, so they never recurse or explode.
+	[Export]
+	public bool BulletShootsBullets {get;set;} = false;
+	[Export]
+	public float SubBulletInterval {get;set;} = 0.25f;
+	[Export]
+	public int SubBulletCount {get;set;} = 1;
+	// Rotates the emission directions each burst, for a spiral spray.
+	[Export]
+	public float SubBulletSpinDegrees {get;set;} = 40f;
+	// Sub-bullet speed; 0 = derive from the carrier's speed.
+	[Export]
+	public float SubBulletSpeed {get;set;} = 0f;
+	// Scene for sub-bullets; null = reuse the gun's BulletType.
+	[Export]
+	public PackedScene SubBulletType {get;set;}
 	[Export]
 	public int Ricochet {get;set;}
 	[Export]
