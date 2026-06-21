@@ -3,6 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://cf1pg2x8l8lpf" path="res://assets/objects/bullet.tscn" id="1_2sfgy"]
 [ext_resource type="SpriteFrames" uid="uid://bpy3kg530tusc" path="res://assets/sprites/Weapons/Lightning Bullet.aseprite" id="1_u57il"]
 [ext_resource type="Texture2D" uid="uid://bwshqc8c7busx" path="res://assets/sprites/Weapons/Tesla Coil.png" id="2_2sfgy"]
+[ext_resource type="AudioStream" uid="uid://l84jimghegj2" path="res://assets/SFX/Electric Zap.mp3" id="3_3r5fk"]
 [ext_resource type="Script" uid="uid://cvu57cdie1j01" path="res://assets/scripts/Gun.cs" id="3_kqu7e"]
 
 [resource]
@@ -14,6 +15,7 @@ Damage = 3
 BulletCount = 1
 MultiBulletAngle = 0.3
 BulletType = ExtResource("1_2sfgy")
+FireSound = ExtResource("3_3r5fk")
 BulletSpriteFrames = ExtResource("1_u57il")
 BulletLifetime = 1.0
 BulletSize = 2.0

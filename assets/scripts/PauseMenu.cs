@@ -21,6 +21,7 @@ public partial class PauseMenu : CanvasLayer
 			GetTree().Paused = !GetTree().Paused;
 			if (GetTree().Paused)
 			{
+				Sfx.PlaySelect(this);
 				GetNode<Button>("VBoxContainer/Unpause").GrabFocus();
 				Engine.TimeScale = 0;
 				RefreshLoadout();
@@ -28,6 +29,7 @@ public partial class PauseMenu : CanvasLayer
 			}
 			else
 			{
+				Sfx.PlayCancel(this);
 				Engine.TimeScale = 1;
 				Visible = false;
 			}

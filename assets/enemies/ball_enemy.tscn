@@ -7,6 +7,8 @@
 [ext_resource type="Texture2D" uid="uid://cum2gpblsuglx" path="res://assets/enemies/Ball Enemy.png" id="3_m04ux"]
 [ext_resource type="Resource" uid="uid://yinsm4qyoywv" path="res://assets/pickups/Health Pickup.tres" id="3_ntv5x"]
 [ext_resource type="Resource" uid="uid://bpi2u85b8oi7t" path="res://assets/pickups/Small EXP Pickup.tres" id="4_ebkm7"]
+[ext_resource type="AudioStream" uid="uid://d1nlr5l64mmvq" path="res://assets/SFX/Explosion.wav" id="5_mx7il"]
+[ext_resource type="PackedScene" uid="uid://dq5bq4jsc66se" path="res://assets/objects/Explosion.tscn" id="6_shkpx"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_kihfr"]
 radius = 6.50781
@@ -109,6 +111,8 @@ SpawnMovementSpeed = 8
 MovementSpeed = 150.0
 Size = 2.0
 EnemySprite = ExtResource("3_m04ux")
+DeathSound = ExtResource("5_mx7il")
+DeathExplosions = ExtResource("6_shkpx")
 ItemDrops = Array[Resource]([ExtResource("3_ntv5x"), ExtResource("4_ebkm7")])
 TeleportHesitationTime = 2.0
 metadata/Enemy = false

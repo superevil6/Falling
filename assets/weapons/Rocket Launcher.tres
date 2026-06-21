@@ -1,9 +1,10 @@
-[gd_resource type="Resource" load_steps=5 format=3 uid="uid://crt30p2jp82qs"]
+[gd_resource type="Resource" format=3 uid="uid://crt30p2jp82qs"]
 
 [ext_resource type="SpriteFrames" uid="uid://bfa3p7wq3kr2y" path="res://assets/sprites/Weapons/Rocket Bullet.aseprite" id="1_8y72v"]
 [ext_resource type="PackedScene" uid="uid://cf1pg2x8l8lpf" path="res://assets/objects/bullet.tscn" id="1_b3k2y"]
 [ext_resource type="Texture2D" uid="uid://oi0sb0fv6vco" path="res://assets/sprites/Weapons/Rocket Launcher.png" id="2_b3k2y"]
 [ext_resource type="Script" uid="uid://cvu57cdie1j01" path="res://assets/scripts/Gun.cs" id="3_lu7bq"]
+[ext_resource type="AudioStream" uid="uid://cs8jnp0a1mxjj" path="res://assets/SFX/Rocket.wav" id="3_rk8g3"]
 
 [resource]
 script = ExtResource("3_lu7bq")
@@ -11,10 +12,11 @@ GunImage = ExtResource("2_b3k2y")
 GunType = 4
 GunDescription = "Fires exploding rounds. Slow attack speed, high damage, and hits multiple enemies."
 FireRate = 1.0
-Damage = 40
+Damage = 20
 BulletCount = 1
 MultiBulletAngle = 0.3
 BulletType = ExtResource("1_b3k2y")
+FireSound = ExtResource("3_rk8g3")
 BulletSpriteFrames = ExtResource("1_8y72v")
 BulletLifetime = 1.0
 Explode = true

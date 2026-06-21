@@ -6,6 +6,9 @@ public partial class Pickup : Area2D
 	public float MagnetRadius {get;set;} = 100f;
 	[Export]
 	public float MagnetSpeed {get;set;} = 300f;
+	// Sound played when the player collects this pickup.
+	[Export]
+	public AudioStream PickupSound {get;set;}
 
 	private Player player;
 
@@ -37,6 +40,7 @@ public partial class Pickup : Area2D
 	{
 		if (area.GetParent() is Player p) {
 			OnCollected(p);
+			Sfx.Play(this, PickupSound);
 			QueueFree();
 		}
 	}

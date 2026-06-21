@@ -370,7 +370,10 @@ public partial class Player : CharacterBody2D
 		int finalDamage = Mathf.Max(0, Mathf.RoundToInt(dmg) - DamageReduction);
 		CurrentHealth -= finalDamage;
 		GetParent().GetNode<TextureProgressBar>("Health Bar").Value = CurrentHealth;
-		if (finalDamage > 0) FloatingDamageText.Spawn(this, GlobalPosition, finalDamage, FloatingDamageText.ElementColor(element, new Color(1f, 0.4f, 0.4f)));
+		if (finalDamage > 0) {
+			FloatingDamageText.Spawn(this, GlobalPosition, finalDamage, FloatingDamageText.ElementColor(element, new Color(1f, 0.4f, 0.4f)));
+			Sfx.PlayHit(this);
+		}
 		FlashRed();
 	}
 
@@ -672,6 +675,7 @@ public partial class Player : CharacterBody2D
 
 	private void Shoot(Vector2 aimDirection) {
 		animatedSprite2D.Animation = "Shooting";
+		Sfx.Play(this, Gun.FireSound);
 		int dirCount = Mathf.Max(1, Gun.DirectionalCount);
 		float dirStep = Mathf.DegToRad(Gun.DirectionalAngle);
 		for (int d = 0; d < dirCount; d++) {

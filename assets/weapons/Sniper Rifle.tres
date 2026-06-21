@@ -1,9 +1,10 @@
-[gd_resource type="Resource" load_steps=5 format=3 uid="uid://ktyac25vkuh7"]
+[gd_resource type="Resource" format=3 uid="uid://ktyac25vkuh7"]
 
 [ext_resource type="SpriteFrames" uid="uid://bb7nrvc0kw37n" path="res://assets/sprites/Weapons/Bullet 3.aseprite" id="1_6ihid"]
 [ext_resource type="PackedScene" uid="uid://cf1pg2x8l8lpf" path="res://assets/objects/bullet.tscn" id="1_jisv3"]
 [ext_resource type="Texture2D" uid="uid://u7faqv4fufa0" path="res://assets/sprites/Weapons/Sniper Rifle.png" id="2_6ihid"]
 [ext_resource type="Script" uid="uid://cvu57cdie1j01" path="res://assets/scripts/Gun.cs" id="2_ysa6b"]
+[ext_resource type="AudioStream" uid="uid://dvijwtqha2lcw" path="res://assets/SFX/Gun Shot.mp3" id="3_grjp6"]
 
 [resource]
 script = ExtResource("2_ysa6b")
@@ -13,6 +14,7 @@ Damage = 10
 BulletCount = 1
 MultiBulletAngle = 0.1
 BulletType = ExtResource("1_jisv3")
+FireSound = ExtResource("3_grjp6")
 BulletSpriteFrames = ExtResource("1_6ihid")
 BulletLifetime = 2.0
 BulletSize = 2.0

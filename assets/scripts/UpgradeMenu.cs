@@ -19,7 +19,8 @@ public partial class UpgradeMenu : CanvasLayer
 		if (Input.IsActionJustPressed("menu")) {
 			Visible = !Visible;
 			GetTree().Paused = Visible;
-			if (Visible) RefreshContent();
+			if (Visible) { Sfx.PlaySelect(this); RefreshContent(); }
+			else Sfx.PlayCancel(this);
 		}
 	}
 

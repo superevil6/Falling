@@ -1,9 +1,10 @@
-[gd_resource type="Resource" load_steps=5 format=3 uid="uid://likngwjw3bfh"]
+[gd_resource type="Resource" format=3 uid="uid://likngwjw3bfh"]
 
 [ext_resource type="SpriteFrames" uid="uid://btlmj76g0xc37" path="res://assets/sprites/Weapons/Seeking Bullet.aseprite" id="1_61ps0"]
 [ext_resource type="PackedScene" uid="uid://cf1pg2x8l8lpf" path="res://assets/objects/bullet.tscn" id="1_ha3na"]
 [ext_resource type="Texture2D" uid="uid://drlpm883n8w5y" path="res://assets/sprites/Weapons/Heat Seeker.png" id="2_61ps0"]
 [ext_resource type="Script" uid="uid://cvu57cdie1j01" path="res://assets/scripts/Gun.cs" id="2_p16ca"]
+[ext_resource type="AudioStream" uid="uid://dvijwtqha2lcw" path="res://assets/SFX/Gun Shot.mp3" id="3_g6lr1"]
 
 [resource]
 script = ExtResource("2_p16ca")
@@ -15,6 +16,7 @@ Damage = 5
 BulletCount = 1
 MultiBulletAngle = 0.3
 BulletType = ExtResource("1_ha3na")
+FireSound = ExtResource("3_g6lr1")
 BulletSpriteFrames = ExtResource("1_61ps0")
 BulletLifetime = 1.0
 HeatSeeking = 5.0

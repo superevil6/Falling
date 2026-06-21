@@ -3,6 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://cf1pg2x8l8lpf" path="res://assets/objects/bullet.tscn" id="1_mlp2x"]
 [ext_resource type="Script" uid="uid://cvu57cdie1j01" path="res://assets/scripts/Gun.cs" id="2_10ltj"]
 [ext_resource type="Texture2D" uid="uid://befuhie2mbaf0" path="res://assets/sprites/Weapons/MultiDirectional.png" id="2_bdcc4"]
+[ext_resource type="AudioStream" uid="uid://dvijwtqha2lcw" path="res://assets/SFX/Gun Shot.mp3" id="2_prg7x"]
 
 [resource]
 script = ExtResource("2_10ltj")
@@ -14,5 +15,6 @@ DirectionalCount = 2
 DirectionalAngle = 180.0
 MultiBulletAngle = 0.3
 BulletType = ExtResource("1_mlp2x")
+FireSound = ExtResource("2_prg7x")
 BulletLifetime = 1.0
 GunUpgrades = null

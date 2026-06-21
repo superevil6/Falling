@@ -37,6 +37,7 @@ public partial class SelectionMenu : CanvasLayer
 			UpdateHighlight();
 		}
 		if (Input.IsActionJustPressed("menu_confirm")) {
+			Sfx.PlaySelect(this);
 			if (currentPicks != null && selectedIndex >= 0 && selectedIndex < currentPicks.Length) {
 				ApplyPickToPlayer(currentPicks[selectedIndex]);
 			}

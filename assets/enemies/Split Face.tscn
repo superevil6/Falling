@@ -3,7 +3,9 @@
 [ext_resource type="Script" uid="uid://b3od7f8efylhu" path="res://assets/scripts/Enemy.cs" id="1_5vbsj"]
 [ext_resource type="Resource" uid="uid://dq3psdjhaotip" path="res://assets/weapons/Multi-Direction Blaster.tres" id="2_5vbsj"]
 [ext_resource type="Resource" uid="uid://t4f5lqyn51u2" path="res://assets/weapons/Simple Sword.tres" id="3_5vfmq"]
+[ext_resource type="AudioStream" uid="uid://d1nlr5l64mmvq" path="res://assets/SFX/Explosion.wav" id="4_ijrc5"]
 [ext_resource type="Resource" uid="uid://yinsm4qyoywv" path="res://assets/pickups/Health Pickup.tres" id="5_3ocab"]
+[ext_resource type="PackedScene" uid="uid://dq5bq4jsc66se" path="res://assets/objects/Explosion.tscn" id="5_5vfmq"]
 [ext_resource type="Resource" uid="uid://bpi2u85b8oi7t" path="res://assets/pickups/Small EXP Pickup.tres" id="6_jupw6"]
 [ext_resource type="Shader" uid="uid://nej1tvi1ocse" path="res://assets/shaders/PixelArt.gdshader" id="7_ewf01"]
 [ext_resource type="SpriteFrames" uid="uid://xuti13rygkjs" path="res://assets/sprites/Enemies/Split Face.ase" id="8_ijrc5"]
@@ -34,6 +36,8 @@ MovementType = 1
 SpawnMovementSpeed = 8
 MovementSpeed = 150.0
 Size = 2.0
+DeathSound = ExtResource("4_ijrc5")
+DeathExplosions = ExtResource("5_5vfmq")
 ItemDrops = Array[Resource]([ExtResource("5_3ocab"), ExtResource("6_jupw6")])
 TeleportHesitationTime = 2.0
 metadata/Enemy = false

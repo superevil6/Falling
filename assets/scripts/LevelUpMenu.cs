@@ -61,6 +61,7 @@ public partial class LevelUpMenu : CanvasLayer
 		}
 		AnimateRotation();
 		if (Input.IsActionJustPressed("menu_confirm")) {
+			Sfx.PlaySelect(this);
 			if (currentGun != null && currentGunUpgrades != null
 				&& selectedIndex >= 0 && selectedIndex < currentGunUpgrades.Length) {
 				currentGun.ApplyUpgrade(currentGunUpgrades[selectedIndex]);

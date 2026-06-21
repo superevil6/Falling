@@ -1,9 +1,10 @@
-[gd_resource type="Resource" load_steps=5 format=3 uid="uid://wbajl8smb0i2"]
+[gd_resource type="Resource" format=3 uid="uid://wbajl8smb0i2"]
 
 [ext_resource type="SpriteFrames" uid="uid://vi5cxtmr70h2" path="res://assets/sprites/Weapons/Laser Bullet.aseprite" id="1_ahwpj"]
 [ext_resource type="PackedScene" uid="uid://cf1pg2x8l8lpf" path="res://assets/objects/bullet.tscn" id="1_lv7dq"]
 [ext_resource type="Texture2D" uid="uid://b2krutswihon2" path="res://assets/sprites/Weapons/Charge Blaster.png" id="2_ahwpj"]
 [ext_resource type="Script" uid="uid://cvu57cdie1j01" path="res://assets/scripts/Gun.cs" id="2_w4dy4"]
+[ext_resource type="AudioStream" uid="uid://dek2bbxqhd24t" path="res://assets/SFX/Laser.wav" id="3_aeofw"]
 
 [resource]
 script = ExtResource("2_w4dy4")
@@ -15,6 +16,7 @@ Damage = 1
 BulletCount = 1
 MultiBulletAngle = 0.3
 BulletType = ExtResource("1_lv7dq")
+FireSound = ExtResource("3_aeofw")
 BulletSpriteFrames = ExtResource("1_ahwpj")
 BulletLifetime = 1.0
 IsChargeWeapon = true

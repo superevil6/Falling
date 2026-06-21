@@ -35,6 +35,13 @@ public partial class Enemy : Area2D
 	public float Size {get;set;}
 	[Export]
 	public Texture2D EnemySprite {get;set;}
+	// Sound played once when this enemy dies/explodes.
+	[Export]
+	public AudioStream DeathSound {get;set;}
+	// Spawned over the enemy on death (the scene handles its own random variation).
+	// Null = nothing.
+	[Export]
+	public PackedScene DeathExplosions {get;set;}
 	[Export]
 	public AttackDirection AttackDirection {get; set;}
 	[Export]
@@ -499,6 +506,7 @@ public partial class Enemy : Area2D
 		CurrentHealth -= finalDamage;
 		if (finalDamage > 0) FloatingDamageText.Spawn(this, GlobalPosition, finalDamage, FloatingDamageText.ElementColor(element, new Color(1f, 0.95f, 0.85f)));
 		if (CurrentHealth > 0) FlashRed();
+		if (finalDamage > 0 && CurrentHealth > 0) Sfx.PlayHit(this); // death sound covers lethal hits
 		hasBeenHit = true;
 		QueueRedraw();
 		if (this.IsCore == true && CurrentHealth <= 0 && !coreDeathTriggered) {
@@ -555,6 +563,8 @@ public partial class Enemy : Area2D
 	{
 		if (isDying) return;
 		isDying = true;
+		Sfx.Play(this, DeathSound);
+		SpawnDeathExplosion();
 		PlayDeathAnimation(animatedSprite2D);
 		var frames = animatedSprite2D?.SpriteFrames;
 		string anim = animatedSprite2D?.Animation;
@@ -564,6 +574,18 @@ public partial class Enemy : Area2D
 			if (fps > 0f) deathAnimTimer = frameCount / fps;
 		}
 		if (deathAnimTimer <= 0f) deathAnimTimer = 0.5f;
+	}
+
+	// Spawns the DeathExplosions scene over the enemy (the scene handles its own random
+	// variation). Parented to the enemy's parent so it outlives the enemy being freed.
+	private void SpawnDeathExplosion()
+	{
+		if (DeathExplosions == null) return;
+		Vector2 pos = GlobalPosition;
+		var explosion = DeathExplosions.Instantiate<Node2D>();
+		explosion.ZIndex = 20; // over the enemy
+		GetParent().AddChild(explosion);
+		explosion.GlobalPosition = pos;
 	}
 
 	private void HandleDeathFinished()
@@ -799,6 +821,7 @@ public partial class Enemy : Area2D
 			if (baseDir == Vector2.Zero) return;
 		}
 		baseDir = baseDir.Rotated(Mathf.DegToRad(aimOffsetDegrees));
+		Sfx.Play(this, gun.FireSound);
 		int baseDamage = Mathf.RoundToInt(gun.Damage * ComputeStageScale());
 		int boostedDamage = Mathf.RoundToInt(baseDamage * (1f + GetLeaderBoost(LeaderType.Attack)));
 		PlayAttackAnimation();

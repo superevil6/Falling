@@ -31,6 +31,9 @@ public partial class Gun : Resource
 	public float BulletSpread {get;set;} = 0f;
 	[Export]
 	public PackedScene BulletType {get;set;}
+	// Sound played each time this gun fires (player or enemy).
+	[Export]
+	public AudioStream FireSound {get;set;}
 	[Export]
 	public float BulletSpeed {get;set;} = 2000f;
 	[Export]

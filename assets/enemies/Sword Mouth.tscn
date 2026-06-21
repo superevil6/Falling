@@ -1,0 +1,72 @@
+[gd_scene format=3 uid="uid://bb41cicd8h42y"]
+
+[ext_resource type="Script" uid="uid://b3od7f8efylhu" path="res://assets/scripts/Enemy.cs" id="1_pxaj7"]
+[ext_resource type="Resource" uid="uid://t4f5lqyn51u2" path="res://assets/weapons/Simple Sword.tres" id="3_jlnhk"]
+[ext_resource type="Texture2D" uid="uid://cum2gpblsuglx" path="res://assets/enemies/Ball Enemy.png" id="4_rws48"]
+[ext_resource type="AudioStream" uid="uid://d1nlr5l64mmvq" path="res://assets/SFX/Explosion.wav" id="5_v8jyq"]
+[ext_resource type="PackedScene" uid="uid://dq5bq4jsc66se" path="res://assets/objects/Explosion.tscn" id="6_ppvny"]
+[ext_resource type="Resource" uid="uid://yinsm4qyoywv" path="res://assets/pickups/Health Pickup.tres" id="7_76elj"]
+[ext_resource type="Resource" uid="uid://bpi2u85b8oi7t" path="res://assets/pickups/Small EXP Pickup.tres" id="8_c0aq2"]
+[ext_resource type="Shader" uid="uid://nej1tvi1ocse" path="res://assets/shaders/PixelArt.gdshader" id="9_bjysw"]
+[ext_resource type="SpriteFrames" uid="uid://d072v2a1vc3mg" path="res://assets/sprites/Enemies/Sword Mouth.ase" id="10_4c076"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_kihfr"]
+radius = 6.50781
+height = 22.282291
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_58uc7"]
+shader = ExtResource("9_bjysw")
+shader_parameter/pixel_size = 4.0
+shader_parameter/color_steps = 8
+shader_parameter/hue_shift = 0.0
+shader_parameter/darkness = 0.0
+
+[node name="Sword Mouth" type="Area2D" unique_id=526864984 groups=["Enemy"]]
+position = Vector2(2, -1)
+scale = Vector2(0.60434794, 0.6081258)
+collision_layer = 4
+collision_mask = 8
+script = ExtResource("1_pxaj7")
+MaxHealth = 10
+Melee = ExtResource("3_jlnhk")
+MeleeCooldown = 1.0
+MovementType = 1
+SpawnMovementSpeed = 8
+MovementSpeed = 150.0
+Size = 2.0
+EnemySprite = ExtResource("4_rws48")
+DeathSound = ExtResource("5_v8jyq")
+DeathExplosions = ExtResource("6_ppvny")
+ItemDrops = Array[Resource]([ExtResource("7_76elj"), ExtResource("8_c0aq2")])
+TeleportHesitationTime = 2.0
+metadata/Enemy = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=631487845]
+position = Vector2(-3.3093522, -11.5107765)
+scale = Vector2(11.2173, 8.11782)
+shape = SubResource("CapsuleShape2D_kihfr")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=198878853]
+texture_filter = 1
+material = SubResource("ShaderMaterial_58uc7")
+position = Vector2(-3.309352, 0)
+sprite_frames = ExtResource("10_4c076")
+animation = &"Death"
+metadata/_aseprite_wizard_config_ = {
+"layer": "",
+"o_ex_p": "",
+"o_folder": "",
+"o_name": "",
+"only_visible": false,
+"slice": "",
+"source": "res://assets/sprites/Ball Enemy.aseprite"
+}
+metadata/_aseprite_wizard_source_file_hash_ = "50dde8af9d7688233b8f7db3e27ef890"
+metadata/_aseprite_wizard_interface_config_ = {
+"layer_section": false,
+"output_section": false,
+"slice_section": false
+}
+
+[connection signal="area_entered" from="." to="." method="_on_area_entered"]
+[connection signal="animation_finished" from="AnimatedSprite2D" to="." method="_on_animated_sprite_2d_animation_finished"]

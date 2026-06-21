@@ -3,6 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://cf1pg2x8l8lpf" path="res://assets/objects/bullet.tscn" id="1_h32k7"]
 [ext_resource type="Script" uid="uid://cvu57cdie1j01" path="res://assets/scripts/Gun.cs" id="2_hnubu"]
 [ext_resource type="Texture2D" uid="uid://7n64wdqvmtd5" path="res://assets/sprites/Weapons/Handgun.png" id="2_ps7ig"]
+[ext_resource type="AudioStream" uid="uid://dvijwtqha2lcw" path="res://assets/SFX/Gun Shot.mp3" id="2_twxw4"]
 
 [resource]
 script = ExtResource("2_hnubu")
@@ -12,6 +13,7 @@ Damage = 3
 BulletCount = 1
 MultiBulletAngle = 0.3
 BulletType = ExtResource("1_h32k7")
+FireSound = ExtResource("2_twxw4")
 BulletLifetime = 1.0
 BulletSize = 2.0
 Explode = true

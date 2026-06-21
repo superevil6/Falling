@@ -4,6 +4,7 @@
 [ext_resource type="SpriteFrames" uid="uid://dye6svw6maub0" path="res://assets/sprites/Weapons/Bullet 2.aseprite" id="1_nhs2k"]
 [ext_resource type="Script" uid="uid://cvu57cdie1j01" path="res://assets/scripts/Gun.cs" id="2_iogci"]
 [ext_resource type="Texture2D" uid="uid://bjdyvq7ygcwrl" path="res://assets/sprites/Weapons/SMG.png" id="2_rmikx"]
+[ext_resource type="AudioStream" uid="uid://dvijwtqha2lcw" path="res://assets/SFX/Gun Shot.mp3" id="3_x75md"]
 
 [resource]
 script = ExtResource("2_iogci")
@@ -14,6 +15,7 @@ Damage = 1
 BulletCount = 1
 MultiBulletAngle = 0.1
 BulletType = ExtResource("1_m5rhh")
+FireSound = ExtResource("3_x75md")
 BulletSpriteFrames = ExtResource("1_nhs2k")
 BulletLifetime = 1.0
 GunUpgrades = null

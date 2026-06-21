@@ -1,7 +1,7 @@
 [remap]
 
-importer="aseprite_wizard.plugin.noop"
-type="PackedDataContainer"
+importer="aseprite_wizard.plugin"
+type="SpriteFrames"
 uid="uid://ct6lxbpknk118"
 path="res://.godot/imported/Dichotomyoptic.aseprite-294ae2ef4a0cc4513be9c990b01e37e3.res"
 
@@ -12,3 +12,7 @@ dest_files=["res://.godot/imported/Dichotomyoptic.aseprite-294ae2ef4a0cc4513be9c
 
 [params]
 
+split_layers=false
+exclude_layers_pattern=""
+only_visible_layers=false
+sheet_type="Packed"
