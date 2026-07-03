@@ -1,0 +1,11 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" uid="uid://cjvebtbs1ft7k" path="res://assets/scripts/GunUpgrade.cs" id="1_gunup"]
+
+[resource]
+script = ExtResource("1_gunup")
+Type = 10
+UpgradeName = "Bullet Magnifier"
+UpgradeDescription = "Multiplies the size of your bullets."
+Value = 1.5
+Rarity = 1

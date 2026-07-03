@@ -28,9 +28,15 @@ public partial class Stage : Resource
 	[Export]
 	public float ScrollSpeed {get;set;} = 200f;
 	[Export]
-	public PackedScene[] BackgroundImages {get;set;}
+	public Texture2D[] BackgroundImages {get;set;}
+	// Per-tile darkness for BackgroundImages, fed to the PixelArt shader. Indices line
+	// up with BackgroundImages; missing entries fall back to the queue's default.
 	[Export]
-	public PackedScene[] Background2Images {get;set;}
+	public float[] BackgroundDarkness {get;set;}
+	[Export]
+	public Texture2D[] Background2Images {get;set;}
+	[Export]
+	public float[] Background2Darkness {get;set;}
 	// Timed stage events (wall contractions, obstacle bursts). The StageDirector
 	// fires one every EventInterval seconds — sequentially, or randomly when
 	// RandomEventOrder is set. Suppressed during boss fights if DisableEventsDuringBoss.

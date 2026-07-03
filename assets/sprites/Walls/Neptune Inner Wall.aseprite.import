@@ -1,0 +1,16 @@
+[remap]
+
+importer="aseprite_wizard.plugin.static-texture"
+type="AtlasTexture"
+uid="uid://bi0cgx4uga7co"
+path="res://.godot/imported/Neptune Inner Wall.aseprite-0dc5ed4001ea6e3b56b4ddcb10be6e71.res"
+
+[deps]
+
+source_file="res://assets/sprites/Walls/Neptune Inner Wall.aseprite"
+dest_files=["res://.godot/imported/Neptune Inner Wall.aseprite-0dc5ed4001ea6e3b56b4ddcb10be6e71.res"]
+
+[params]
+
+exclude_layers_pattern=""
+only_visible_layers=false

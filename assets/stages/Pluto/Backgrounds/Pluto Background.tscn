@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://deefktfo0kkhg"]
+[gd_scene format=3 uid="uid://cj15iua6mkiw6"]
 
 [ext_resource type="Shader" uid="uid://nej1tvi1ocse" path="res://assets/shaders/PixelArt.gdshader" id="1_jp2a4"]
 [ext_resource type="Texture2D" uid="uid://c2cdk30xq4fxe" path="res://assets/stages/Pluto/Backgrounds/Pluto background 2.png" id="2_hdc6d"]
@@ -10,9 +10,9 @@ shader_parameter/color_steps = 8
 shader_parameter/hue_shift = 0.0
 shader_parameter/darkness = 0.5930000281675
 
-[node name="TestBackground" type="Node2D"]
+[node name="TestBackground" type="Node2D" unique_id=1456443374]
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=352059743]
 texture_repeat = 2
 material = SubResource("ShaderMaterial_ml8e1")
 position = Vector2(3.0517578e-05, 0)

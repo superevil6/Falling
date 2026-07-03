@@ -4,88 +4,21 @@
 [ext_resource type="PackedScene" uid="uid://cf1pg2x8l8lpf" path="res://assets/objects/bullet.tscn" id="2_34ecl"]
 [ext_resource type="Resource" uid="uid://svn642061r6v" path="res://assets/weapons/Swarm Cannon.tres" id="3_34ecl"]
 [ext_resource type="Resource" uid="uid://t4f5lqyn51u2" path="res://assets/weapons/Simple Sword.tres" id="3_idqgg"]
-[ext_resource type="Resource" uid="uid://dib52vs6i4eql" path="res://assets/weapons/Bubbler.tres" id="4_34ecl"]
-[ext_resource type="Texture2D" uid="uid://dsmm5pqbthh2x" path="res://assets/objects/temp player.png" id="4_g5vn5"]
-[ext_resource type="Resource" uid="uid://c8b2ycj85fkc5" path="res://assets/weapons/Slicer.tres" id="5_34ecl"]
-[ext_resource type="Resource" uid="uid://dhxwiafwkl55" path="res://assets/weapons/Laser.tres" id="6_34ecl"]
-[ext_resource type="Resource" uid="uid://b48w24n0dq0s7" path="res://assets/body mods/head mod.tres" id="6_bkysh"]
+[ext_resource type="Resource" uid="uid://bp6mqrys7v0op" path="res://assets/weapons/Tesla Coil.tres" id="4_34ecl"]
+[ext_resource type="Resource" uid="uid://d3b7r5oey1p82" path="res://assets/weapons/Shotgun.tres" id="5_fg3d2"]
+[ext_resource type="Resource" uid="uid://dq3psdjhaotip" path="res://assets/weapons/Multi-Direction Blaster.tres" id="6_1qp14"]
+[ext_resource type="SpriteFrames" uid="uid://jrumw1swp6rs" path="res://assets/sprites/Player.aseprite" id="6_nqkij"]
 [ext_resource type="Shader" uid="uid://nej1tvi1ocse" path="res://assets/shaders/PixelArt.gdshader" id="7_fh75e"]
-[ext_resource type="Resource" uid="uid://dx5n6or0rm1b" path="res://assets/body mods/body mod.tres" id="7_htwuo"]
-[ext_resource type="Resource" uid="uid://dgdydgnsl0p2n" path="res://assets/body mods/limbs mod.tres" id="8_34ecl"]
+[ext_resource type="Resource" uid="uid://dx5n6or0rm1b" path="res://assets/body mods/body mod.tres" id="7_qgtm8"]
+[ext_resource type="Resource" uid="uid://b48w24n0dq0s7" path="res://assets/body mods/head mod.tres" id="8_7muya"]
+[ext_resource type="Resource" uid="uid://dgdydgnsl0p2n" path="res://assets/body mods/limbs mod.tres" id="9_y0ns2"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_bkysh"]
 shader = ExtResource("7_fh75e")
 shader_parameter/pixel_size = 4.0
-shader_parameter/color_steps = 8
+shader_parameter/color_steps = 9
 shader_parameter/hue_shift = 0.0
 shader_parameter/darkness = 0.0
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_8w5do"]
-atlas = ExtResource("4_g5vn5")
-region = Rect2(0, 0, 256, 256)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_f3scy"]
-atlas = ExtResource("4_g5vn5")
-region = Rect2(256, 0, 256, 256)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_ccu12"]
-atlas = ExtResource("4_g5vn5")
-region = Rect2(512, 0, 256, 256)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_u8f2p"]
-atlas = ExtResource("4_g5vn5")
-region = Rect2(0, 256, 256, 256)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_vo8fi"]
-atlas = ExtResource("4_g5vn5")
-region = Rect2(256, 256, 256, 256)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_70imd"]
-atlas = ExtResource("4_g5vn5")
-region = Rect2(512, 256, 256, 256)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_phpo2"]
-atlas = ExtResource("4_g5vn5")
-region = Rect2(0, 512, 256, 256)
-
-[sub_resource type="SpriteFrames" id="SpriteFrames_w8w64"]
-animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_8w5do")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_f3scy")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_ccu12")
-}],
-"loop": true,
-"name": &"Falling",
-"speed": 10.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_u8f2p")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_vo8fi")
-}],
-"loop": false,
-"name": &"Shooting",
-"speed": 10.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_70imd")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_phpo2")
-}],
-"loop": false,
-"name": &"Swording",
-"speed": 10.0
-}]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_eevfn"]
 size = Vector2(133, 187)
@@ -101,8 +34,8 @@ collision_mask = 17
 script = ExtResource("1_l4bou")
 MaxHealth = 100
 MinionBullet = ExtResource("2_34ecl")
-Guns = [ExtResource("3_34ecl"), ExtResource("4_34ecl"), ExtResource("5_34ecl"), ExtResource("6_34ecl")]
-BodyMods = [ExtResource("6_bkysh"), ExtResource("7_htwuo"), ExtResource("8_34ecl")]
+Guns = [ExtResource("3_34ecl"), ExtResource("4_34ecl"), ExtResource("5_fg3d2"), ExtResource("6_1qp14")]
+BodyMods = [ExtResource("7_qgtm8"), ExtResource("8_7muya"), ExtResource("9_y0ns2"), null]
 Melee = ExtResource("3_idqgg")
 WallKickPriorityTime = 0.5
 DashDuration = 0.5
@@ -111,8 +44,8 @@ metadata/_edit_group_ = true
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=943954774]
 texture_filter = 1
 material = SubResource("ShaderMaterial_bkysh")
-sprite_frames = SubResource("SpriteFrames_w8w64")
-animation = &"Swording"
+sprite_frames = ExtResource("6_nqkij")
+animation = &"Idle"
 metadata/_aseprite_wizard_config_ = {
 "layer": "",
 "o_ex_p": "",

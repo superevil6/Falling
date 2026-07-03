@@ -1,0 +1,16 @@
+[remap]
+
+importer="aseprite_wizard.plugin.static-texture"
+type="AtlasTexture"
+uid="uid://drlx4i6ih2mp2"
+path="res://.godot/imported/Pluto Inner Wall.aseprite-8f3e1b6dd2a15d5949370c85980aa21d.res"
+
+[deps]
+
+source_file="res://assets/sprites/Walls/Pluto Inner Wall.aseprite"
+dest_files=["res://.godot/imported/Pluto Inner Wall.aseprite-8f3e1b6dd2a15d5949370c85980aa21d.res"]
+
+[params]
+
+exclude_layers_pattern=""
+only_visible_layers=false

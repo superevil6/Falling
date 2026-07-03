@@ -9,6 +9,6 @@ size = Vector2(20, 200)
 [resource]
 script = ExtResource("2_gone1")
 CollisionShape = SubResource("RectangleShape2D_n43am")
-Graphic = ExtResource("1_3lk0n")
+Graphics = [ExtResource("1_3lk0n")]
 Height = 200.0
 DotStacksPerTick = 5

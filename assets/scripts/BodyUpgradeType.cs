@@ -21,5 +21,11 @@ public enum BodyUpgradeType
     ShockResistance = 18,
     OrbitalShield = 19,
     OrbitalMinion = 20,
-    ItemDropChanceUp = 21
+    ItemDropChanceUp = 21,
+    MeleeAttackSpeed = 22,
+    MeleeLifeSteal = 23,
+    Shield = 24,
+    MaxHealthOnKill = 25,
+    ExpGainUp = 26,
+    DashCooldownReduction = 27
 }

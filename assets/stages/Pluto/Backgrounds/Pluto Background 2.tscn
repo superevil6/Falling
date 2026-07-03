@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://ddupwal2epbso"]
+[gd_scene format=3 uid="uid://bkadnov8b25bu"]
 
 [ext_resource type="Shader" uid="uid://nej1tvi1ocse" path="res://assets/shaders/PixelArt.gdshader" id="1_s7hrc"]
 [ext_resource type="Texture2D" uid="uid://cl2nkxtp62xup" path="res://assets/stages/Pluto/Backgrounds/Pluto background 1.png" id="2_s7hrc"]

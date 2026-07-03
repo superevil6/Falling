@@ -1,0 +1,16 @@
+[remap]
+
+importer="aseprite_wizard.plugin.static-texture"
+type="AtlasTexture"
+uid="uid://dcoumjd81jnk2"
+path="res://.godot/imported/Neptune Background 4.aseprite-2151d24006f8763f69de3dbd6d65ef94.res"
+
+[deps]
+
+source_file="res://assets/sprites/Walls/Neptune Background 4.aseprite"
+dest_files=["res://.godot/imported/Neptune Background 4.aseprite-2151d24006f8763f69de3dbd6d65ef94.res"]
+
+[params]
+
+exclude_layers_pattern=""
+only_visible_layers=false

@@ -1,6 +1,6 @@
 [gd_resource type="Resource" format=3 uid="uid://d1tlv3wkhe7hh"]
 
-[ext_resource type="Texture2D" uid="uid://dpp4d6s3v002c" path="res://assets/sprites/test wall 2.png" id="1_sd7kd"]
+[ext_resource type="Texture2D" uid="uid://dpp4d6s3v002c" path="res://assets/sprites/Walls/test wall 2.png" id="1_sd7kd"]
 [ext_resource type="Script" uid="uid://bna4yt1fh0nl1" path="res://assets/scripts/Wall.cs" id="2_p4l3j"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_n43am"]
@@ -9,5 +9,5 @@ size = Vector2(20, 200)
 [resource]
 script = ExtResource("2_p4l3j")
 CollisionShape = SubResource("RectangleShape2D_n43am")
-Graphic = ExtResource("1_sd7kd")
+Graphics = [ExtResource("1_sd7kd")]
 Height = 200.0

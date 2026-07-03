@@ -1,0 +1,39 @@
+[gd_scene format=3 uid="uid://842jli7vy0hj"]
+
+[ext_resource type="Script" uid="uid://b3od7f8efylhu" path="res://assets/scripts/Enemy.cs" id="1_ywd46"]
+[ext_resource type="Resource" uid="uid://djf7mu16ymf8a" path="res://assets/weapons/Enemy Weapons/Grow Shot Ring.tres" id="2_t3mdo"]
+[ext_resource type="SpriteFrames" uid="uid://ct6lxbpknk118" path="res://assets/sprites/Enemies/Dichotomyoptic.aseprite" id="3_lb0ap"]
+[ext_resource type="Script" uid="uid://bspw55irr0s5c" path="res://assets/scripts/BossController.cs" id="4_yh476"]
+[ext_resource type="Resource" uid="uid://c88c6ur5cpbi" path="res://assets/bosses/ExampleBossPhase1.tres" id="5_bc5wa"]
+[ext_resource type="Resource" uid="uid://68b5221as0ej" path="res://assets/bosses/ExampleBossPhase2.tres" id="6_hmnko"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_boss"]
+radius = 77.02597
+
+[node name="Example Boss" type="Area2D" unique_id=672677150 groups=["Enemy"]]
+collision_layer = 4
+collision_mask = 8
+script = ExtResource("1_ywd46")
+MaxHealth = 300
+Gun = ExtResource("2_t3mdo")
+CanMelee = false
+MovementType = 1
+SpawnMovementSpeed = 8
+MovementSpeed = 80.0
+Size = 4.0
+IsBoss = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1313650051]
+shape = SubResource("CircleShape2D_boss")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1097997562]
+texture_filter = 1
+sprite_frames = ExtResource("3_lb0ap")
+animation = &"Explode"
+
+[node name="BossController" type="Node2D" parent="." unique_id=8364118]
+script = ExtResource("4_yh476")
+Phases = Array[Resource]([ExtResource("5_bc5wa"), ExtResource("6_hmnko")])
+
+[connection signal="area_entered" from="." to="." method="_on_area_entered"]
+[connection signal="animation_finished" from="AnimatedSprite2D" to="." method="_on_animated_sprite_2d_animation_finished"]

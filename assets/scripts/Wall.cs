@@ -5,7 +5,7 @@ public partial class Wall : Resource
 	[Export]
 	public Shape2D CollisionShape {get;set;}
 	[Export]
-	public Texture2D Graphic {get;set;}
+	public Texture2D[] Graphics {get;set;} = [];
 	[Export(PropertyHint.Range, "0,1,0.05")]
 	public float SpeedReduction {get;set;} = 1.0f;
 	[Export]

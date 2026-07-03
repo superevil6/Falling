@@ -5,16 +5,32 @@ public enum BackgroundQueuePosition { Left, Middle, Right }
 
 public partial class BackgroundQueue : Node2D
 {
+	private const string PixelArtShaderPath = "res://assets/shaders/PixelArt.gdshader";
+	private const float DefaultDarkness = 0.4f;
+
 	[Export]
 	public BackgroundQueuePosition QueuePosition {get;set;} = BackgroundQueuePosition.Left;
 	[Export]
-	public PackedScene[] TilesOverride {get;set;}
+	public Texture2D[] TilesOverride {get;set;}
+	[Export]
+	public float[] TilesOverrideDarkness {get;set;}
+	// PixelArt shader applied to each background tile. Falls back to loading the
+	// project shader if left unassigned.
+	[Export]
+	public Shader BackgroundShader {get;set;}
+	// On-screen size (px) of a single repetition of the texture. The texture loops
+	// horizontally across the column and vertically as strips stack. Set X to 0 to
+	// stretch one copy across the full column width (no horizontal tiling); set Y to
+	// 0 to keep the texture's own aspect ratio (uniform scale).
+	[Export]
+	public Vector2 TileScreenSize {get;set;} = Vector2.Zero;
 	[Export]
 	public float ScrollSpeedMultiplier {get;set;} = 1f;
 
-	private PackedScene[] tiles;
+	private Texture2D[] tiles;
+	private float[] tileDarkness;
 	private int nextTileIndex = 0;
-	private List<Node2D> activeTiles = new List<Node2D>();
+	private List<Sprite2D> activeTiles = new List<Sprite2D>();
 	private float viewportHeight;
 	private float targetTileWidth;
 	private WallQueue scrollSource;
@@ -34,18 +50,25 @@ public partial class BackgroundQueue : Node2D
 		}
 		GlobalPosition = new Vector2(queueX, GlobalPosition.Y);
 
+		if (BackgroundShader == null) {
+			BackgroundShader = GD.Load<Shader>(PixelArtShaderPath);
+		}
+
 		var main = GetParent() as Main;
-		PackedScene[] stageTiles = null;
+		Texture2D[] stageTiles = null;
+		float[] stageDarkness = null;
 		if (main != null && main.Stages != null && main.Stages.Length > 0) {
 			var stage = main.Stages[main.CurrentStage];
-			stageTiles = QueuePosition == BackgroundQueuePosition.Middle
-				? stage.Background2Images
-				: stage.BackgroundImages;
+			bool middle = QueuePosition == BackgroundQueuePosition.Middle;
+			stageTiles = middle ? stage.Background2Images : stage.BackgroundImages;
+			stageDarkness = middle ? stage.Background2Darkness : stage.BackgroundDarkness;
 		}
 		if (stageTiles != null && stageTiles.Length > 0) {
 			tiles = stageTiles;
+			tileDarkness = stageDarkness;
 		} else if (TilesOverride != null && TilesOverride.Length > 0) {
 			tiles = TilesOverride;
+			tileDarkness = TilesOverrideDarkness;
 		}
 		scrollSource = GetParent()?.GetNodeOrNull<WallQueue>("Left Wall Queue");
 	}
@@ -83,20 +106,18 @@ public partial class BackgroundQueue : Node2D
 
 	private void SpawnTile()
 	{
-		var scene = tiles[nextTileIndex];
+		var texture = tiles[nextTileIndex];
+		int tileIndex = nextTileIndex;
 		nextTileIndex = (nextTileIndex + 1) % tiles.Length;
-		if (scene == null) return;
-		var tile = scene.Instantiate<Node2D>();
-		AddChild(tile);
+		if (texture == null) return;
 
-		var sprite = FindFirstSprite(tile);
-		if (sprite != null && sprite.Texture != null) {
-			float visibleWidth = sprite.GetRect().Size.X * sprite.GlobalScale.X;
-			if (visibleWidth > 0f) {
-				float factor = targetTileWidth / visibleWidth;
-				tile.Scale = tile.Scale * factor;
-			}
-		}
+		var tile = new Sprite2D {
+			Texture = texture,
+			TextureRepeat = CanvasItem.TextureRepeatEnum.Enabled,
+			Material = BuildMaterial(tileIndex),
+		};
+		ApplyTiling(tile, texture);
+		AddChild(tile);
 
 		float height = GetTileHeight(tile);
 		float globalY;
@@ -110,21 +131,46 @@ public partial class BackgroundQueue : Node2D
 		activeTiles.Add(tile);
 	}
 
-	private float GetTileHeight(Node2D tile)
+	// Sizes the sprite to fill the column width and sets up region-based repetition.
+	// One repetition is TileScreenSize px on screen; the region rect is widened so the
+	// texture loops horizontally, and the queue stacks strips to loop vertically.
+	private void ApplyTiling(Sprite2D tile, Texture2D texture)
 	{
-		var sprite = FindFirstSprite(tile);
-		if (sprite != null && sprite.Texture != null) {
-			return sprite.GetRect().Size.Y * sprite.GlobalScale.Y;
-		}
-		GD.PrintErr($"BackgroundQueue: tile '{tile.Name}' has no Sprite2D with texture — using fallback 200");
-		return 200f;
+		float texW = texture.GetWidth();
+		float texH = texture.GetHeight();
+		if (texW <= 0f || texH <= 0f) return;
+
+		int columns = TileScreenSize.X > 0f
+			? Mathf.Max(1, Mathf.RoundToInt(targetTileWidth / TileScreenSize.X))
+			: 1;
+		float scaleX = (targetTileWidth / columns) / texW;
+		float scaleY = TileScreenSize.Y > 0f ? (TileScreenSize.Y / texH) : scaleX;
+
+		tile.RegionEnabled = true;
+		tile.RegionRect = new Rect2(0f, 0f, texW * columns, texH);
+		tile.Scale = new Vector2(scaleX, scaleY);
 	}
 
-	private Sprite2D FindFirstSprite(Node node)
+	private ShaderMaterial BuildMaterial(int tileIndex)
 	{
-		foreach (var child in node.GetChildren()) {
-			if (child is Sprite2D s && s.Texture != null) return s;
+		if (BackgroundShader == null) return null;
+		float darkness = (tileDarkness != null && tileIndex < tileDarkness.Length)
+			? tileDarkness[tileIndex]
+			: DefaultDarkness;
+		var mat = new ShaderMaterial { Shader = BackgroundShader };
+		mat.SetShaderParameter("pixel_size", 4.0f);
+		mat.SetShaderParameter("color_steps", 8);
+		mat.SetShaderParameter("hue_shift", 0.0f);
+		mat.SetShaderParameter("darkness", darkness);
+		return mat;
+	}
+
+	private float GetTileHeight(Sprite2D tile)
+	{
+		if (tile.Texture != null) {
+			return tile.GetRect().Size.Y * tile.GlobalScale.Y;
 		}
-		return null;
+		GD.PrintErr($"BackgroundQueue: tile '{tile.Name}' has no texture — using fallback 200");
+		return 200f;
 	}
 }

@@ -1,6 +1,6 @@
 [gd_resource type="Resource" load_steps=12 format=3 uid="uid://drxdwiakxfced"]
 
-[ext_resource type="PackedScene" uid="uid://cpkjwu8cghp1l" path="res://assets/stages/Stage One/Backgrounds/Test Background.tscn" id="1_ir7cr"]
+[ext_resource type="Texture2D" uid="uid://csakvxsgokdoj" path="res://assets/sprites/Walls/Test Background 2.png" id="1_ir7cr"]
 [ext_resource type="Resource" path="res://assets/enemy groups/Cross.tres" id="2_nyti0"]
 [ext_resource type="PackedScene" uid="uid://cl8qfm2t0ht11" path="res://assets/stages/Stage One/Walls/Test Wall.tscn" id="3_3umc1"]
 [ext_resource type="Resource" path="res://assets/enemy groups/Pentagon.tres" id="3_nl33a"]
@@ -19,4 +19,5 @@ EnemyGroup = Array[Resource]([ExtResource("2_nyti0"), ExtResource("3_nl33a"), Ex
 Hazards = Array[PackedScene]([])
 LeftWallChunks = Array[PackedScene]([ExtResource("3_3umc1"), ExtResource("4_3umc1"), ExtResource("5_rgdmu")])
 RightWallChunks = Array[PackedScene]([ExtResource("3_3umc1"), ExtResource("4_3umc1"), ExtResource("5_rgdmu")])
-BackgroundImages = Array[PackedScene]([ExtResource("1_ir7cr")])
+BackgroundImages = Array[Texture2D]([ExtResource("1_ir7cr")])
+BackgroundDarkness = PackedFloat32Array(0.4)

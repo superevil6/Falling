@@ -1,0 +1,12 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" uid="uid://c16jiuasboxwv" path="res://assets/scripts/BodyUpgrade.cs" id="1_bodup"]
+
+[resource]
+script = ExtResource("1_bodup")
+BodyUpgradeType = 9
+BodyModType = 2
+UpgradeName = "Power Gauntlets"
+UpgradeDescription = "Increases the damage of your melee attacks."
+Value = 10.0
+Rarity = 0

@@ -468,6 +468,13 @@ public partial class Enemy : Area2D
 				p?.Heal(heal);
 			}
 		}
+		if (node2D is MeleeAttack ma && ma.LifeSteal > 0f) {
+			int heal = Mathf.RoundToInt(ma.LifeSteal);
+			if (heal > 0) {
+				var p = GetTree().CurrentScene?.GetNodeOrNull<Player>("Player");
+				p?.Heal(heal);
+			}
+		}
 	}
 
 	private bool hasBeenHit = false;
@@ -592,11 +599,12 @@ public partial class Enemy : Area2D
 	{
 		if (deathHandled) return;
 		deathHandled = true;
+		GetParent()?.GetNodeOrNull<Player>("Player")?.OnEnemyKilled();
 		DropItems();
 		if (this.IsBoss) {
+			// Main shows the reward menu once all boss segments are down and handles
+			// advancing to the next stage afterwards.
 			(GetParent() as Main)?.OnBossDefeated();
-			var menu = GetParent()?.GetNodeOrNull<SelectionMenu>("Selection Menu");
-			menu?.Open();
 		}
 		int othersAlive = GetParent().GetChildren()
 			.Where(child => child != this && child is Enemy other && other.CurrentHealth > 0)
@@ -733,9 +741,10 @@ public partial class Enemy : Area2D
 	}
 	private void DropItems() {
 		if (this.ItemDrops == null) return;
+		float dropMult = GetParent()?.GetNodeOrNull<Player>("Player")?.ItemDropChanceMultiplier ?? 1f;
 		foreach (var drop in this.ItemDrops) {
 			if (drop?.Item == null) continue;
-			if (GD.Randf() < drop.Chance) {
+			if (GD.Randf() < drop.Chance * dropMult) {
 				var item = drop.Item.Instantiate<Node2D>();
 				float angle = rng.RandfRange(0f, Mathf.Pi * 2f);
 				float radius = rng.RandfRange(0f, DropSpreadRadius);

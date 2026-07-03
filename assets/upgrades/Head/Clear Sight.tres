@@ -1,0 +1,11 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" uid="uid://c16jiuasboxwv" path="res://assets/scripts/BodyUpgrade.cs" id="1_bodup"]
+
+[resource]
+script = ExtResource("1_bodup")
+BodyUpgradeType = 15
+UpgradeName = "Clear Sight"
+UpgradeDescription = "Reduces the duration of blindness effects applied to you."
+Value = 25.0
+Rarity = 0

@@ -46,9 +46,11 @@ public partial class SelectionMenu : CanvasLayer
 		}
 	}
 
-	public void Open()
+	// Returns whether the menu actually opened (it won't if the player can't take any
+	// more guns or body mods).
+	public bool Open()
 	{
-		if (IsPlayerGunsFull() && IsPlayerBodyModsFull()) return;
+		if (IsPlayerGunsFull() && IsPlayerBodyModsFull()) return false;
 		BuildPicksFromArrays();
 		BuildOptions();
 		selectedIndex = 0;
@@ -56,6 +58,7 @@ public partial class SelectionMenu : CanvasLayer
 		Visible = true;
 		GetTree().Paused = true;
 		Engine.TimeScale = 0;
+		return true;
 	}
 
 	public void Close()
@@ -111,7 +114,7 @@ public partial class SelectionMenu : CanvasLayer
 	private bool IsPlayerGunsFull()
 	{
 		var player = GetTree().CurrentScene?.GetNodeOrNull<Player>("Player");
-		if (player == null || player.Guns == null) return false;
+		if (player == null || player.Guns == null || player.Guns.Length == 0) return false;
 		for (int i = 0; i < player.Guns.Length; i++) {
 			if (player.Guns[i] == null) return false;
 		}
@@ -121,7 +124,7 @@ public partial class SelectionMenu : CanvasLayer
 	private bool IsPlayerBodyModsFull()
 	{
 		var player = GetTree().CurrentScene?.GetNodeOrNull<Player>("Player");
-		if (player == null || player.BodyMods == null) return false;
+		if (player == null || player.BodyMods == null || player.BodyMods.Length == 0) return false;
 		for (int i = 0; i < player.BodyMods.Length; i++) {
 			if (player.BodyMods[i] == null) return false;
 		}

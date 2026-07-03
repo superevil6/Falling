@@ -1,0 +1,18 @@
+[remap]
+
+importer="aseprite_wizard.plugin"
+type="SpriteFrames"
+uid="uid://co3w8preqhjrb"
+path="res://.godot/imported/test wall.ase-be1d23bfc087f6a4c2d92c260c908e45.res"
+
+[deps]
+
+source_file="res://assets/sprites/Walls/test wall.ase"
+dest_files=["res://.godot/imported/test wall.ase-be1d23bfc087f6a4c2d92c260c908e45.res"]
+
+[params]
+
+split_layers=false
+exclude_layers_pattern=""
+only_visible_layers=false
+sheet_type="Packed"

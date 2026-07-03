@@ -6,6 +6,8 @@ public partial class MeleeAttack : Attack
 	public Vector2 Direction {get;set;}
 	public float SwingArc {get;set;} = Mathf.Pi * 0.75f;
 	public float OffsetDistance {get;set;} = 90f;
+	// Heal granted to the wielder per enemy hit (Player MeleeLifeSteal upgrade; 0 for enemies).
+	public float LifeSteal {get;set;} = 0f;
 	public AnimatedSprite2D animatedSprite2D;
 
 	private float elapsed;

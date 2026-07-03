@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://b6bqvnkrgxmt7"]
+[gd_scene format=3 uid="uid://b6bqvnkrgxmt7"]
 
 [ext_resource type="Script" uid="uid://tu36bfp3p2rn" path="res://assets/scripts/WallBody.cs" id="1_q24mg"]
 [ext_resource type="Resource" uid="uid://ief3ojk1rry6" path="res://assets/stages/Neptune/Walls/Neptune Wall.tres" id="2_x8fst"]
@@ -11,11 +11,11 @@ shader_parameter/color_steps = 8
 shader_parameter/hue_shift = 0.0
 shader_parameter/darkness = 0.0
 
-[node name="TestWall" type="StaticBody2D" groups=["Wall"]]
+[node name="TestWall" type="StaticBody2D" unique_id=1467296512 groups=["Wall"]]
 script = ExtResource("1_q24mg")
 WallData = ExtResource("2_x8fst")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=459044594]
 material = SubResource("ShaderMaterial_ylusg")
 metadata/_aseprite_wizard_config_ = {
 "i_mode": 1,
@@ -30,4 +30,4 @@ metadata/_aseprite_wizard_config_ = {
 "source": "res://assets/sprites/Pluto Wall 1.ase"
 }
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1925690139]

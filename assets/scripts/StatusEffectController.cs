@@ -10,6 +10,8 @@ public class StatusEffectController
 	public float SpreadPerStack = 0.05f;
 
 	private Dictionary<StatusEffectType, List<float>> stackExpiries = new Dictionary<StatusEffectType, List<float>>();
+	// Per-type resistance in [0, 0.95]; shortens the duration of newly-applied stacks.
+	private Dictionary<StatusEffectType, float> resistances = new Dictionary<StatusEffectType, float>();
 	private float dotTickTimer = 0f;
 	private float currentTime = 0f;
 
@@ -18,12 +20,24 @@ public class StatusEffectController
 		return stackExpiries.TryGetValue(type, out var list) ? list.Count : 0;
 	}
 
+	// Sets the resistance fraction for a status type (0 = no resistance, 0.95 = 95% shorter).
+	public void SetResistance(StatusEffectType type, float fraction)
+	{
+		resistances[type] = Mathf.Clamp(fraction, 0f, 0.95f);
+	}
+
+	private float EffectiveDuration(StatusEffectType type)
+	{
+		float r = resistances.TryGetValue(type, out var v) ? v : 0f;
+		return StackDuration * (1f - r);
+	}
+
 	public void AddStack(StatusEffectType type)
 	{
 		if (!stackExpiries.ContainsKey(type)) {
 			stackExpiries[type] = new List<float>();
 		}
-		stackExpiries[type].Add(currentTime + StackDuration);
+		stackExpiries[type].Add(currentTime + EffectiveDuration(type));
 	}
 
 	public void AddStacks(StatusEffectType type, int count)

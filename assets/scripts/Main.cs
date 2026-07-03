@@ -24,6 +24,28 @@ public partial class Main : Node2D
 	private int bossCount = 0;
 	// True while at least one boss is alive, used to suppress stage events.
 	public bool BossActive => bossCount > 0;
+	// Set once every boss segment is down; the boss-reward selection then advances stage.
+	private bool awaitingStageAdvance = false;
+	// Carries the next stage index across the scene reload. Instance fields reset to
+	// their .tscn values on reload, so a static survives it.
+	private static int pendingStage = -1;
+	// Apply the carried-over stage before children (wall/background queues) read
+	// CurrentStage in their own _Ready (which runs before Main._Ready).
+	public override void _EnterTree()
+	{
+		if (pendingStage >= 0) { CurrentStage = pendingStage; pendingStage = -1; }
+	}
+
+	// Loads saved progress into the carriers so the next Main scene resumes it.
+	// Call right before changing to the Main scene (e.g. from a "Continue" button).
+	public static void PrepareContinue(SaveData data)
+	{
+		if (data == null) return;
+		pendingStage = data.StageBeaten;
+		global::Player.CarriedState = data.State;
+		GameSession.Mode = data.Mode;
+	}
+
 	public override void _Ready()
 	{
 		music = new MusicPlayer();
@@ -34,10 +56,17 @@ public partial class Main : Node2D
 		var stage = CurrentStageData();
 		if (stage != null) music.PlayMusic(stage.StageIntroMusic, stage.StageMusic);
 		AddChild(new StageDirector());
+		var selectionMenu = GetNodeOrNull<SelectionMenu>("Selection Menu");
+		if (selectionMenu != null) selectionMenu.SelectionMade += OnBossRewardSelected;
 		SpawnEnemyGroup();
 		Player player = Player.Instantiate<Player>();
 		AddChild(player);
 		player.Position = new Vector2(500,500);
+		// Restore the carried-over loadout/upgrades after advancing from a prior stage.
+		if (global::Player.CarriedState != null) {
+			player.RestoreState(global::Player.CarriedState);
+			global::Player.CarriedState = null;
+		}
 	}
 
 	public Stage CurrentStageData()
@@ -46,10 +75,48 @@ public partial class Main : Node2D
 		return Stages[CurrentStage];
 	}
 
-	// Called by an Enemy with IsBoss when it dies, to clear the boss-active state.
+	// Called by an Enemy with IsBoss when it dies. Once the last boss segment is down,
+	// show the reward menu (advancing the stage after a pick); if no menu can open
+	// (e.g. player's slots are full) advance straight away so progress isn't blocked.
 	public void OnBossDefeated()
 	{
 		bossCount = Mathf.Max(0, bossCount - 1);
+		if (bossCount > 0) return;
+		awaitingStageAdvance = true;
+		var menu = GetNodeOrNull<SelectionMenu>("Selection Menu");
+		bool opened = menu != null && menu.Open();
+		if (!opened) OnBossRewardSelected(0);
+	}
+
+	// Fired when the player confirms a boss-reward pick (or immediately if no menu
+	// opened). Advances to the next stage when a boss fight has just been cleared.
+	private void OnBossRewardSelected(int index)
+	{
+		if (!awaitingStageAdvance) return;
+		awaitingStageAdvance = false;
+		AdvanceToNextStage();
+	}
+
+	private void AdvanceToNextStage()
+	{
+		// The reward menu paused the game; clear that or the next scene starts frozen.
+		GetTree().Paused = false;
+		Engine.TimeScale = 1f;
+		int next = CurrentStage + 1;
+		if (Stages != null && next < Stages.Length) {
+			// Carry the player's loadout/upgrades across the reload, and persist progress.
+			var player = GetNodeOrNull<Player>("Player");
+			if (player != null) {
+				global::Player.CarriedState = player.CaptureState();
+				SaveSystem.Save(next, GameSession.Mode, player);
+			}
+			pendingStage = next; // re-read by the reloaded Main._Ready
+			GetTree().CallDeferred(SceneTree.MethodName.ReloadCurrentScene);
+		} else {
+			// No further stages — run complete; drop any carry and return to the title.
+			global::Player.CarriedState = null;
+			GetTree().CallDeferred(SceneTree.MethodName.ChangeSceneToFile, "res://assets/objects/TitleScreen.tscn");
+		}
 	}
 
 	// Fades out the stage music and flashes a red WARNING across the screen, then

@@ -43,6 +43,29 @@ public partial class Player : CharacterBody2D
 	public float ItemMagnetMultiplier = 1f;
 	public float HealthRegenPerSecond = 0f;
 	private float healthRegenAccumulator = 0f;
+	// Melee upgrade modifiers, applied when spawning a MeleeAttack (see MeleeAttack()).
+	public int MeleeDamageBonus = 0;
+	public float MeleeRangeBonus = 0f;
+	public float MeleeArcBonus = 0f;
+	public float MeleeSwingSpeedMultiplier = 1f;
+	public float MeleeLifeSteal = 0f;
+	// Status resistances (0..0.95); mirrored into StatusEffects via SyncResistances().
+	public float BlindResistance = 0f;
+	public float BurningResistance = 0f;
+	public float SlowResistance = 0f;
+	public float ShockResistance = 0f;
+	// Rechargeable shield that absorbs damage before health.
+	public int MaxShield = 0;
+	public float CurrentShield = 0f;
+	[Export]
+	public float ShieldRegenDelay {get;set;} = 3f;
+	[Export]
+	public float ShieldRegenPerSecond {get;set;} = 5f;
+	private float shieldRegenTimer = 0f;
+	// Permanent MaxHealth gained per enemy killed (MaxHealthOnKill upgrade).
+	public int MaxHealthPerKill = 0;
+	public float ExperienceMultiplier = 1f;
+	public float ItemDropChanceMultiplier = 1f;
 	public StatusEffectController StatusEffects = new StatusEffectController();
 	private float wallTouchTickTimer = 0f;
 	private float gunCoolDown;
@@ -105,6 +128,7 @@ public partial class Player : CharacterBody2D
 	private float lightningFlashTimer = 0f;
 	private float chargeAmount = 0f;
 	private float chargePulseTime = 0f;
+	private bool playingDamageAnim = false; // while true, the one-shot hit animation owns the sprite
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
@@ -192,7 +216,7 @@ public partial class Player : CharacterBody2D
 			y: Mathf.Clamp(Position.Y, ScreenSize.Y * 0.1f, ScreenSize.Y * 0.9f)
 		);
 		int dotDamage = StatusEffects.Tick((float)delta);
-		if (dotDamage > 0) TakeDamage(dotDamage);
+		if (dotDamage > 0) TakeDamage(dotDamage, playHitAnimation: false); // DoT shouldn't flinch each tick
 		animatedSprite2D.SelfModulate = StatusEffects.GetTint();
 		if (orbitalShields.Count > 0) {
 			orbitalAngle += OrbitalRotationSpeed * (float)delta;
@@ -210,11 +234,46 @@ public partial class Player : CharacterBody2D
 				Heal(heal);
 			}
 		}
+		if (MaxShield > 0 && CurrentShield < MaxShield && CurrentHealth > 0) {
+			if (shieldRegenTimer > 0f) {
+				shieldRegenTimer -= (float)delta;
+			} else {
+				CurrentShield = Mathf.Min(MaxShield, CurrentShield + ShieldRegenPerSecond * (float)delta);
+			}
+		}
 		TimeSinceLastAfterImage += (float)delta;
 		bool shouldTrail = (Input.IsActionPressed("move_down") || RemainingDashTime > 0) && !IsTouchingWall;
 		if (shouldTrail && TimeSinceLastAfterImage >= AfterImageInterval) {
 			SpawnAfterImage();
 			TimeSinceLastAfterImage = 0f;
+		}
+		UpdateMovementAnimation();
+	}
+
+	// Loops the "Dash" animation while dashing, or the "Dive" animation while holding
+	// down; otherwise returns to idle. Runs after the shoot/sword animation logic so
+	// the movement state takes visual priority. Dash outranks dive.
+	private void UpdateMovementAnimation()
+	{
+		if (animatedSprite2D == null || playingDamageAnim) return;
+		if (RemainingDashTime > 0f) {
+			PlayLoopingAnimation("Dash");
+		} else if (Input.IsActionPressed("move_down")) {
+			PlayLoopingAnimation("Dive");
+		} else if (animatedSprite2D.Animation == "Dash" || animatedSprite2D.Animation == "Dive") {
+			animatedSprite2D.Animation = "Idle";
+			animatedSprite2D.Play();
+		}
+	}
+
+	// Plays the named animation looping, if the sprite has it and it isn't already current.
+	private void PlayLoopingAnimation(string anim)
+	{
+		var frames = animatedSprite2D.SpriteFrames;
+		if (frames != null && frames.HasAnimation(anim) && animatedSprite2D.Animation != anim) {
+			frames.SetAnimationLoop(anim, true);
+			animatedSprite2D.Animation = anim;
+			animatedSprite2D.Play();
 		}
 	}
 
@@ -273,7 +332,163 @@ public partial class Player : CharacterBody2D
 				OrbitalMinionCount++;
 				RebuildOrbitalMinions();
 				break;
+			case BodyUpgradeType.MeleeDamage:
+				MeleeDamageBonus += Mathf.RoundToInt(upgrade.Value);
+				break;
+			case BodyUpgradeType.MeleeRange:
+				MeleeRangeBonus += upgrade.Value;
+				break;
+			case BodyUpgradeType.MeleeSwingArc:
+				MeleeArcBonus += Mathf.DegToRad(upgrade.Value);
+				break;
+			case BodyUpgradeType.MeleeAttackSpeed:
+				MeleeSwingSpeedMultiplier += upgrade.Value / 100f;
+				break;
+			case BodyUpgradeType.MeleeLifeSteal:
+				MeleeLifeSteal += upgrade.Value;
+				break;
+			case BodyUpgradeType.BlindResistance:
+				BlindResistance = Mathf.Min(0.95f, BlindResistance + upgrade.Value / 100f);
+				SyncResistances();
+				break;
+			case BodyUpgradeType.BurningResistance:
+				BurningResistance = Mathf.Min(0.95f, BurningResistance + upgrade.Value / 100f);
+				SyncResistances();
+				break;
+			case BodyUpgradeType.SlowResistance:
+				SlowResistance = Mathf.Min(0.95f, SlowResistance + upgrade.Value / 100f);
+				SyncResistances();
+				break;
+			case BodyUpgradeType.ShockResistance:
+				ShockResistance = Mathf.Min(0.95f, ShockResistance + upgrade.Value / 100f);
+				SyncResistances();
+				break;
+			case BodyUpgradeType.Shield:
+				MaxShield += Mathf.RoundToInt(upgrade.Value);
+				CurrentShield += upgrade.Value;
+				break;
+			case BodyUpgradeType.MaxHealthOnKill:
+				MaxHealthPerKill += Mathf.RoundToInt(upgrade.Value);
+				break;
+			case BodyUpgradeType.ExpGainUp:
+				ExperienceMultiplier += upgrade.Value / 100f;
+				break;
+			case BodyUpgradeType.ItemDropChanceUp:
+				ItemDropChanceMultiplier += upgrade.Value / 100f;
+				break;
+			case BodyUpgradeType.DashCooldownReduction:
+				ShortDashCooldown = Mathf.Max(0.1f, ShortDashCooldown * (1f - upgrade.Value / 100f));
+				break;
 		}
+	}
+
+	// Pushes the current status-resistance fractions into the (possibly freshly-built)
+	// StatusEffectController. Called after a resistance upgrade and on state restore.
+	private void SyncResistances()
+	{
+		StatusEffects.SetResistance(StatusEffectType.Blind, BlindResistance);
+		StatusEffects.SetResistance(StatusEffectType.DamageOverTime, BurningResistance);
+		StatusEffects.SetResistance(StatusEffectType.Slow, SlowResistance);
+		StatusEffects.SetResistance(StatusEffectType.ReducedFireRate, ShockResistance);
+	}
+
+	// Called by Enemy when it dies, so on-kill upgrades can react.
+	public void OnEnemyKilled()
+	{
+		if (MaxHealthPerKill > 0 && CurrentHealth > 0) {
+			MaxHealth += MaxHealthPerKill;
+			CurrentHealth += MaxHealthPerKill;
+			var hb = GetParent()?.GetNodeOrNull<TextureProgressBar>("Health Bar");
+			if (hb != null) { hb.MaxValue = MaxHealth; hb.Value = CurrentHealth; }
+		}
+	}
+
+	// Carried across the stage-advance scene reload (set by Main before reloading,
+	// consumed by Main after the new player spawns).
+	public static PlayerState CarriedState;
+
+	public PlayerState CaptureState() => new PlayerState {
+		Guns = Guns,
+		BodyMods = BodyMods,
+		MaxHealth = MaxHealth,
+		CurrentHealth = CurrentHealth,
+		CurrentExperience = CurrentExperience,
+		DamageReduction = DamageReduction,
+		Speed = Speed,
+		HasSeeEnemyHealth = HasSeeEnemyHealth,
+		HasLaserSight = HasLaserSight,
+		FireDefenseStacks = FireDefenseStacks,
+		IceDefenseStacks = IceDefenseStacks,
+		ElectricDefenseStacks = ElectricDefenseStacks,
+		OrbitalShieldCount = OrbitalShieldCount,
+		OrbitalMinionCount = OrbitalMinionCount,
+		ItemMagnetMultiplier = ItemMagnetMultiplier,
+		HealthRegenPerSecond = HealthRegenPerSecond,
+		MaxDashCharges = MaxDashCharges,
+		CurrentDashCharges = currentDashCharges,
+		ShortDashDistance = ShortDashDistance,
+		ShortDashCooldown = ShortDashCooldown,
+		MeleeDamageBonus = MeleeDamageBonus,
+		MeleeRangeBonus = MeleeRangeBonus,
+		MeleeArcBonus = MeleeArcBonus,
+		MeleeSwingSpeedMultiplier = MeleeSwingSpeedMultiplier,
+		MeleeLifeSteal = MeleeLifeSteal,
+		BlindResistance = BlindResistance,
+		BurningResistance = BurningResistance,
+		SlowResistance = SlowResistance,
+		ShockResistance = ShockResistance,
+		MaxShield = MaxShield,
+		CurrentShield = CurrentShield,
+		MaxHealthPerKill = MaxHealthPerKill,
+		ExperienceMultiplier = ExperienceMultiplier,
+		ItemDropChanceMultiplier = ItemDropChanceMultiplier,
+	};
+
+	// Re-applies a captured snapshot (loadout + upgrade effects) onto a freshly spawned
+	// player. Call after the player is in the tree (orbitals/UI need its parent).
+	public void RestoreState(PlayerState s)
+	{
+		if (s == null) return;
+		Guns = s.Guns;
+		BodyMods = s.BodyMods;
+		MaxHealth = s.MaxHealth;
+		CurrentHealth = s.CurrentHealth;
+		CurrentExperience = s.CurrentExperience;
+		DamageReduction = s.DamageReduction;
+		Speed = s.Speed;
+		HasSeeEnemyHealth = s.HasSeeEnemyHealth;
+		HasLaserSight = s.HasLaserSight;
+		FireDefenseStacks = s.FireDefenseStacks;
+		IceDefenseStacks = s.IceDefenseStacks;
+		ElectricDefenseStacks = s.ElectricDefenseStacks;
+		OrbitalShieldCount = s.OrbitalShieldCount;
+		OrbitalMinionCount = s.OrbitalMinionCount;
+		ItemMagnetMultiplier = s.ItemMagnetMultiplier;
+		HealthRegenPerSecond = s.HealthRegenPerSecond;
+		MaxDashCharges = s.MaxDashCharges;
+		currentDashCharges = s.CurrentDashCharges;
+		ShortDashDistance = s.ShortDashDistance;
+		if (s.ShortDashCooldown > 0f) ShortDashCooldown = s.ShortDashCooldown;
+		MeleeDamageBonus = s.MeleeDamageBonus;
+		MeleeRangeBonus = s.MeleeRangeBonus;
+		MeleeArcBonus = s.MeleeArcBonus;
+		MeleeSwingSpeedMultiplier = s.MeleeSwingSpeedMultiplier > 0f ? s.MeleeSwingSpeedMultiplier : 1f;
+		MeleeLifeSteal = s.MeleeLifeSteal;
+		BlindResistance = s.BlindResistance;
+		BurningResistance = s.BurningResistance;
+		SlowResistance = s.SlowResistance;
+		ShockResistance = s.ShockResistance;
+		SyncResistances();
+		MaxShield = s.MaxShield;
+		CurrentShield = s.CurrentShield;
+		MaxHealthPerKill = s.MaxHealthPerKill;
+		ExperienceMultiplier = s.ExperienceMultiplier > 0f ? s.ExperienceMultiplier : 1f;
+		ItemDropChanceMultiplier = s.ItemDropChanceMultiplier > 0f ? s.ItemDropChanceMultiplier : 1f;
+		var hb = GetParent()?.GetNodeOrNull<TextureProgressBar>("Health Bar");
+		if (hb != null) { hb.MaxValue = MaxHealth; hb.Value = CurrentHealth; }
+		UpdateGunLabel();
+		RebuildOrbitalShields();
+		RebuildOrbitalMinions();
 	}
 
 	public void UpdateGunLabel()
@@ -356,7 +571,7 @@ public partial class Player : CharacterBody2D
 		}
 	}
 
-	public void TakeDamage(int amount, ElementType element = ElementType.NonElemental)
+	public void TakeDamage(int amount, ElementType element = ElementType.NonElemental, bool playHitAnimation = true)
 	{
 		if (CurrentHealth <= 0) return;
 		float dmg = amount;
@@ -368,13 +583,42 @@ public partial class Player : CharacterBody2D
 		};
 		if (stacks > 0) dmg *= Mathf.Pow(0.5f, stacks);
 		int finalDamage = Mathf.Max(0, Mathf.RoundToInt(dmg) - DamageReduction);
+		shieldRegenTimer = ShieldRegenDelay;
+		if (CurrentShield > 0f && finalDamage > 0) {
+			int absorbed = Mathf.Min(Mathf.CeilToInt(CurrentShield), finalDamage);
+			CurrentShield = Mathf.Max(0f, CurrentShield - absorbed);
+			finalDamage -= absorbed;
+			if (absorbed > 0) FloatingDamageText.Spawn(this, GlobalPosition, absorbed, new Color(0.4f, 0.8f, 1f));
+		}
 		CurrentHealth -= finalDamage;
 		GetParent().GetNode<TextureProgressBar>("Health Bar").Value = CurrentHealth;
 		if (finalDamage > 0) {
 			FloatingDamageText.Spawn(this, GlobalPosition, finalDamage, FloatingDamageText.ElementColor(element, new Color(1f, 0.4f, 0.4f)));
 			Sfx.PlayHit(this);
+			if (playHitAnimation) PlayDamageAnimation();
 		}
 		FlashRed();
+	}
+
+	// Plays the "Damage" hit-reaction once; while it runs it owns the sprite (shooting,
+	// dash and dive defer to it), then it returns to idle on finish.
+	private void PlayDamageAnimation()
+	{
+		if (animatedSprite2D == null) return;
+		var frames = animatedSprite2D.SpriteFrames;
+		if (frames == null || !frames.HasAnimation("Damage")) return;
+		frames.SetAnimationLoop("Damage", false);
+		playingDamageAnim = true;
+		animatedSprite2D.Animation = "Damage";
+		animatedSprite2D.Play();
+	}
+
+	// Sets a one-shot action animation (shooting/sword) unless the hit reaction owns the sprite.
+	private void PlayActionAnimation(string anim)
+	{
+		if (playingDamageAnim || animatedSprite2D == null) return;
+		animatedSprite2D.Animation = anim;
+		animatedSprite2D.Play();
 	}
 
 	private void RebuildOrbitalShields()
@@ -614,8 +858,7 @@ public partial class Player : CharacterBody2D
 	}
 
 	private void FireCharged(Vector2 aimDirection) {
-		animatedSprite2D.Animation = "Shooting";
-		animatedSprite2D.Play();
+		PlayActionAnimation("Fire");
 		float ratio = Gun.ChargeTime > 0f ? Mathf.Clamp(chargeAmount / Gun.ChargeTime, 0f, 1f) : 1f;
 		int baseDamage = Mathf.RoundToInt(Mathf.Lerp(Gun.MinDamage, Gun.MaxDamage, ratio));
 		float sizeMult = Mathf.Lerp(Gun.MinSize, Gun.MaxSize, ratio);
@@ -674,14 +917,13 @@ public partial class Player : CharacterBody2D
 	}
 
 	private void Shoot(Vector2 aimDirection) {
-		animatedSprite2D.Animation = "Shooting";
+		PlayActionAnimation("Fire");
 		Sfx.Play(this, Gun.FireSound);
 		int dirCount = Mathf.Max(1, Gun.DirectionalCount);
 		float dirStep = Mathf.DegToRad(Gun.DirectionalAngle);
 		for (int d = 0; d < dirCount; d++) {
 			SpawnBulletSpread(aimDirection.Rotated(dirStep * d));
 		}
-		animatedSprite2D.Play();
 		gunCoolDown = Gun.FireRate * StatusEffects.GetFireRateMultiplier();
 	}
 
@@ -1117,14 +1359,14 @@ public partial class Player : CharacterBody2D
 
 	private void MeleeAttack(Vector2 aimDirection) {
 		if (Melee?.Attack == null) return;
-		animatedSprite2D.Animation = "Swording";
-		animatedSprite2D.Play();
+		PlayActionAnimation("Swording");
 		MeleeAttack a = Melee.Attack.Instantiate<MeleeAttack>();
 		a.Direction = aimDirection.Normalized();
-		a.Damage = Melee.Damage;
-		a.SwingDuration = Melee.SwingDuration;
-		a.SwingArc = Melee.SwingArc;
-		a.OffsetDistance = Melee.OffsetDistance;
+		a.Damage = Melee.Damage + MeleeDamageBonus;
+		a.SwingDuration = Melee.SwingDuration / Mathf.Max(0.1f, MeleeSwingSpeedMultiplier);
+		a.SwingArc = Melee.SwingArc + MeleeArcBonus;
+		a.OffsetDistance = Melee.OffsetDistance + MeleeRangeBonus;
+		a.LifeSteal = MeleeLifeSteal;
 		a.SetCollisionLayerValue(4, true);
 		a.SetCollisionMaskValue(5, true);
 		AddChild(a);
@@ -1132,9 +1374,14 @@ public partial class Player : CharacterBody2D
 
 	private void _on_animated_sprite_2d_animation_finished() {
 		switch (animatedSprite2D.Animation) {
+			case "Damage":
+			playingDamageAnim = false;
+			animatedSprite2D.Animation = "Idle";
+			animatedSprite2D.Play();
+			break;
 			case "Shooting":
 			case "Swording":
-			animatedSprite2D.Animation = "Falling";
+			animatedSprite2D.Animation = "Idle";
 			animatedSprite2D.Play();
 			break;
 		}

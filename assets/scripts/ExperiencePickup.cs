@@ -7,14 +7,15 @@ public partial class ExperiencePickup : Pickup
 
 	protected override void OnCollected(Player player)
 	{
-		player.CurrentExperience += ExperienceAmount;
+		int gained = Mathf.Max(1, Mathf.RoundToInt(ExperienceAmount * player.ExperienceMultiplier));
+		player.CurrentExperience += gained;
 		player.GetParent().GetNode<Label>("Experience Counter").Text = $"XP: {player.CurrentExperience}";
 		var menu = player.GetParent().GetNodeOrNull<LevelUpMenu>("Level Up Menu");
 		if (player.Guns != null) {
 			foreach (var gun in player.Guns) {
 				if (gun == null) continue;
 				int prev = gun.CurrentLevel;
-				gun.AddExperience(ExperienceAmount);
+				gun.AddExperience(gained);
 				if (gun.CurrentLevel > prev) {
 					string name = !string.IsNullOrEmpty(gun.SourceName)
 						? gun.SourceName
@@ -29,7 +30,7 @@ public partial class ExperiencePickup : Pickup
 			foreach (var mod in player.BodyMods) {
 				if (mod == null) continue;
 				int prev = mod.Level;
-				mod.AddExperience(ExperienceAmount);
+				mod.AddExperience(gained);
 				if (mod.Level > prev) {
 					string name = !string.IsNullOrEmpty(mod.Name) ? mod.Name : "BodyMod";
 					menu?.Open(name, null, mod);
