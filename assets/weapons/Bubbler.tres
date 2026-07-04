@@ -16,6 +16,5 @@ BulletType = ExtResource("1_8h1db")
 BulletSpeed = 100.0
 BulletLifetime = 2.0
 BulletSize = 0.5
-Explode = true
 AuraDamages = true
 GunUpgrades = null

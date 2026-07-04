@@ -22,6 +22,7 @@ public partial class SelectionMenu : CanvasLayer
 	public override void _Ready()
 	{
 		container = GetNode<VBoxContainer>("Panel/VBoxContainer");
+		Helpers.CenterMenu(this);
 		ProcessMode = ProcessModeEnum.Always;
 		Visible = false;
 	}

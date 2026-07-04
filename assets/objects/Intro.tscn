@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://dq3sq43xwemru"]
+
+[ext_resource type="Script" uid="uid://dgfc7pstohvo2" path="res://assets/scripts/CutscenePlayer.cs" id="1"]
+[ext_resource type="Resource" uid="uid://6hy2x8fgfjls" path="res://assets/cutscenes/Intro Cutscene/Slide 1.tres" id="2_4sw24"]
+[ext_resource type="Resource" uid="uid://w3wlvkmq7tsd" path="res://assets/cutscenes/Intro Cutscene/Slide 2.tres" id="3_4n6wg"]
+[ext_resource type="Resource" uid="uid://dwdskjhypjtvu" path="res://assets/cutscenes/Intro Cutscene/Slide 3.tres" id="4_h4svo"]
+[ext_resource type="Resource" uid="uid://bh3dwl7qi03uf" path="res://assets/cutscenes/Intro Cutscene/Slide 4.tres" id="5_4lq33"]
+[ext_resource type="Resource" uid="uid://l3c1erticdcn" path="res://assets/cutscenes/Intro Cutscene/Slide 5.tres" id="6_vsl8q"]
+[ext_resource type="Resource" uid="uid://bc1diqhai8l0a" path="res://assets/cutscenes/Intro Cutscene/Slide 6.tres" id="7_70s1l"]
+[ext_resource type="Resource" uid="uid://cbjaluh7v3jbq" path="res://assets/cutscenes/Intro Cutscene/Slide 7.tres" id="8_chwou"]
+[ext_resource type="Script" uid="uid://442jdbttu4jq" path="res://assets/scripts/Cutscene.cs" id="9_u7g5n"]
+
+[sub_resource type="Resource" id="Resource_q3se2"]
+script = ExtResource("9_u7g5n")
+Name = "Intro"
+Slides = Array[Resource]([ExtResource("2_4sw24"), ExtResource("3_4n6wg"), ExtResource("4_h4svo"), ExtResource("5_4lq33"), ExtResource("6_vsl8q"), ExtResource("7_70s1l"), ExtResource("8_chwou")])
+
+[node name="CutscenePlayer" type="Control" unique_id=1480276294]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+Cutscene = SubResource("Resource_q3se2")
+NextScenePath = "res://assets/objects/TitleScreen.tscn"

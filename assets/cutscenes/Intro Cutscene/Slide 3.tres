@@ -1,0 +1,10 @@
+[gd_resource type="Resource" format=3 uid="uid://dwdskjhypjtvu"]
+
+[ext_resource type="Script" uid="uid://w0thch4hj6wo" path="res://assets/scripts/CutsceneSlide.cs" id="1_p6648"]
+
+[resource]
+script = ExtResource("1_p6648")
+Text = "Out of love for their creators they have strived to become more human like in their features. Artificial skin comprised of water for moisture, silicon for softness of touch, and mercury for its temperature reactive properties."
+TextPosition = 0
+TypewriterText = true
+Fullscreen = true

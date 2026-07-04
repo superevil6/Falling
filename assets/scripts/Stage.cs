@@ -4,6 +4,10 @@ public partial class Stage : Resource
 {
 	[Export]
 	public string Name {get;set;}
+	// Optional cutscene played (via the CutscenePlayer) right before this stage loads.
+	// Leave null for stages that begin immediately.
+	[Export]
+	public Cutscene Cutscene {get;set;}
 	[Export]
 	public EnemyGroup[] EnemyGroup {get;set;}
 	[Export]

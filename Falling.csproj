@@ -3,4 +3,9 @@
     <TargetFramework>net8.0</TargetFramework>
     <EnableDynamicLoading>true</EnableDynamicLoading>
   </PropertyGroup>
+  <!-- The Godot.NET.Sdk globs **/*.cs, which would otherwise pull the unit-test sources
+       (and their xunit references) into the game assembly. Keep tests out of the game. -->
+  <ItemGroup>
+    <Compile Remove="tests/**/*.cs" />
+  </ItemGroup>
 </Project>

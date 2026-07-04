@@ -1,0 +1,10 @@
+[gd_resource type="Resource" format=3 uid="uid://w3wlvkmq7tsd"]
+
+[ext_resource type="Script" uid="uid://w0thch4hj6wo" path="res://assets/scripts/CutsceneSlide.cs" id="1_dchvo"]
+
+[resource]
+script = ExtResource("1_dchvo")
+Text = "The robots have achieved sentience, and wish to return to their creators. They have left Earth and have expanded throughout the solar system."
+TextPosition = 0
+TypewriterText = true
+Fullscreen = true

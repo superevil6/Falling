@@ -10,7 +10,10 @@ public partial class PauseMenu : CanvasLayer
 	{
 		gunsList = GetNodeOrNull<VBoxContainer>("GunsPanel/List");
 		modsList = GetNodeOrNull<VBoxContainer>("BodyModsPanel/Scroll/List");
-		GetNode<Button>("VBoxContainer/Unpause").GrabFocus();
+		Helpers.CenterMenu(this);
+		// Start hidden; _Process toggles this on the pause input. The scene root has no
+		// explicit visibility set, so it would otherwise show at stage start.
+		Visible = false;
 	}
 
 	public override void _Process(double delta)

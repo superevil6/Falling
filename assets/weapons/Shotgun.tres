@@ -20,4 +20,5 @@ BulletSpriteFrames = ExtResource("1_re6dt")
 BulletLifetime = 0.2
 CriticalChance = 0.01
 ExperiencePerLevel = 1
+ExperienceCurveStep = 1
 GunUpgrades = null

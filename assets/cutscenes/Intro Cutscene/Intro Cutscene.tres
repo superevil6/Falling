@@ -1,0 +1,15 @@
+[gd_resource type="Resource" format=3 uid="uid://d25v53topfx60"]
+
+[ext_resource type="Script" uid="uid://442jdbttu4jq" path="res://assets/scripts/Cutscene.cs" id="1_st5ni"]
+[ext_resource type="Resource" uid="uid://6hy2x8fgfjls" path="res://assets/cutscenes/Intro Cutscene/Slide 1.tres" id="1_ygqp7"]
+[ext_resource type="Resource" uid="uid://w3wlvkmq7tsd" path="res://assets/cutscenes/Intro Cutscene/Slide 2.tres" id="2_gluwt"]
+[ext_resource type="Resource" uid="uid://dwdskjhypjtvu" path="res://assets/cutscenes/Intro Cutscene/Slide 3.tres" id="3_wh51a"]
+[ext_resource type="Resource" uid="uid://bh3dwl7qi03uf" path="res://assets/cutscenes/Intro Cutscene/Slide 4.tres" id="4_bnm4p"]
+[ext_resource type="Resource" uid="uid://l3c1erticdcn" path="res://assets/cutscenes/Intro Cutscene/Slide 5.tres" id="5_e33g0"]
+[ext_resource type="Resource" uid="uid://bc1diqhai8l0a" path="res://assets/cutscenes/Intro Cutscene/Slide 6.tres" id="6_t4u1d"]
+[ext_resource type="Resource" uid="uid://cbjaluh7v3jbq" path="res://assets/cutscenes/Intro Cutscene/Slide 7.tres" id="7_wml0j"]
+
+[resource]
+script = ExtResource("1_st5ni")
+Name = "Intro"
+Slides = Array[Resource]([ExtResource("1_ygqp7"), ExtResource("2_gluwt"), ExtResource("3_wh51a"), ExtResource("4_bnm4p"), ExtResource("5_e33g0"), ExtResource("6_t4u1d"), ExtResource("7_wml0j")])

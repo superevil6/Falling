@@ -10,6 +10,7 @@ public partial class UpgradeMenu : CanvasLayer
 	{
 		headerLabel = GetNode<Label>("Panel/Header");
 		list = GetNode<VBoxContainer>("Panel/Scroll/List");
+		Helpers.CenterMenu(this);
 		Visible = false;
 		ProcessMode = ProcessModeEnum.Always;
 	}

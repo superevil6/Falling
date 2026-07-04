@@ -7,3 +7,4 @@ script = ExtResource("1_iukvx")
 type = 2
 Name = "Limbs"
 ExperiencePerLevel = 1
+ExperienceCurveStep = 1

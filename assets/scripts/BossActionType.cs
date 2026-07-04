@@ -10,4 +10,8 @@ public enum BossActionType
 	Move,
 	// Do nothing for the action's Duration (a pause between attacks).
 	Wait,
+	// Launch a small beam upward, then rain large telegraphed lasers from the top.
+	RainLasers,
+	// Drop a single large damaging mine at the boss's position.
+	DropMine,
 }

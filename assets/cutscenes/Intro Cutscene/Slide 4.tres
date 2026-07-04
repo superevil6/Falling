@@ -1,0 +1,10 @@
+[gd_resource type="Resource" format=3 uid="uid://bh3dwl7qi03uf"]
+
+[ext_resource type="Script" uid="uid://w0thch4hj6wo" path="res://assets/scripts/CutsceneSlide.cs" id="1_6unte"]
+
+[resource]
+script = ExtResource("1_6unte")
+Text = "Robotic production facilities have been constructed on every planet in the solar system."
+TextPosition = 0
+TypewriterText = true
+Fullscreen = true

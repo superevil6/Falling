@@ -1,6 +1,6 @@
 [gd_resource type="Resource" format=3 uid="uid://dctl74u585md3"]
 
-[ext_resource type="PackedScene" uid="uid://bq2yam4kv7te3" path="res://assets/bosses/ExampleBoss.tscn" id="1_ysjcm"]
+[ext_resource type="PackedScene" uid="uid://842jli7vy0hj" path="res://assets/bosses/Dichotomyoptic.tscn" id="1_ysjcm"]
 [ext_resource type="Script" uid="uid://co2yygdrwkshm" path="res://assets/scripts/EnemyGroup.cs" id="2_group"]
 
 [resource]

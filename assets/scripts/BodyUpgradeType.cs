@@ -27,5 +27,6 @@ public enum BodyUpgradeType
     Shield = 24,
     MaxHealthOnKill = 25,
     ExpGainUp = 26,
-    DashCooldownReduction = 27
+    DashCooldownReduction = 27,
+    WeaknessInsight = 28
 }

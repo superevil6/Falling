@@ -11,6 +11,7 @@ public partial class Player : CharacterBody2D
 	public int DamageReduction;
 	public bool HasSeeEnemyHealth = true;
 	public bool HasLaserSight = false;
+	public bool HasWeaknessInsight = false;
 	public int FireDefenseStacks = 0;
 	public int OrbitalShieldCount = 0;
 	private float orbitalAngle = 0f;
@@ -129,6 +130,8 @@ public partial class Player : CharacterBody2D
 	private float chargeAmount = 0f;
 	private float chargePulseTime = 0f;
 	private bool playingDamageAnim = false; // while true, the one-shot hit animation owns the sprite
+	private bool isDead = false; // set once health hits 0; freezes input and plays the death sequence
+	private bool gameOverShown = false; // guards the one-shot game-over menu
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
@@ -161,6 +164,7 @@ public partial class Player : CharacterBody2D
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
+		if (isDead) return; // dead: input is frozen; the Explode animation owns the sprite
 		bool gunSwitched = false;
 		if (Input.IsActionJustPressed("gun_1")) { currentGunIndex = 0; gunSwitched = true; }
 		else if (Input.IsActionJustPressed("gun_2")) { currentGunIndex = 1; gunSwitched = true; }
@@ -255,14 +259,22 @@ public partial class Player : CharacterBody2D
 	// the movement state takes visual priority. Dash outranks dive.
 	private void UpdateMovementAnimation()
 	{
-		if (animatedSprite2D == null || playingDamageAnim) return;
+		if (animatedSprite2D == null || playingDamageAnim || isDead) return;
 		if (RemainingDashTime > 0f) {
+			// The Dash art faces left; flip it horizontally when dashing rightward.
+			if (DashDirection.X > 0f) animatedSprite2D.FlipH = true;
+			else if (DashDirection.X < 0f) animatedSprite2D.FlipH = false;
 			PlayLoopingAnimation("Dash");
 		} else if (Input.IsActionPressed("move_down")) {
+			animatedSprite2D.FlipH = false;
 			PlayLoopingAnimation("Dive");
 		} else if (animatedSprite2D.Animation == "Dash" || animatedSprite2D.Animation == "Dive") {
+			animatedSprite2D.FlipH = false;
 			animatedSprite2D.Animation = "Idle";
 			animatedSprite2D.Play();
+		} else if (animatedSprite2D.Animation == "Idle") {
+			// Idle faces neutral; clear any leftover flip from a rightward dash/fire.
+			animatedSprite2D.FlipH = false;
 		}
 	}
 
@@ -379,6 +391,9 @@ public partial class Player : CharacterBody2D
 			case BodyUpgradeType.DashCooldownReduction:
 				ShortDashCooldown = Mathf.Max(0.1f, ShortDashCooldown * (1f - upgrade.Value / 100f));
 				break;
+			case BodyUpgradeType.WeaknessInsight:
+				HasWeaknessInsight = true;
+				break;
 		}
 	}
 
@@ -416,6 +431,7 @@ public partial class Player : CharacterBody2D
 		DamageReduction = DamageReduction,
 		Speed = Speed,
 		HasSeeEnemyHealth = HasSeeEnemyHealth,
+		HasWeaknessInsight = HasWeaknessInsight,
 		HasLaserSight = HasLaserSight,
 		FireDefenseStacks = FireDefenseStacks,
 		IceDefenseStacks = IceDefenseStacks,
@@ -457,6 +473,7 @@ public partial class Player : CharacterBody2D
 		DamageReduction = s.DamageReduction;
 		Speed = s.Speed;
 		HasSeeEnemyHealth = s.HasSeeEnemyHealth;
+		HasWeaknessInsight = s.HasWeaknessInsight;
 		HasLaserSight = s.HasLaserSight;
 		FireDefenseStacks = s.FireDefenseStacks;
 		IceDefenseStacks = s.IceDefenseStacks;
@@ -574,30 +591,76 @@ public partial class Player : CharacterBody2D
 	public void TakeDamage(int amount, ElementType element = ElementType.NonElemental, bool playHitAnimation = true)
 	{
 		if (CurrentHealth <= 0) return;
-		float dmg = amount;
 		int stacks = element switch {
 			ElementType.Fire => FireDefenseStacks,
 			ElementType.Ice => IceDefenseStacks,
 			ElementType.Electric => ElectricDefenseStacks,
 			_ => 0,
 		};
-		if (stacks > 0) dmg *= Mathf.Pow(0.5f, stacks);
-		int finalDamage = Mathf.Max(0, Mathf.RoundToInt(dmg) - DamageReduction);
 		shieldRegenTimer = ShieldRegenDelay;
-		if (CurrentShield > 0f && finalDamage > 0) {
-			int absorbed = Mathf.Min(Mathf.CeilToInt(CurrentShield), finalDamage);
-			CurrentShield = Mathf.Max(0f, CurrentShield - absorbed);
-			finalDamage -= absorbed;
-			if (absorbed > 0) FloatingDamageText.Spawn(this, GlobalPosition, absorbed, new Color(0.4f, 0.8f, 1f));
-		}
+		var hit = Combat.ResolvePlayerHit(amount, stacks, DamageReduction, CurrentShield);
+		CurrentShield = hit.RemainingShield;
+		if (hit.ShieldAbsorbed > 0) FloatingDamageText.Spawn(this, GlobalPosition, hit.ShieldAbsorbed, new Color(0.4f, 0.8f, 1f));
+		int finalDamage = hit.HealthLoss;
 		CurrentHealth -= finalDamage;
 		GetParent().GetNode<TextureProgressBar>("Health Bar").Value = CurrentHealth;
 		if (finalDamage > 0) {
 			FloatingDamageText.Spawn(this, GlobalPosition, finalDamage, FloatingDamageText.ElementColor(element, new Color(1f, 0.4f, 0.4f)));
 			Sfx.PlayHit(this);
-			if (playHitAnimation) PlayDamageAnimation();
 		}
+		if (CurrentHealth <= 0) {
+			Die();
+			return;
+		}
+		if (finalDamage > 0 && playHitAnimation) PlayDamageAnimation();
 		FlashRed();
+	}
+
+	// Begins the death sequence: freezes the player, clears active weapon visuals,
+	// wipes the roguelite save (permadeath), and plays the Explode animation. The
+	// game-over menu opens when that animation finishes (see the animation_finished
+	// handler), or immediately if the sprite has no Explode animation.
+	private void Die()
+	{
+		if (isDead) return;
+		isDead = true;
+		CurrentHealth = 0;
+		Velocity = Vector2.Zero;
+		ClearLaser();
+		ClearLightning();
+		ClearLaserSight();
+		CancelCharge();
+		// Roguelite runs are permadeath — end the run by deleting its save.
+		if (GameSession.Mode == GameMode.Roguelite) {
+			SaveSystem.Delete(GameMode.Roguelite);
+		}
+		PlayExplodeAnimation();
+	}
+
+	// Plays the one-shot "Explode" death animation. If it's missing, jumps straight
+	// to the game-over menu so death never softlocks.
+	private void PlayExplodeAnimation()
+	{
+		playingDamageAnim = false;
+		var frames = animatedSprite2D?.SpriteFrames;
+		if (frames == null || !frames.HasAnimation("Explode")) {
+			ShowGameOver();
+			return;
+		}
+		flashTween?.Kill();
+		animatedSprite2D.Modulate = Colors.White;
+		frames.SetAnimationLoop("Explode", false);
+		animatedSprite2D.Animation = "Explode";
+		animatedSprite2D.Play();
+	}
+
+	// Opens the GAME OVER menu and pauses the game behind it.
+	private void ShowGameOver()
+	{
+		if (gameOverShown) return;
+		gameOverShown = true;
+		GetParent().AddChild(new GameOverMenu());
+		GetTree().Paused = true;
 	}
 
 	// Plays the "Damage" hit-reaction once; while it runs it owns the sprite (shooting,
@@ -614,9 +677,12 @@ public partial class Player : CharacterBody2D
 	}
 
 	// Sets a one-shot action animation (shooting/sword) unless the hit reaction owns the sprite.
-	private void PlayActionAnimation(string anim)
+	// When an aim direction is given, the art (which faces left) is flipped to point rightward.
+	private void PlayActionAnimation(string anim, Vector2 aimDirection = default)
 	{
 		if (playingDamageAnim || animatedSprite2D == null) return;
+		if (aimDirection.X > 0f) animatedSprite2D.FlipH = true;
+		else if (aimDirection.X < 0f) animatedSprite2D.FlipH = false;
 		animatedSprite2D.Animation = anim;
 		animatedSprite2D.Play();
 	}
@@ -724,6 +790,7 @@ public partial class Player : CharacterBody2D
 
 	public override void _PhysicsProcess(double delta) //TODO Wall kicking variables can probably be removed in favor of checking float time remaining
 	{
+		if (isDead) { Velocity = Vector2.Zero; return; } // dead: stop moving while the death sequence plays
 		if (knockbackTimer > 0f) {
 			Velocity = knockbackVelocity;
 			MoveAndSlide();
@@ -858,9 +925,9 @@ public partial class Player : CharacterBody2D
 	}
 
 	private void FireCharged(Vector2 aimDirection) {
-		PlayActionAnimation("Fire");
+		PlayActionAnimation("Fire", aimDirection);
 		float ratio = Gun.ChargeTime > 0f ? Mathf.Clamp(chargeAmount / Gun.ChargeTime, 0f, 1f) : 1f;
-		int baseDamage = Mathf.RoundToInt(Mathf.Lerp(Gun.MinDamage, Gun.MaxDamage, ratio));
+		int baseDamage = Combat.ChargedBaseDamage(Gun.MinDamage, Gun.MaxDamage, ratio);
 		float sizeMult = Mathf.Lerp(Gun.MinSize, Gun.MaxSize, ratio);
 		int dirCount = Mathf.Max(1, Gun.DirectionalCount);
 		float dirStep = Mathf.DegToRad(Gun.DirectionalAngle);
@@ -891,8 +958,8 @@ public partial class Player : CharacterBody2D
 	private static readonly Color CritAuraColor = new Color(1f, 0.84f, 0.1f, 0.95f);
 
 	private bool RollCrit(Gun gun, out int damage, int baseDamage) {
-		bool crit = gun.CriticalChance > 0f && rng.Randf() < gun.CriticalChance;
-		damage = crit ? Mathf.RoundToInt(baseDamage * gun.CriticalMultiplier) : baseDamage;
+		bool crit = Combat.RollsCrit(gun.CriticalChance, rng.Randf());
+		damage = crit ? Combat.CritDamage(baseDamage, gun.CriticalMultiplier) : baseDamage;
 		return crit;
 	}
 
@@ -917,7 +984,7 @@ public partial class Player : CharacterBody2D
 	}
 
 	private void Shoot(Vector2 aimDirection) {
-		PlayActionAnimation("Fire");
+		PlayActionAnimation("Fire", aimDirection);
 		Sfx.Play(this, Gun.FireSound);
 		int dirCount = Mathf.Max(1, Gun.DirectionalCount);
 		float dirStep = Mathf.DegToRad(Gun.DirectionalAngle);
@@ -1374,6 +1441,9 @@ public partial class Player : CharacterBody2D
 
 	private void _on_animated_sprite_2d_animation_finished() {
 		switch (animatedSprite2D.Animation) {
+			case "Explode":
+			ShowGameOver();
+			break;
 			case "Damage":
 			playingDamageAnim = false;
 			animatedSprite2D.Animation = "Idle";

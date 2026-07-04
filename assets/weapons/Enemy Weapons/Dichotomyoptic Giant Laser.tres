@@ -1,0 +1,26 @@
+[gd_resource type="Resource" format=3 uid="uid://dufu7d47bl4u"]
+
+[ext_resource type="SpriteFrames" uid="uid://c4y32o6gg1rw8" path="res://assets/sprites/Weapons/Laser Beam.aseprite" id="1_da7e0"]
+[ext_resource type="PackedScene" uid="uid://cf1pg2x8l8lpf" path="res://assets/objects/bullet.tscn" id="2_laser"]
+[ext_resource type="Texture2D" uid="uid://de5l5nx63cv1a" path="res://assets/sprites/Weapons/Laser.png" id="3_6wyv6"]
+[ext_resource type="Resource" uid="uid://bpvakhjpkpob3" path="res://assets/fire patterns/Laser Spin 360.tres" id="4_spin"]
+[ext_resource type="Script" uid="uid://cvu57cdie1j01" path="res://assets/scripts/Gun.cs" id="5_laser"]
+
+[resource]
+script = ExtResource("5_laser")
+GunImage = ExtResource("3_6wyv6")
+GunType = 6
+GunDescription = "A giant beam that sweeps slowly through a full 360 degrees, scything across the arena."
+AttackNumber = 3
+FireRate = 0.4
+Damage = 10
+BulletCount = 1
+FirePattern = ExtResource("4_spin")
+BulletType = ExtResource("2_laser")
+BulletSpeed = 1600.0
+BulletSpriteFrames = ExtResource("1_da7e0")
+BulletLifetime = 0.6
+BulletSize = 4.0
+Pierce = true
+IsLaser = true
+GunUpgrades = null

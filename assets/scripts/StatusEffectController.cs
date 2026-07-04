@@ -95,7 +95,7 @@ public class StatusEffectController
 		if (dotTickTimer >= 1f) {
 			dotTickTimer -= 1f;
 			int dotStacks = GetStackCount(StatusEffectType.DamageOverTime);
-			return Mathf.RoundToInt(dotStacks * DamagePerStackPerSecond);
+			return Combat.DotTickDamage(dotStacks, DamagePerStackPerSecond);
 		}
 		return 0;
 	}

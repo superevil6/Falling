@@ -40,6 +40,7 @@ public partial class LevelUpMenu : CanvasLayer
 		cursor = GetNodeOrNull<Control>("Panel/Cursor");
 		entityImage = GetNodeOrNull<TextureRect>("Panel/EntityImage");
 		entityNameLabel = GetNodeOrNull<Label>("Panel/EntityName");
+		Helpers.CenterMenu(this);
 		ProcessMode = ProcessModeEnum.Always;
 		Visible = false;
 	}
@@ -182,6 +183,7 @@ public partial class LevelUpMenu : CanvasLayer
 			if (player != null) {
 				if (up.BodyUpgradeType == BodyUpgradeType.LaserSight && player.HasLaserSight) continue;
 				if (up.BodyUpgradeType == BodyUpgradeType.SeeEnemyHealth && player.HasSeeEnemyHealth) continue;
+				if (up.BodyUpgradeType == BodyUpgradeType.WeaknessInsight && player.HasWeaknessInsight) continue;
 			}
 			applicable.Add(up);
 		}

@@ -4,8 +4,8 @@
 [ext_resource type="Resource" uid="uid://djf7mu16ymf8a" path="res://assets/weapons/Enemy Weapons/Grow Shot Ring.tres" id="2_t3mdo"]
 [ext_resource type="SpriteFrames" uid="uid://ct6lxbpknk118" path="res://assets/sprites/Enemies/Dichotomyoptic.aseprite" id="3_lb0ap"]
 [ext_resource type="Script" uid="uid://bspw55irr0s5c" path="res://assets/scripts/BossController.cs" id="4_yh476"]
-[ext_resource type="Resource" uid="uid://c88c6ur5cpbi" path="res://assets/bosses/ExampleBossPhase1.tres" id="5_bc5wa"]
-[ext_resource type="Resource" uid="uid://68b5221as0ej" path="res://assets/bosses/ExampleBossPhase2.tres" id="6_hmnko"]
+[ext_resource type="Resource" uid="uid://ddichophase6fa" path="res://assets/bosses/DichotomyopticPhase.tres" id="5_bc5wa"]
+[ext_resource type="Resource" uid="uid://ddichophase7fb" path="res://assets/bosses/DichotomyopticPhase2.tres" id="6_hmnko"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_boss"]
 radius = 77.02597
@@ -28,6 +28,8 @@ shape = SubResource("CircleShape2D_boss")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1097997562]
 texture_filter = 1
+position = Vector2(-0.5, 0.5)
+scale = Vector2(0.9980469, 1.0019531)
 sprite_frames = ExtResource("3_lb0ap")
 animation = &"Explode"
 

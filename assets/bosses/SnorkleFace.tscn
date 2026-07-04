@@ -4,8 +4,8 @@
 [ext_resource type="Resource" uid="uid://djf7mu16ymf8a" path="res://assets/weapons/Enemy Weapons/Grow Shot Ring.tres" id="2_0eeym"]
 [ext_resource type="SpriteFrames" uid="uid://dyyhsb50qvy66" path="res://assets/sprites/Enemies/Snorkleface.aseprite" id="3_ra1ho"]
 [ext_resource type="Script" uid="uid://bspw55irr0s5c" path="res://assets/scripts/BossController.cs" id="4_t43na"]
-[ext_resource type="Resource" uid="uid://c88c6ur5cpbi" path="res://assets/bosses/ExampleBossPhase1.tres" id="5_6ggn5"]
-[ext_resource type="Resource" uid="uid://68b5221as0ej" path="res://assets/bosses/ExampleBossPhase2.tres" id="6_7whnt"]
+[ext_resource type="Resource" uid="uid://sj4kp8xd4wv7" path="res://assets/bosses/SnorkleFacePhase1.tres" id="5_6ggn5"]
+[ext_resource type="Resource" uid="uid://fjcxl288lmhv" path="res://assets/bosses/SnorkleFacePhase2.tres" id="6_7whnt"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_d5m10"]
 size = Vector2(149.5, 92)
@@ -30,7 +30,7 @@ shape = SubResource("RectangleShape2D_d5m10")
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1097997562]
 texture_filter = 1
 sprite_frames = ExtResource("3_ra1ho")
-animation = &"Spawn"
+animation = &"Fire2"
 
 [node name="BossController" type="Node2D" parent="." unique_id=8364118]
 script = ExtResource("4_t43na")

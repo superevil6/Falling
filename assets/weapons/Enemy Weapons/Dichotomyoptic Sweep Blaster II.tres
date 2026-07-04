@@ -1,0 +1,25 @@
+[gd_resource type="Resource" format=3 uid="uid://dsweepblst5eb"]
+
+[ext_resource type="PackedScene" uid="uid://cf1pg2x8l8lpf" path="res://assets/objects/bullet.tscn" id="1_766c3"]
+[ext_resource type="AudioStream" uid="uid://dvijwtqha2lcw" path="res://assets/SFX/Gun Shot.mp3" id="2_r34yy"]
+[ext_resource type="Texture2D" uid="uid://befuhie2mbaf0" path="res://assets/sprites/Weapons/MultiDirectional.png" id="3_e262n"]
+[ext_resource type="Resource" uid="uid://4ujiwqxu300u" path="res://assets/fire patterns/Wide Sweep 50.tres" id="4_sweep"]
+[ext_resource type="Script" uid="uid://cvu57cdie1j01" path="res://assets/scripts/Gun.cs" id="5_ulku5"]
+
+[resource]
+script = ExtResource("5_ulku5")
+GunImage = ExtResource("3_e262n")
+GunType = 1
+GunDescription = "A rapid-fire wide sweep that sprays 25 bullets to each side in a broad fan."
+AttackNumber = 2
+FireRate = 0.15
+Damage = 6
+BulletCount = 1
+FirePattern = ExtResource("4_sweep")
+MultiBulletAngle = 0.3
+BulletType = ExtResource("1_766c3")
+FireSound = ExtResource("2_r34yy")
+BulletSpeed = 900.0
+BulletLifetime = 2.0
+BulletSize = 1.5
+GunUpgrades = null

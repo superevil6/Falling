@@ -93,6 +93,14 @@ public partial class BossController : Node2D
 				break;
 			case BossActionType.Wait:
 				break;
+			case BossActionType.RainLasers:
+				boss.LaunchLaserRain(action.RainLaserCount, action.RainWarningDuration,
+					action.RainLaserDamage, action.RainLaserThickness, action.RainLaserDuration,
+					action.RainFlareTime, action.RainLaserColor);
+				break;
+			case BossActionType.DropMine:
+				boss.DropMine(action.MineDamage, action.MineRadius, action.MineScene, action.AttackNumber);
+				break;
 		}
 	}
 

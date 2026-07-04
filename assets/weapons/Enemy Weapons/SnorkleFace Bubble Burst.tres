@@ -1,0 +1,23 @@
+[gd_resource type="Resource" format=3 uid="uid://bcn1eehkislxm"]
+
+[ext_resource type="PackedScene" uid="uid://cf1pg2x8l8lpf" path="res://assets/objects/bullet.tscn" id="1_bub"]
+[ext_resource type="Texture2D" uid="uid://cxbpisoqsbtdm" path="res://assets/sprites/Weapons/Bubbler.png" id="2_bub"]
+[ext_resource type="Resource" uid="uid://ddo456kicq6ke" path="res://assets/fire patterns/Bubble Ring 100.tres" id="3_ring"]
+[ext_resource type="Script" uid="uid://cvu57cdie1j01" path="res://assets/scripts/Gun.cs" id="4_gun"]
+
+[resource]
+script = ExtResource("4_gun")
+GunImage = ExtResource("2_bub")
+GunDescription = "Belches a full 360-degree ring of ~100 slow bubble bullets, drifting outward in every direction."
+AttackNumber = 2
+FireRate = 0.1
+Damage = 2
+BulletCount = 1
+FirePattern = ExtResource("3_ring")
+BulletSpread = 8.0
+BulletType = ExtResource("1_bub")
+BulletSpeed = 100.0
+BulletLifetime = 2.0
+BulletSize = 0.5
+AuraDamages = true
+GunUpgrades = null

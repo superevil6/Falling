@@ -169,6 +169,11 @@ public partial class Enemy : Area2D
 		foreach (var anim in OneShotAnimations) {
 			if (frames.HasAnimation(anim)) frames.SetAnimationLoop(anim, false);
 		}
+		// Per-weapon attack animations (Fire1, Fire2, ...) are one-shot too, so their
+		// AnimationFinished fires and they transition back to Idle.
+		foreach (var anim in frames.GetAnimationNames()) {
+			if (anim.StartsWith("Fire")) frames.SetAnimationLoop(anim, false);
+		}
 	}
 
 	private void SpawnDestinationIndicator()
@@ -184,6 +189,9 @@ public partial class Enemy : Area2D
 	public override void _Process(double delta)
 	{
 		if (this.IsLeader == true && CurrentHealth > 0) QueueRedraw();
+		else if (CurrentHealth > 0 && this.ElementalWeakness != ElementType.NonElemental
+			&& (player ??= GetParent()?.GetNodeOrNull<Player>("Player")) != null
+			&& player.HasWeaknessInsight) QueueRedraw();
 		if (armorShellTimer > 0f) {
 			armorShellTimer -= (float)delta;
 			QueueRedraw();
@@ -497,19 +505,14 @@ public partial class Enemy : Area2D
 
 	public void TakeDamage(int damage, ElementType element, int acidStacks = 0)
 	{
-		float dmg = damage;
-		if (element != ElementType.NonElemental) {
-			if (element == ElementalWeakness) dmg *= 2f;
-			else if (element == ElementalDefense) dmg *= 0.5f;
-		}
 		int boostedReduction = Mathf.RoundToInt(scaledDamageReduction * (1f + GetLeaderBoost(LeaderType.Defense)));
-		int finalDamage = Mathf.Max(0, Mathf.RoundToInt(dmg) - boostedReduction);
-		if (currentArmor > 0) {
-			finalDamage = Mathf.CeilToInt(finalDamage * 0.5f);
-			int armorDmg = finalDamage * (1 + acidStacks);
-			currentArmor = Mathf.Max(0, currentArmor - armorDmg);
-			armorShellTimer = 0.5f;
-		}
+		bool isWeakness = element != ElementType.NonElemental && element == ElementalWeakness;
+		bool isResisted = element != ElementType.NonElemental && element == ElementalDefense;
+		bool hadArmor = currentArmor > 0;
+		var hit = Combat.ResolveEnemyHit(damage, isWeakness, isResisted, boostedReduction, currentArmor, acidStacks);
+		int finalDamage = hit.HealthLoss;
+		currentArmor = hit.RemainingArmor;
+		if (hadArmor) armorShellTimer = 0.5f;
 		CurrentHealth -= finalDamage;
 		if (finalDamage > 0) FloatingDamageText.Spawn(this, GlobalPosition, finalDamage, FloatingDamageText.ElementColor(element, new Color(1f, 0.95f, 0.85f)));
 		if (CurrentHealth > 0) FlashRed();
@@ -655,6 +658,27 @@ public partial class Enemy : Area2D
 		activeDeployables.Add(mine);
 	}
 
+	// Drops a single mine at this enemy's position and plays the given attack
+	// animation. Unlike the autonomous UsesMines path, this is a one-shot scripted
+	// attack (no cooldown/cap), so a BossController can trigger it directly.
+	public void DropMine(int damage, float radius, PackedScene scene = null, AttackNumber attackNumber = AttackNumber.Default)
+	{
+		if (mineScene == null) {
+			mineScene = GD.Load<PackedScene>("res://assets/objects/Mine.tscn");
+		}
+		PackedScene toUse = scene ?? mineScene;
+		if (toUse == null) return;
+		var mine = toUse.Instantiate<Mine>();
+		mine.GlobalPosition = GlobalPosition;
+		mine.Damage = Mathf.Max(1, Mathf.RoundToInt(damage * ComputeStageScale()));
+		mine.Radius = radius;
+		mine.TargetsEnemy = false;
+		mine.TargetsPlayer = true;
+		GetParent().AddChild(mine);
+		PlayAttackAnimation(attackNumber);
+		animatedSprite2D?.Play();
+	}
+
 	private void ApplyPhasingShader()
 	{
 		if (animatedSprite2D == null) return;
@@ -677,18 +701,34 @@ public partial class Enemy : Area2D
 		if (currentArmor > 0 && armorShellTimer > 0f && CurrentHealth > 0) {
 			DrawCircle(Vector2.Zero, 100f, new Color(0.7f, 0.85f, 1f, 0.3f));
 		}
+		if (CurrentHealth > 0 && this.ElementalWeakness != ElementType.NonElemental) {
+			var pw = GetParent()?.GetNodeOrNull<Player>("Player");
+			if (pw != null && pw.HasWeaknessInsight) DrawWeaknessIndicator();
+		}
 		if (!hasBeenHit || CurrentHealth <= 0) return;
 		var p = GetParent()?.GetNodeOrNull<Player>("Player");
 		if (p == null || !p.HasSeeEnemyHealth) return;
-		float barWidth = 72f;
-		float barHeight = 10f;
-		float yOffset = -42f;
+		float barWidth = 100f;
+		float barHeight = 16f;
+		float yOffset = -48f;
 		float maxHealth = Mathf.Max(1, scaledMaxHealth);
 		float healthRatio = Mathf.Clamp((float)CurrentHealth / maxHealth, 0f, 1f);
 		Vector2 barPos = new Vector2(-barWidth / 2f, yOffset);
 		DrawRect(new Rect2(barPos, new Vector2(barWidth, barHeight)), new Color(0.1f, 0.1f, 0.1f, 0.85f));
 		DrawRect(new Rect2(barPos, new Vector2(barWidth * healthRatio, barHeight)), new Color(0.9f, 0.2f, 0.2f));
 		DrawRect(new Rect2(barPos, new Vector2(barWidth, barHeight)), Colors.Black, false, 1.0f);
+	}
+
+	// Small element-colored diamond above the enemy revealing its elemental weakness
+	// (shown only while the player has the WeaknessInsight upgrade).
+	private void DrawWeaknessIndicator()
+	{
+		Color c = FloatingDamageText.ElementColor(this.ElementalWeakness, Colors.White);
+		float y = -58f;
+		float s = 7f;
+		Vector2[] pts = { new(0f, y - s), new(s, y), new(0f, y + s), new(-s, y) };
+		DrawColoredPolygon(pts, c);
+		DrawPolyline(new Vector2[] { pts[0], pts[1], pts[2], pts[3], pts[0] }, Colors.Black, 1.5f);
 	}
 
 	private void DrawLeaderAura()
@@ -719,24 +759,23 @@ public partial class Enemy : Area2D
 	}
 
 	private void _on_animated_sprite_2d_animation_finished() {
-		switch (animatedSprite2D.Animation) {
+		string anim = animatedSprite2D.Animation;
+		switch (anim) {
 			case "Explode":
 			case "Death":
 			HandleDeathFinished();
-			break;
-			case "Shoot":
-			animatedSprite2D.Animation = "Idle";
-			animatedSprite2D.Play();
-			break;
+			return;
 			case "Spawn":
 			spawnComplete = true;
 			animatedSprite2D.Animation = "Idle";
 			animatedSprite2D.Play();
-			break;
-			case "Fire":
+			return;
+		}
+		// "Shoot", "Fire" and the per-weapon attack animations (Fire1, Fire2, ...)
+		// all fall back to Idle once they finish.
+		if (anim == "Shoot" || anim.StartsWith("Fire")) {
 			animatedSprite2D.Animation = "Idle";
 			animatedSprite2D.Play();
-			break;
 		}
 	}
 	private void DropItems() {
@@ -800,13 +839,23 @@ public partial class Enemy : Area2D
 		sprite.Play();
 	}
 
-	private void PlayAttackAnimation()
+	private void PlayAttackAnimation(AttackNumber attackNumber = AttackNumber.Default)
 	{
 		if (animatedSprite2D == null) return;
 		var frames = animatedSprite2D.SpriteFrames;
-		if (frames != null && frames.HasAnimation("Fire")) {
+		if (frames == null) return;
+		// Prefer the attack's dedicated animation (e.g. "Fire1") when it exists, so a
+		// boss can show a distinct animation per weapon or scripted attack.
+		if (attackNumber != AttackNumber.Default) {
+			string named = attackNumber.ToString();
+			if (frames.HasAnimation(named)) {
+				animatedSprite2D.Animation = named;
+				return;
+			}
+		}
+		if (frames.HasAnimation("Fire")) {
 			animatedSprite2D.Animation = "Fire";
-		} else if (frames != null && frames.HasAnimation("Shoot")) {
+		} else if (frames.HasAnimation("Shoot")) {
 			animatedSprite2D.Animation = "Shoot";
 		}
 	}
@@ -833,7 +882,7 @@ public partial class Enemy : Area2D
 		Sfx.Play(this, gun.FireSound);
 		int baseDamage = Mathf.RoundToInt(gun.Damage * ComputeStageScale());
 		int boostedDamage = Mathf.RoundToInt(baseDamage * (1f + GetLeaderBoost(LeaderType.Attack)));
-		PlayAttackAnimation();
+		PlayAttackAnimation(gun.AttackNumber);
 		animatedSprite2D.LookAt(baseDir);
 		animatedSprite2D.Play();
 		foreach (Vector2 baseDirection in BuildPatternDirections(gun, pattern, baseDir)) {
@@ -908,6 +957,24 @@ public partial class Enemy : Area2D
 	// Shows an attack-warning indicator for the given lead time. Public so bosses
 	// can telegraph special attacks before they land.
 	public void ShowTelegraph(float duration) => SpawnAttackIndicator(duration);
+
+	// Launches a small beam upward from this enemy; when it reaches the top of the
+	// screen, warning indicators appear and large lasers rain down at those spots.
+	// Damage scales with stage like the enemy's guns. Public so a BossController can
+	// drive it from a scripted attack pattern.
+	public void LaunchLaserRain(int count, float warningDuration, int damage,
+		float thickness, float laserDuration, float flareTime, Color color) {
+		var rain = new LaserRainAttack();
+		rain.LaserCount = count;
+		rain.WarningDuration = warningDuration;
+		rain.LaserDamage = Mathf.Max(1, Mathf.RoundToInt(damage * ComputeStageScale()));
+		rain.LaserThickness = thickness;
+		rain.LaserDuration = laserDuration;
+		rain.FlareTime = flareTime;
+		rain.LaserColor = color;
+		rain.GlobalPosition = GlobalPosition;
+		GetParent().AddChild(rain);
+	}
 
 	// Spawns a minion at this enemy's position that walks out to Position + offset
 	// using the normal spawn-animation flow. Returns the spawned enemy.

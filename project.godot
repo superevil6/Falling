@@ -15,7 +15,7 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 [application]
 
 config/name="Falling"
-run/main_scene="res://assets/objects/TitleScreen.tscn"
+run/main_scene="res://assets/objects/Intro.tscn"
 config/features=PackedStringArray("4.7", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 

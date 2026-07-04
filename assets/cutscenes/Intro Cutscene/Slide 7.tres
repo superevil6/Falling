@@ -1,0 +1,11 @@
+[gd_resource type="Resource" format=3 uid="uid://cbjaluh7v3jbq"]
+
+[ext_resource type="Script" uid="uid://w0thch4hj6wo" path="res://assets/scripts/CutsceneSlide.cs" id="1_3r20p"]
+
+[resource]
+script = ExtResource("1_3r20p")
+Text = "Life... from the element mercury."
+TextPosition = 0
+TypewriterText = true
+Fullscreen = true
+BackgroundColor = Color(0.51375306, 1.11904e-06, 1.92523e-07, 1)

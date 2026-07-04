@@ -11,6 +11,10 @@ public partial class Gun : Resource
 	public GunType GunType {get; set;}
 	[Export]
 	public string GunDescription {get; set;}
+	// Selects which attack animation the wielder plays when firing this gun (e.g.
+	// Fire1/Fire2/Fire3). Default uses the generic "Fire"/"Shoot" animation.
+	[Export]
+	public AttackNumber AttackNumber {get; set;}
 	[Export]
 	public float FireRate {get;set;}
 	[Export]
@@ -150,6 +154,8 @@ public partial class Gun : Resource
 	[Export]
 	public int ExperiencePerLevel {get;set;} = 10;
 	[Export]
+	public int ExperienceCurveStep {get;set;} = 5;
+	[Export]
 	public int CurrentExperience {get;set;}
 	[Export]
 	public int CurrentLevel {get;set;}
@@ -159,9 +165,11 @@ public partial class Gun : Resource
 	public void AddExperience(int amount)
 	{
 		CurrentExperience += amount;
-		while (ExperiencePerLevel > 0 && CurrentExperience >= ExperiencePerLevel) {
-			CurrentExperience -= ExperiencePerLevel;
+		int needed = Helpers.ExperienceForLevel(CurrentLevel, ExperiencePerLevel, ExperienceCurveStep);
+		while (needed > 0 && CurrentExperience >= needed) {
+			CurrentExperience -= needed;
 			CurrentLevel++;
+			needed = Helpers.ExperienceForLevel(CurrentLevel, ExperiencePerLevel, ExperienceCurveStep);
 		}
 	}
 

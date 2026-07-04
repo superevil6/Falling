@@ -1,0 +1,10 @@
+[gd_resource type="Resource" format=3 uid="uid://6hy2x8fgfjls"]
+
+[ext_resource type="Script" uid="uid://w0thch4hj6wo" path="res://assets/scripts/CutsceneSlide.cs" id="1_xler8"]
+
+[resource]
+script = ExtResource("1_xler8")
+Text = "The year is 2037. Humans left earth millions of years ago. All that remains are the robots they created before their departure."
+TextPosition = 0
+TypewriterText = true
+Fullscreen = true

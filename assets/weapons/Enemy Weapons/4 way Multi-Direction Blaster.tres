@@ -1,0 +1,21 @@
+[gd_resource type="Resource" format=3 uid="uid://byt74n5in56dc"]
+
+[ext_resource type="PackedScene" uid="uid://cf1pg2x8l8lpf" path="res://assets/objects/bullet.tscn" id="1_766c3"]
+[ext_resource type="AudioStream" uid="uid://dvijwtqha2lcw" path="res://assets/SFX/Gun Shot.mp3" id="2_r34yy"]
+[ext_resource type="Texture2D" uid="uid://befuhie2mbaf0" path="res://assets/sprites/Weapons/MultiDirectional.png" id="3_e262n"]
+[ext_resource type="Script" uid="uid://cvu57cdie1j01" path="res://assets/scripts/Gun.cs" id="4_ulku5"]
+
+[resource]
+script = ExtResource("4_ulku5")
+GunImage = ExtResource("3_e262n")
+FireRate = 0.5
+Damage = 10
+BulletCount = 4
+DirectionalCount = 4
+DirectionalAngle = 180.0
+MultiBulletAngle = 0.3
+BulletType = ExtResource("1_766c3")
+FireSound = ExtResource("2_r34yy")
+BulletLifetime = 1.0
+BulletSize = 2.0
+GunUpgrades = null

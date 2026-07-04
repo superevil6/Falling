@@ -15,6 +15,7 @@ public partial class PlayerState : Resource
 	[Export] public int Speed {get;set;}
 	[Export] public bool HasSeeEnemyHealth {get;set;}
 	[Export] public bool HasLaserSight {get;set;}
+	[Export] public bool HasWeaknessInsight {get;set;}
 	[Export] public int FireDefenseStacks {get;set;}
 	[Export] public int IceDefenseStacks {get;set;}
 	[Export] public int ElectricDefenseStacks {get;set;}

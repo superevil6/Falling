@@ -1,0 +1,24 @@
+[gd_resource type="Resource" format=3 uid="uid://dhsnipe2xk3ca"]
+
+[ext_resource type="SpriteFrames" uid="uid://bb7nrvc0kw37n" path="res://assets/sprites/Weapons/Bullet 3.aseprite" id="1_svlad"]
+[ext_resource type="PackedScene" uid="uid://cf1pg2x8l8lpf" path="res://assets/objects/bullet.tscn" id="2_dw3oh"]
+[ext_resource type="Texture2D" uid="uid://u7faqv4fufa0" path="res://assets/sprites/Weapons/Sniper Rifle.png" id="3_vccqe"]
+[ext_resource type="Script" uid="uid://cvu57cdie1j01" path="res://assets/scripts/Gun.cs" id="4_28c7j"]
+
+[resource]
+script = ExtResource("4_28c7j")
+GunImage = ExtResource("3_vccqe")
+GunType = 2
+GunDescription = "A charged high-caliber sniper round that deals heavy damage and ricochets twice off arena walls."
+AttackNumber = 1
+FireRate = 1.5
+Damage = 60
+BulletCount = 1
+MultiBulletAngle = 0.1
+BulletType = ExtResource("2_dw3oh")
+BulletSpeed = 1400.0
+BulletSpriteFrames = ExtResource("1_svlad")
+BulletLifetime = 3.0
+BulletSize = 4.0
+Ricochet = 2
+GunUpgrades = null

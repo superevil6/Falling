@@ -1,0 +1,10 @@
+[gd_resource type="Resource" format=3 uid="uid://bc1diqhai8l0a"]
+
+[ext_resource type="Script" uid="uid://w0thch4hj6wo" path="res://assets/scripts/CutsceneSlide.cs" id="1_g3xw1"]
+
+[resource]
+script = ExtResource("1_g3xw1")
+Text = "And in those millions of year... life has evolved from a new source."
+TextPosition = 0
+TypewriterText = true
+Fullscreen = true

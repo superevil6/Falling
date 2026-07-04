@@ -1,0 +1,64 @@
+[gd_resource type="Resource" format=3 uid="uid://5byq6nhjxjxm"]
+
+[ext_resource type="Script" uid="uid://bfgt7nxol2r7g" path="res://assets/scripts/BossPhase.cs" id="1"]
+[ext_resource type="Script" uid="uid://kw4e1fehbgul" path="res://assets/scripts/BossAction.cs" id="2"]
+[ext_resource type="Resource" uid="uid://dhsnipe2xk3ca" path="res://assets/weapons/Enemy Weapons/Dichotomyoptic Heavy Sniper.tres" id="3_sniper"]
+[ext_resource type="Resource" uid="uid://dsweepblst5ea" path="res://assets/weapons/Enemy Weapons/Dichotomyoptic Sweep Blaster.tres" id="4_sweep"]
+[ext_resource type="Resource" uid="uid://dufu7d47bl4u" path="res://assets/weapons/Enemy Weapons/Dichotomyoptic Giant Laser.tres" id="5_laser"]
+
+[sub_resource type="Resource" id="tele_sniper"]
+script = ExtResource("2")
+Type = 1
+Duration = 0.8
+SummonScenes = null
+
+[sub_resource type="Resource" id="fire_sniper"]
+script = ExtResource("2")
+OverrideGun = ExtResource("3_sniper")
+SummonScenes = null
+
+[sub_resource type="Resource" id="wait_a"]
+script = ExtResource("2")
+Type = 4
+Duration = 0.4
+SummonScenes = null
+
+[sub_resource type="Resource" id="tele_sweep"]
+script = ExtResource("2")
+Type = 1
+Duration = 0.6
+SummonScenes = null
+
+[sub_resource type="Resource" id="fire_sweep"]
+script = ExtResource("2")
+Duration = 0.15
+OverrideGun = ExtResource("4_sweep")
+SummonScenes = null
+
+[sub_resource type="Resource" id="wait_b"]
+script = ExtResource("2")
+Type = 4
+Duration = 0.4
+SummonScenes = null
+
+[sub_resource type="Resource" id="tele_laser"]
+script = ExtResource("2")
+Type = 1
+Duration = 1.0
+SummonScenes = null
+
+[sub_resource type="Resource" id="fire_laser"]
+script = ExtResource("2")
+Duration = 0.18
+OverrideGun = ExtResource("5_laser")
+SummonScenes = null
+
+[sub_resource type="Resource" id="wait_c"]
+script = ExtResource("2")
+Type = 4
+Duration = 0.6
+SummonScenes = null
+
+[resource]
+script = ExtResource("1")
+Actions = Array[Resource]([SubResource("tele_sniper"), SubResource("fire_sniper"), SubResource("fire_sniper"), SubResource("wait_a"), SubResource("tele_sweep"), SubResource("fire_sweep"), SubResource("fire_sweep"), SubResource("fire_sweep"), SubResource("fire_sweep"), SubResource("fire_sweep"), SubResource("wait_b"), SubResource("tele_laser"), SubResource("fire_laser"), SubResource("fire_laser"), SubResource("fire_laser"), SubResource("fire_laser"), SubResource("fire_laser"), SubResource("fire_laser"), SubResource("fire_laser"), SubResource("fire_laser"), SubResource("fire_laser"), SubResource("fire_laser"), SubResource("fire_laser"), SubResource("fire_laser"), SubResource("wait_c")])

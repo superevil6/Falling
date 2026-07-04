@@ -1,0 +1,10 @@
+[gd_resource type="Resource" format=3 uid="uid://l3c1erticdcn"]
+
+[ext_resource type="Script" uid="uid://w0thch4hj6wo" path="res://assets/scripts/CutsceneSlide.cs" id="1_u3sst"]
+
+[resource]
+script = ExtResource("1_u3sst")
+Text = "Millions of years have passed since this began though, and the resources of most planets have been extracted. Large cavernous holes and mineshafts reach down to the core of these mostly lifeless husks of the planets."
+TextPosition = 0
+TypewriterText = true
+Fullscreen = true

@@ -1,0 +1,61 @@
+[gd_resource type="Resource" format=3 uid="uid://sj4kp8xd4wv7"]
+
+[ext_resource type="Script" uid="uid://bfgt7nxol2r7g" path="res://assets/scripts/BossPhase.cs" id="1"]
+[ext_resource type="Resource" uid="uid://4e24meju8y6y" path="res://assets/weapons/Enemy Weapons/Boss Ricochet Sniper Rifle.tres" id="1_whge5"]
+[ext_resource type="Script" uid="uid://kw4e1fehbgul" path="res://assets/scripts/BossAction.cs" id="2"]
+[ext_resource type="PackedScene" uid="uid://tng40x5blnrr" path="res://assets/enemies/ball_enemy.tscn" id="3"]
+[ext_resource type="Resource" uid="uid://bcn1eehkislxm" path="res://assets/weapons/Enemy Weapons/SnorkleFace Bubble Burst.tres" id="4_bubble"]
+
+[sub_resource type="Resource" id="BossAction_a"]
+script = ExtResource("2")
+Duration = 1.0
+OverrideGun = ExtResource("1_whge5")
+SummonScenes = null
+
+[sub_resource type="Resource" id="BossAction_b"]
+script = ExtResource("2")
+Duration = 1.0
+AimOffsetDegrees = 20.0
+SummonScenes = null
+
+[sub_resource type="Resource" id="BossAction_tele_mine"]
+script = ExtResource("2")
+Type = 1
+Duration = 0.8
+SummonScenes = null
+
+[sub_resource type="Resource" id="BossAction_mine"]
+script = ExtResource("2")
+Type = 6
+Duration = 1.2
+SummonScenes = null
+MineDamage = 45
+MineRadius = 190.0
+AttackNumber = 1
+
+[sub_resource type="Resource" id="BossAction_bubble"]
+script = ExtResource("2")
+Duration = 1.5
+OverrideGun = ExtResource("4_bubble")
+SummonScenes = null
+
+[sub_resource type="Resource" id="BossAction_rain"]
+script = ExtResource("2")
+Type = 5
+Duration = 3.0
+SummonScenes = null
+RainLaserCount = 5
+RainLaserDuration = 1.2
+RainFlareTime = 0.4
+
+[sub_resource type="Resource" id="BossAction_c"]
+script = ExtResource("2")
+Type = 2
+Duration = 3.0
+SummonScenes = Array[PackedScene]([ExtResource("3")])
+
+[resource]
+script = ExtResource("1")
+MovementType = 3
+MovementSpeed = 80.0
+Actions = Array[Resource]([SubResource("BossAction_a"), SubResource("BossAction_b"), SubResource("BossAction_tele_mine"), SubResource("BossAction_mine"), SubResource("BossAction_bubble"), SubResource("BossAction_rain"), SubResource("BossAction_c")])
