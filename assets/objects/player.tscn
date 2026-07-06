@@ -2,16 +2,12 @@
 
 [ext_resource type="Script" uid="uid://dhriy820co01m" path="res://assets/scripts/Player.cs" id="1_l4bou"]
 [ext_resource type="PackedScene" uid="uid://cf1pg2x8l8lpf" path="res://assets/objects/bullet.tscn" id="2_34ecl"]
-[ext_resource type="Resource" uid="uid://svn642061r6v" path="res://assets/weapons/Swarm Cannon.tres" id="3_34ecl"]
 [ext_resource type="Resource" uid="uid://t4f5lqyn51u2" path="res://assets/weapons/Simple Sword.tres" id="3_idqgg"]
-[ext_resource type="Resource" uid="uid://bp6mqrys7v0op" path="res://assets/weapons/Tesla Coil.tres" id="4_34ecl"]
-[ext_resource type="Resource" uid="uid://d3b7r5oey1p82" path="res://assets/weapons/Shotgun.tres" id="5_fg3d2"]
-[ext_resource type="Resource" uid="uid://dq3psdjhaotip" path="res://assets/weapons/Multi-Direction Blaster.tres" id="6_1qp14"]
+[ext_resource type="Resource" uid="uid://cc5s5y6gpiagm" path="res://assets/weapons/Pistol.tres" id="3_nqkij"]
+[ext_resource type="Resource" uid="uid://chpqx3ssxn3se" path="res://assets/weapons/Gas Gun.tres" id="4_fh75e"]
+[ext_resource type="Resource" uid="uid://c8b2ycj85fkc5" path="res://assets/weapons/Slicer.tres" id="5_bkysh"]
 [ext_resource type="SpriteFrames" uid="uid://jrumw1swp6rs" path="res://assets/sprites/Player.aseprite" id="6_nqkij"]
 [ext_resource type="Shader" uid="uid://nej1tvi1ocse" path="res://assets/shaders/PixelArt.gdshader" id="7_fh75e"]
-[ext_resource type="Resource" uid="uid://dx5n6or0rm1b" path="res://assets/body mods/body mod.tres" id="7_qgtm8"]
-[ext_resource type="Resource" uid="uid://b48w24n0dq0s7" path="res://assets/body mods/head mod.tres" id="8_7muya"]
-[ext_resource type="Resource" uid="uid://dgdydgnsl0p2n" path="res://assets/body mods/limbs mod.tres" id="9_y0ns2"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_bkysh"]
 shader = ExtResource("7_fh75e")
@@ -34,8 +30,8 @@ collision_mask = 17
 script = ExtResource("1_l4bou")
 MaxHealth = 100
 MinionBullet = ExtResource("2_34ecl")
-Guns = [ExtResource("3_34ecl"), ExtResource("4_34ecl"), ExtResource("5_fg3d2"), ExtResource("6_1qp14")]
-BodyMods = [ExtResource("7_qgtm8"), ExtResource("8_7muya"), ExtResource("9_y0ns2"), null]
+Guns = [ExtResource("3_nqkij"), ExtResource("4_fh75e"), ExtResource("5_bkysh")]
+BodyMods = []
 Melee = ExtResource("3_idqgg")
 WallKickPriorityTime = 0.5
 DashDuration = 0.5

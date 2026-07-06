@@ -17,8 +17,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Compile the production file directly rather than referencing the whole game
-         project, so tests build without dragging in every Node type. -->
+    <!-- Compile the production files directly rather than referencing the whole game
+         project, so tests build without dragging in every Node type. These are all
+         plain classes/enums that only touch GodotSharp's managed types (no engine). -->
     <Compile Include="../../assets/scripts/Combat.cs" />
+    <Compile Include="../../assets/scripts/LevelUpMath.cs" />
+    <Compile Include="../../assets/scripts/StatusEffectController.cs" />
+    <Compile Include="../../assets/scripts/StatusEffectType.cs" />
   </ItemGroup>
 </Project>

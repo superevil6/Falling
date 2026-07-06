@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="Gun" format=3 uid="uid://chpqx3ssxn3se"]
+
+[ext_resource type="PackedScene" uid="uid://cf1pg2x8l8lpf" path="res://assets/objects/bullet.tscn" id="1_bullet"]
+[ext_resource type="Script" uid="uid://cvu57cdie1j01" path="res://assets/scripts/Gun.cs" id="2_gun"]
+[ext_resource type="SpriteFrames" uid="uid://3h6ccxdn3c6e" path="res://assets/sprites/Weapons/Gas Bullet.aseprite" id="3_frames"]
+[ext_resource type="Texture2D" uid="uid://7n64wdqvmtd5" path="res://assets/sprites/Weapons/Handgun.png" id="4_img"]
+[ext_resource type="AudioStream" uid="uid://dvijwtqha2lcw" path="res://assets/SFX/Gun Shot.mp3" id="5_sfx"]
+
+[resource]
+script = ExtResource("2_gun")
+GunImage = ExtResource("4_img")
+GunType = 0
+GunDescription = "Fires gas rounds that burst into a lingering cloud, poisoning anything caught inside."
+FireRate = 0.8
+Damage = 4
+BulletCount = 1
+MultiBulletAngle = 0.3
+BulletType = ExtResource("1_bullet")
+FireSound = ExtResource("5_sfx")
+BulletSpriteFrames = ExtResource("3_frames")
+BulletSpeed = 1400.0
+BulletLifetime = 1.0
+BulletSize = 2.0
+Gas = true
+GasRadius = 70.0
+GasDuration = 4.0
+GasDamageInterval = 0.5
+GasDamage = 3
+GunUpgrades = null

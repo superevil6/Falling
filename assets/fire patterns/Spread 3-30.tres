@@ -1,0 +1,10 @@
+[gd_resource type="Resource" format=3 uid="uid://bor74pvhi4rc7"]
+
+[ext_resource type="Script" uid="uid://diq7ylg5d37mf" path="res://assets/scripts/FirePattern.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+Type = 1
+AimAtPlayer = true
+Count = 3
+ArcDegrees = 30.0

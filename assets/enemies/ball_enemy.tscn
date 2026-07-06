@@ -5,8 +5,8 @@
 [ext_resource type="Resource" uid="uid://t4f5lqyn51u2" path="res://assets/weapons/Simple Sword.tres" id="3_hiw2o"]
 [ext_resource type="Shader" uid="uid://nej1tvi1ocse" path="res://assets/shaders/PixelArt.gdshader" id="3_kirwa"]
 [ext_resource type="Texture2D" uid="uid://cum2gpblsuglx" path="res://assets/enemies/Ball Enemy.png" id="3_m04ux"]
-[ext_resource type="Resource" uid="uid://yinsm4qyoywv" path="res://assets/pickups/Health Pickup.tres" id="3_ntv5x"]
-[ext_resource type="Resource" uid="uid://bpi2u85b8oi7t" path="res://assets/pickups/Small EXP Pickup.tres" id="4_ebkm7"]
+[ext_resource type="PackedScene" uid="uid://kvxtmd0oovc4" path="res://assets/pickups/1hp 50.tscn" id="3_ntv5x"]
+[ext_resource type="PackedScene" uid="uid://bo6exbho5e01u" path="res://assets/pickups/1exp 50.tscn" id="4_ebkm7"]
 [ext_resource type="AudioStream" uid="uid://d1nlr5l64mmvq" path="res://assets/SFX/Explosion.wav" id="5_mx7il"]
 [ext_resource type="PackedScene" uid="uid://dq5bq4jsc66se" path="res://assets/objects/Explosion.tscn" id="6_shkpx"]
 
@@ -113,7 +113,7 @@ Size = 2.0
 EnemySprite = ExtResource("3_m04ux")
 DeathSound = ExtResource("5_mx7il")
 DeathExplosions = ExtResource("6_shkpx")
-ItemDrops = Array[Resource]([ExtResource("3_ntv5x"), ExtResource("4_ebkm7")])
+ItemDrops = Array[PackedScene]([ExtResource("3_ntv5x"), ExtResource("4_ebkm7")])
 TeleportHesitationTime = 2.0
 metadata/Enemy = false
 

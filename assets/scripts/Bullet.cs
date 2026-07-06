@@ -10,9 +10,13 @@ public partial class Bullet : Attack
 	[Export]
 	public PackedScene Explosion {get;set;}
 	[Export]
+	public PackedScene GasCloud {get;set;}
+	[Export]
 	public ElementType Element { get; set; }
 	public Color AuraColor {get;set;} = new Color(0, 0, 0, 0);
 	public float AuraRadius {get;set;} = 3f;
+	// The outermost aura ring (and the aura's damage reach) is AuraRadius * this factor.
+	private const float AuraOuterFactor = 1.6f;
 	private System.Collections.Generic.HashSet<ulong> auraDamagedIds = new System.Collections.Generic.HashSet<ulong>();
 	public Vector2 SpawnOrigin {get;set;}
 	public float SpiralRate {get;set;} = 0f;
@@ -44,7 +48,7 @@ public partial class Bullet : Attack
 	{
 		spawnPhysicsFrame = Engine.GetPhysicsFrames();
 		string shaderPath = Element switch {
-			ElementType.Fire => "res://assets/shaders/Fire.gdshader",
+			ElementType.Corrosive => "res://assets/shaders/Fire.gdshader",
 			ElementType.Ice => "res://assets/shaders/Ice.gdshader",
 			ElementType.Electric => "res://assets/shaders/Lightning.gdshader",
 			ElementType.Poison => "res://assets/shaders/Poison.gdshader",
@@ -58,16 +62,27 @@ public partial class Bullet : Attack
 				sprite.Material = mat;
 			}
 		}
+		// Start the sprite's default animation. Bullets without a Gun (sub-bullets,
+		// split bullets) return below, so play here too, not only in the Gun path.
+		PlayDefaultAnimation();
 		if (Gun == null) return;
 		if (Gun.BulletSpriteFrames != null) {
 			var bulletSprite = GetNodeOrNull<AnimatedSprite2D>("AnimatedSprite2D");
-			if (bulletSprite != null) bulletSprite.SpriteFrames = Gun.BulletSpriteFrames;
+			if (bulletSprite != null) {
+				bulletSprite.SpriteFrames = Gun.BulletSpriteFrames;
+				PlayDefaultAnimation();
+			}
 		}
 		if (Gun.SizeMultiplier > 0) {
 			Scale = new Vector2(Scale.X + Gun.SizeMultiplier, Scale.Y + Gun.SizeMultiplier);
 		}
 		if (Gun.BulletSize > 0) {
 			Scale = new Vector2(Scale.X * Gun.BulletSize, Scale.Y * Gun.BulletSize);
+		}
+		if (Gun.AuraDamages) {
+			// Size the aura so its outer edge (AuraRadius * AuraOuterFactor) spans twice the
+			// bullet's radius. Scale.X is uniform for both, so this ratio is scale-independent.
+			AuraRadius = MeasureBulletRadius() * 2f / AuraOuterFactor;
 		}
 		RemainingRicochets = Gun.Ricochet;
 		if (SpiralRate != 0f) {
@@ -92,9 +107,43 @@ public partial class Bullet : Attack
 		var outer = new Color(AuraColor.R, AuraColor.G, AuraColor.B, AuraColor.A * 0.15f);
 		var mid = new Color(AuraColor.R, AuraColor.G, AuraColor.B, AuraColor.A * 0.30f);
 		var inner = new Color(AuraColor.R, AuraColor.G, AuraColor.B, AuraColor.A * 0.45f);
-		DrawCircle(Vector2.Zero, AuraRadius * 1.6f, outer);
+		DrawCircle(Vector2.Zero, AuraRadius * AuraOuterFactor, outer);
 		DrawCircle(Vector2.Zero, AuraRadius * 1.1f, mid);
 		DrawCircle(Vector2.Zero, AuraRadius * 0.6f, inner);
+	}
+
+	// Plays the sprite's default animation ("default" if present, otherwise the first
+	// animation defined in its SpriteFrames). No-op if there's no sprite or no animations.
+	private void PlayDefaultAnimation()
+	{
+		var sprite = GetNodeOrNull<AnimatedSprite2D>("AnimatedSprite2D");
+		if (sprite?.SpriteFrames == null) return;
+		StringName anim = "default";
+		if (!sprite.SpriteFrames.HasAnimation(anim)) {
+			var names = sprite.SpriteFrames.GetAnimationNames();
+			if (names.Length == 0) return;
+			anim = names[0];
+		}
+		sprite.Play(anim);
+	}
+
+	// The bullet sprite's radius in this node's local space (texture half-size scaled by
+	// the sprite child's own scale). Falls back to the current AuraRadius if unmeasurable.
+	private float MeasureBulletRadius()
+	{
+		var sprite = GetNodeOrNull<AnimatedSprite2D>("AnimatedSprite2D");
+		if (sprite?.SpriteFrames == null) return AuraRadius;
+		StringName anim = sprite.Animation;
+		if (anim.IsEmpty || !sprite.SpriteFrames.HasAnimation(anim)) {
+			var names = sprite.SpriteFrames.GetAnimationNames();
+			if (names.Length == 0) return AuraRadius;
+			anim = names[0];
+		}
+		if (sprite.SpriteFrames.GetFrameCount(anim) == 0) return AuraRadius;
+		var tex = sprite.SpriteFrames.GetFrameTexture(anim, 0);
+		if (tex == null) return AuraRadius;
+		Vector2 sz = tex.GetSize() * sprite.Scale.Abs();
+		return Mathf.Max(sz.X, sz.Y) * 0.5f;
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -165,7 +214,7 @@ public partial class Bullet : Attack
 			Damage = Mathf.RoundToInt(growthInitialDamage * dmgFactor);
 		}
 		if (Gun != null && Gun.AuraDamages && AuraRadius > 0f && AuraColor.A > 0f) {
-			float worldRadius = AuraRadius * 1.6f * Scale.X;
+			float worldRadius = AuraRadius * AuraOuterFactor * Scale.X;
 			int auraDmg = Mathf.CeilToInt(Damage / 10f);
 			if (auraDmg > 0) {
 				foreach (var n in GetTree().GetNodesInGroup("Enemy")) {
@@ -261,6 +310,9 @@ public partial class Bullet : Attack
 		if (Gun.Explode) {
 			CallDeferred("GenerateExplosion");
 		}
+		if (Gun.Gas) {
+			CallDeferred("GenerateGasCloud");
+		}
 		if (hitEnemy && Gun.Split > 0) {
 			SpawnSplitBullets();
 			if (Gun.Pierce) return;
@@ -326,5 +378,21 @@ public partial class Bullet : Attack
 			e.Scale = new Vector2(s, s);
 		}
 		GetParent().AddChild(e);
+	}
+
+	private void GenerateGasCloud() {
+		if (GasCloud == null || Gun == null) return;
+		if (!global::GasCloud.CanSpawn()) return;
+		GasCloud cloud = GasCloud.Instantiate<GasCloud>();
+		cloud.Position = Position;
+		cloud.Radius = Gun.GasRadius;
+		cloud.Duration = Gun.GasDuration;
+		cloud.DamageInterval = Gun.GasDamageInterval;
+		cloud.Damage = Gun.GasDamage > 0 ? Gun.GasDamage : Mathf.Max(1, Damage / 4);
+		if (Element != ElementType.NonElemental) cloud.Element = Element;
+		// Layer 4 = player attack, layer 5 = enemy attack. The bullet's own layer
+		// decides who the cloud is hostile to, so player and enemy gas mirror correctly.
+		cloud.DamagesEnemies = GetCollisionLayerValue(4);
+		GetParent().AddChild(cloud);
 	}
 }

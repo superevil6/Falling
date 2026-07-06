@@ -1,8 +1,0 @@
-[gd_resource type="Resource" load_steps=3 format=3 uid="uid://yinsm4qyoywv"]
-
-[ext_resource type="PackedScene" uid="uid://kvxtmd0oovc4" path="res://assets/pickups/Health Pickup.tscn" id="1_qvbtu"]
-[ext_resource type="Script" uid="uid://b4jyrbyhgktpr" path="res://assets/scripts/ItemDrop.cs" id="2_anvq6"]
-
-[resource]
-script = ExtResource("2_anvq6")
-Item = ExtResource("1_qvbtu")

@@ -7,7 +7,11 @@ public class StatusEffectController
 	public float DamagePerStackPerSecond = 1f;
 	public float SlowPerStack = 0.1f;
 	public float FireRateReductionPerStack = 0.1f;
-	public float SpreadPerStack = 0.05f;
+	// Blind: each stack widens the random aim cone (full width, degrees) and darkens the
+	// entity toward black. The cone is capped so aim never wraps past a semicircle.
+	public float BlindSpreadDegreesPerStack = 6f;
+	public float MaxBlindSpreadDegrees = 170f;
+	public float BlindDarknessPerStack = 0.1f;
 
 	private Dictionary<StatusEffectType, List<float>> stackExpiries = new Dictionary<StatusEffectType, List<float>>();
 	// Per-type resistance in [0, 0.95]; shortens the duration of newly-applied stacks.
@@ -55,33 +59,48 @@ public class StatusEffectController
 		return 1f + GetStackCount(StatusEffectType.ReducedFireRate) * FireRateReductionPerStack;
 	}
 
-	public float GetSpreadIncrease()
+	// Full width (degrees) of the random cone that a blinded shooter's aim is deviated
+	// within. 0 when not blinded. Callers roll a symmetric angle in [-half, +half].
+	public float GetBlindSpreadDegrees()
 	{
-		return GetStackCount(StatusEffectType.Blind) * SpreadPerStack;
+		float cone = GetStackCount(StatusEffectType.Blind) * BlindSpreadDegreesPerStack;
+		return Mathf.Min(MaxBlindSpreadDegrees, cone);
 	}
 
 	public Color GetTint()
 	{
+		// Blend the "color" statuses (fire/slow/shock). Blind is handled separately below:
+		// rather than tinting a hue, it darkens the whole result toward black.
 		float weightSum = 0f;
 		Vector3 accum = Vector3.Zero;
+		int blindStacks = 0;
 		foreach (var kv in stackExpiries) {
 			int n = kv.Value.Count;
 			if (n <= 0) continue;
+			if (kv.Key == StatusEffectType.Blind) { blindStacks = n; continue; }
 			float ratio = Mathf.Min(1f, n / 10f);
 			Color c = kv.Key switch {
 				StatusEffectType.DamageOverTime => new Color(1f, 0.15f, 0.15f),
 				StatusEffectType.Slow => new Color(0.3f, 0.5f, 1f),
 				StatusEffectType.ReducedFireRate => new Color(1f, 0.95f, 0.2f),
-				StatusEffectType.Blind => new Color(0.25f, 0.25f, 0.25f),
 				_ => Colors.White,
 			};
 			accum += new Vector3(c.R, c.G, c.B) * ratio;
 			weightSum += ratio;
 		}
-		if (weightSum <= 0f) return Colors.White;
-		Vector3 avg = accum / weightSum;
-		float intensity = Mathf.Min(1f, weightSum);
-		return Colors.White.Lerp(new Color(avg.X, avg.Y, avg.Z), intensity);
+		Color tint;
+		if (weightSum <= 0f) {
+			tint = Colors.White;
+		} else {
+			Vector3 avg = accum / weightSum;
+			float intensity = Mathf.Min(1f, weightSum);
+			tint = Colors.White.Lerp(new Color(avg.X, avg.Y, avg.Z), intensity);
+		}
+		if (blindStacks > 0) {
+			float darkness = Mathf.Min(1f, blindStacks * BlindDarknessPerStack);
+			tint = tint.Lerp(Colors.Black, darkness);
+		}
+		return tint;
 	}
 
 	public int Tick(float delta)

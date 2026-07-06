@@ -1,0 +1,22 @@
+[gd_resource type="Resource" format=3 uid="uid://dnfyor4rqdv41"]
+
+[ext_resource type="SpriteFrames" uid="uid://bfa3p7wq3kr2y" path="res://assets/sprites/Weapons/Rocket Bullet.aseprite" id="1_8amut"]
+[ext_resource type="PackedScene" uid="uid://cf1pg2x8l8lpf" path="res://assets/objects/bullet.tscn" id="1_j3lax"]
+[ext_resource type="Script" uid="uid://cvu57cdie1j01" path="res://assets/scripts/Gun.cs" id="2_0dpj4"]
+[ext_resource type="AudioStream" uid="uid://dvijwtqha2lcw" path="res://assets/SFX/Gun Shot.mp3" id="3_bwptp"]
+
+[resource]
+script = ExtResource("2_0dpj4")
+GunType = 4
+FireRate = 3.0
+Damage = 12
+BulletCount = 1
+BulletType = ExtResource("1_j3lax")
+FireSound = ExtResource("3_bwptp")
+BulletSpeed = 750.0
+BulletSpriteFrames = ExtResource("1_8amut")
+BulletLifetime = 10.0
+BulletSize = 5.0
+Explode = true
+ExplosionRadius = 20.0
+GunUpgrades = null

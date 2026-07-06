@@ -14,4 +14,4 @@ script = ExtResource("2_46a4g")
 CollisionShape = SubResource("RectangleShape2D_n43am")
 Graphics = [ExtResource("1_yhl76"), ExtResource("2_wnlxe"), ExtResource("3_svyd3"), ExtResource("4_afarx")]
 Height = 200.0
-DotStacksPerTick = 5
+StatusTickInterval = 0.0

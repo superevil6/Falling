@@ -52,6 +52,19 @@ public partial class Gun : Resource
 	public bool Explode {get;set;}
 	[Export]
 	public float ExplosionRadius {get;set;} = 0f;
+	// Gas rounds: on impact (enemy, obstacle, or wall) the bullet leaves a lingering
+	// gas cloud that damages whoever is inside it over time and then fades.
+	[Export]
+	public bool Gas {get;set;} = false;
+	[Export]
+	public float GasRadius {get;set;} = 60f;
+	[Export]
+	public float GasDuration {get;set;} = 4f;
+	[Export]
+	public float GasDamageInterval {get;set;} = 0.5f;
+	// Damage per tick. 0 = derive from the bullet's damage (a quarter, min 1).
+	[Export]
+	public int GasDamage {get;set;} = 0;
 	[Export]
 	public int Split {get;set;}
 	// "Carrier" bullet: while alive it periodically fires sub-bullets that deal half
@@ -131,6 +144,9 @@ public partial class Gun : Resource
 	public bool AuraDamages {get;set;} = false;
 	[Export]
 	public int AcidRoundsCount {get;set;} = 0;
+	// Bullets ignore enemy armor: no reduced damage while an enemy is shielded.
+	[Export]
+	public bool ArmorPierce {get;set;} = false;
 	[Export]
 	public int MinDamage {get;set;} = 1;
 	[Export]
@@ -169,6 +185,7 @@ public partial class Gun : Resource
 		while (needed > 0 && CurrentExperience >= needed) {
 			CurrentExperience -= needed;
 			CurrentLevel++;
+			Damage += 1;
 			needed = Helpers.ExperienceForLevel(CurrentLevel, ExperiencePerLevel, ExperienceCurveStep);
 		}
 	}
@@ -187,6 +204,13 @@ public partial class Gun : Resource
 				break;
 			}
 			case GunUpgradeType.MultiBulletAngle: MultiBulletAngle += upgrade.Value; break;
+			case GunUpgradeType.MultiDirectionalShot: {
+				// Add another firing direction, then spread all directions evenly around a
+				// full circle so the angle never has to be set by hand: 2 → 180°, 4 → 90°.
+				DirectionalCount = Mathf.Max(1, DirectionalCount) + Mathf.Max(1, Mathf.RoundToInt(upgrade.Value));
+				DirectionalAngle = 360f / DirectionalCount;
+				break;
+			}
 			case GunUpgradeType.BulletLifeTime: BulletLifetime += upgrade.Value; break;
 			case GunUpgradeType.Pierce: Pierce = upgrade.Value > 0; break;
 			case GunUpgradeType.Explode: Explode = upgrade.Value > 0; break;
@@ -200,15 +224,19 @@ public partial class Gun : Resource
 			case GunUpgradeType.Element:
 				Element = upgrade.Element;
 				switch (upgrade.Element) {
-					case ElementType.Fire: DotStacksPerHit += 1; break;
+					case ElementType.Corrosive: DotStacksPerHit += 1; break;
 					case ElementType.Ice: SlowStacksPerHit += 1; break;
 					case ElementType.Electric: FireRateStacksPerHit += 1; break;
 				}
 				GD.Print($"Gun '{SourceName}' applied Element upgrade → Element {Element}, DoT/Slow/FireRate per hit: {DotStacksPerHit}/{SlowStacksPerHit}/{FireRateStacksPerHit}");
 				break;
 			case GunUpgradeType.BulletSize: BulletSize += upgrade.Value; break;
+			case GunUpgradeType.CriticalChance: CriticalChance = Mathf.Clamp(CriticalChance + upgrade.Value, 0f, 1f); break;
+			case GunUpgradeType.CriticalMultiplier: CriticalMultiplier += upgrade.Value; break;
 			case GunUpgradeType.LifeSteal: LifeSteal += upgrade.Value; break;
 			case GunUpgradeType.AcidRounds: AcidRoundsCount++; break;
+			case GunUpgradeType.ArmorPierce: ArmorPierce = true; break;
+			case GunUpgradeType.AuraBullets: AuraDamages = true; break;
 		}
 	}
 }

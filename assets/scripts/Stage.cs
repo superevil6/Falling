@@ -10,8 +10,31 @@ public partial class Stage : Resource
 	public Cutscene Cutscene {get;set;}
 	[Export]
 	public EnemyGroup[] EnemyGroup {get;set;}
+
+	// --- Obstacle spawner ---
+	// The ObstacleSpawner node inherits these at runtime (see ObstacleSpawner._Ready).
+	// Hazards is the pool of obstacle scenes it cycles through; an empty pool leaves the
+	// spawner idle. The rest tune its timing/placement/warning for this stage.
 	[Export]
 	public PackedScene[] Hazards {get;set;}
+	[Export]
+	public float ObstacleMinInterval {get;set;} = 2f;
+	[Export]
+	public float ObstacleMaxInterval {get;set;} = 5f;
+	[Export]
+	public float ObstacleMinX {get;set;} = 100f;
+	[Export]
+	public float ObstacleMaxX {get;set;} = 1400f;
+	[Export]
+	public float ObstacleSpawnYBelow {get;set;} = 100f;
+	[Export]
+	public float ObstacleWarningDuration {get;set;} = 1f;
+	[Export]
+	public float ObstacleWarningYOffset {get;set;} = 80f;
+	[Export]
+	public Color ObstacleWarningColor {get;set;} = new Color(0.3f, 0.6f, 1f);
+	[Export]
+	public float ObstacleStaticSpawnMargin {get;set;} = 120f;
 	[Export]
 	public PackedScene[] LeftWallChunks {get;set;}
 	[Export]

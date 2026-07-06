@@ -58,7 +58,7 @@ public partial class BackgroundQueue : Node2D
 		Texture2D[] stageTiles = null;
 		float[] stageDarkness = null;
 		if (main != null && main.Stages != null && main.Stages.Length > 0) {
-			var stage = main.Stages[main.CurrentStage];
+			var stage = main.Stages[main.StageIndex];
 			bool middle = QueuePosition == BackgroundQueuePosition.Middle;
 			stageTiles = middle ? stage.Background2Images : stage.BackgroundImages;
 			stageDarkness = middle ? stage.Background2Darkness : stage.BackgroundDarkness;

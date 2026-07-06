@@ -41,7 +41,7 @@ public partial class FloatingDamageText : Node2D
 	public static Color ElementColor(ElementType element, Color fallback)
 	{
 		return element switch {
-			ElementType.Fire => new Color(1f, 0.5f, 0.1f),
+			ElementType.Corrosive => new Color(0.5f, 0.9f, 0.2f),
 			ElementType.Electric => new Color(1f, 0.95f, 0.2f),
 			ElementType.Ice => new Color(0.4f, 0.7f, 1f),
 			ElementType.Poison => new Color(0.7f, 0.3f, 0.9f),

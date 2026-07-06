@@ -12,11 +12,11 @@ public enum BodyUpgradeType
     MeleeDamage = 9,
     MeleeRange = 10,
     MeleeSwingArc = 11,
-    FireDefense = 12,
+    CorrosiveDefense = 12,
     IceDefense = 13,
     ElectricDefense = 14,
     BlindResistance = 15,
-    BurningResistance = 16,
+    CorrosionResistance = 16,
     SlowResistance = 17,
     ShockResistance = 18,
     OrbitalShield = 19,
@@ -28,5 +28,6 @@ public enum BodyUpgradeType
     MaxHealthOnKill = 25,
     ExpGainUp = 26,
     DashCooldownReduction = 27,
-    WeaknessInsight = 28
+    WeaknessInsight = 28,
+    PickCount = 29
 }

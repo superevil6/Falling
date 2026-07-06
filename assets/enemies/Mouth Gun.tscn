@@ -6,8 +6,8 @@
 [ext_resource type="Texture2D" uid="uid://cw4yf6k5xpdyo" path="res://assets/sprites/Enemies/Mouth Gun.png" id="4_fbbju"]
 [ext_resource type="AudioStream" uid="uid://d1nlr5l64mmvq" path="res://assets/SFX/Explosion.wav" id="5_e1kef"]
 [ext_resource type="PackedScene" uid="uid://dq5bq4jsc66se" path="res://assets/objects/Explosion.tscn" id="6_hc432"]
-[ext_resource type="Resource" uid="uid://yinsm4qyoywv" path="res://assets/pickups/Health Pickup.tres" id="7_abbor"]
-[ext_resource type="Resource" uid="uid://bpi2u85b8oi7t" path="res://assets/pickups/Small EXP Pickup.tres" id="8_074f1"]
+[ext_resource type="PackedScene" uid="uid://kvxtmd0oovc4" path="res://assets/pickups/1hp 50.tscn" id="7_abbor"]
+[ext_resource type="PackedScene" uid="uid://bo6exbho5e01u" path="res://assets/pickups/1exp 50.tscn" id="8_074f1"]
 [ext_resource type="Shader" uid="uid://nej1tvi1ocse" path="res://assets/shaders/PixelArt.gdshader" id="9_63e6s"]
 [ext_resource type="SpriteFrames" uid="uid://cf7x8v65wjwjr" path="res://assets/sprites/Enemies/Mouth Gun.ase" id="10_uwv70"]
 
@@ -39,7 +39,7 @@ Size = 2.0
 EnemySprite = ExtResource("4_fbbju")
 DeathSound = ExtResource("5_e1kef")
 DeathExplosions = ExtResource("6_hc432")
-ItemDrops = Array[Resource]([ExtResource("7_abbor"), ExtResource("8_074f1")])
+ItemDrops = Array[PackedScene]([ExtResource("7_abbor"), ExtResource("8_074f1")])
 TeleportHesitationTime = 2.0
 metadata/Enemy = false
 

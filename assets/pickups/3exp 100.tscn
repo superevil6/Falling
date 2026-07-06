@@ -1,0 +1,47 @@
+[gd_scene format=3 uid="uid://dxc2cety26xw2"]
+
+[ext_resource type="Script" uid="uid://cwi8fxcecaorx" path="res://assets/scripts/Pickup.cs" id="1_fvlj1"]
+[ext_resource type="AudioStream" uid="uid://dy56dapbggisl" path="res://assets/SFX/Pickup.wav" id="2_eb70v"]
+[ext_resource type="Shader" uid="uid://nej1tvi1ocse" path="res://assets/shaders/PixelArt.gdshader" id="3_yy3gg"]
+[ext_resource type="SpriteFrames" uid="uid://dblf07libnvko" path="res://assets/sprites/Item Drop.aseprite" id="4_fvlj1"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_xqkwk"]
+radius = 36.013885
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_22uqq"]
+shader = ExtResource("3_yy3gg")
+shader_parameter/pixel_size = 2.0000000475
+shader_parameter/color_steps = 8
+shader_parameter/hue_shift = 0.5500000736250001
+shader_parameter/darkness = 0.0
+
+[node name="Area2D" type="Area2D" unique_id=812243547]
+collision_mask = 3
+script = ExtResource("1_fvlj1")
+Amount = 3
+PickupScale = 0.5
+ExpireTime = 10.0
+PickupSound = ExtResource("2_eb70v")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1535305980]
+shape = SubResource("CircleShape2D_xqkwk")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=515777804]
+texture_filter = 1
+material = SubResource("ShaderMaterial_22uqq")
+sprite_frames = ExtResource("4_fvlj1")
+metadata/_aseprite_wizard_config_ = {
+"layer": "",
+"o_ex_p": "",
+"o_folder": "",
+"o_name": "",
+"only_visible": false,
+"slice": "",
+"source": "res://assets/sprites/Energy Ball.aseprite"
+}
+metadata/_aseprite_wizard_interface_config_ = {
+"layer_section": false,
+"output_section": false,
+"slice_section": false
+}
+metadata/_aseprite_wizard_source_file_hash_ = "994856740a5a0a03bbe07b4be8841b07"

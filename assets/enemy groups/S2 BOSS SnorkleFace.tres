@@ -1,0 +1,12 @@
+[gd_resource type="Resource" format=3 uid="uid://bcxjsgo70q2we"]
+
+[ext_resource type="PackedScene" uid="uid://iot4ba5ra22r" path="res://assets/bosses/SnorkleFace.tscn" id="1_q34hn"]
+[ext_resource type="Script" uid="uid://co2yygdrwkshm" path="res://assets/scripts/EnemyGroup.cs" id="2_mhwyh"]
+
+[resource]
+script = ExtResource("2_mhwyh")
+Enemies = Array[PackedScene]([ExtResource("1_q34hn")])
+SpawnLocations = PackedVector2Array(950, -83)
+PostSpawnDestination = PackedVector2Array(950, 300)
+TimeBetweenSpawns = 0.25
+TimeBeforeNextGroup = 2.0

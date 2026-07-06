@@ -16,6 +16,4 @@ BulletType = ExtResource("1_h32k7")
 FireSound = ExtResource("2_twxw4")
 BulletLifetime = 1.0
 BulletSize = 2.0
-Explode = true
-AuraDamages = true
 GunUpgrades = null

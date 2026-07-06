@@ -1,0 +1,43 @@
+[gd_scene format=3 uid="uid://xavg5hqw8ck3"]
+
+[ext_resource type="Script" uid="uid://cwi8fxcecaorx" path="res://assets/scripts/Pickup.cs" id="1_2psqe"]
+[ext_resource type="Shader" uid="uid://nej1tvi1ocse" path="res://assets/shaders/PixelArt.gdshader" id="2_cs4hr"]
+[ext_resource type="SpriteFrames" uid="uid://dblf07libnvko" path="res://assets/sprites/Item Drop.aseprite" id="3_2psqe"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_xqkwk"]
+radius = 36.013885
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_22uqq"]
+shader = ExtResource("2_cs4hr")
+shader_parameter/pixel_size = 2.0000000475
+shader_parameter/color_steps = 8
+shader_parameter/hue_shift = -0.47699997515750003
+shader_parameter/darkness = 0.0
+
+[node name="Area2D" type="Area2D" unique_id=1094738497]
+collision_mask = 3
+script = ExtResource("1_2psqe")
+ExpireTime = 10.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2001484263]
+shape = SubResource("CircleShape2D_xqkwk")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1931880523]
+texture_filter = 1
+material = SubResource("ShaderMaterial_22uqq")
+sprite_frames = ExtResource("3_2psqe")
+metadata/_aseprite_wizard_config_ = {
+"layer": "",
+"o_ex_p": "",
+"o_folder": "",
+"o_name": "",
+"only_visible": false,
+"slice": "",
+"source": "res://assets/sprites/Energy Ball.aseprite"
+}
+metadata/_aseprite_wizard_interface_config_ = {
+"layer_section": false,
+"output_section": false,
+"slice_section": false
+}
+metadata/_aseprite_wizard_source_file_hash_ = "994856740a5a0a03bbe07b4be8841b07"

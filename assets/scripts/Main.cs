@@ -11,6 +11,11 @@ public partial class Main : Node2D
 	public Stage[] Stages {get;set;}
 	[Export]
 	public int CurrentStage {get;set;} = 0;
+	// Demo mode: instead of ending the run after the last stage, keep looping the
+	// story/roguelite content. CurrentStage still climbs each loop (so enemy stat
+	// scaling keeps ramping) while StageIndex wraps back into the Stages array.
+	[Export]
+	public bool DemoLoop {get;set;} = false;
 	[Export]
 	public float EnemyInputDriftSpeed {get;set;} = 50f;
 	[Export]
@@ -72,10 +77,21 @@ public partial class Main : Node2D
 		}
 	}
 
+	// The index into Stages for the content currently playing. Wraps CurrentStage
+	// back into range so demo looping (CurrentStage >= Stages.Length) replays the
+	// stage array while CurrentStage itself keeps climbing for enemy scaling.
+	public int StageIndex => WrapStageIndex(CurrentStage);
+
+	public int WrapStageIndex(int stage)
+	{
+		if (Stages == null || Stages.Length == 0) return 0;
+		return ((stage % Stages.Length) + Stages.Length) % Stages.Length;
+	}
+
 	public Stage CurrentStageData()
 	{
-		if (Stages == null || CurrentStage < 0 || CurrentStage >= Stages.Length) return null;
-		return Stages[CurrentStage];
+		if (Stages == null || Stages.Length == 0 || CurrentStage < 0) return null;
+		return Stages[StageIndex];
 	}
 
 	// Called by an Enemy with IsBoss when it dies. Once the last boss segment is down,
@@ -106,7 +122,9 @@ public partial class Main : Node2D
 		GetTree().Paused = false;
 		Engine.TimeScale = 1f;
 		int next = CurrentStage + 1;
-		if (Stages != null && next < Stages.Length) {
+		// In demo mode there is always a "next" stage — CurrentStage keeps climbing and
+		// StageIndex wraps the content back to the start of the array.
+		if (Stages != null && Stages.Length > 0 && (DemoLoop || next < Stages.Length)) {
 			// Carry the player's loadout/upgrades across the reload, and persist progress.
 			var player = GetNodeOrNull<Player>("Player");
 			if (player != null) {
@@ -116,7 +134,7 @@ public partial class Main : Node2D
 			pendingStage = next; // re-read by the reloaded Main._Ready
 			// If the next stage has a cutscene, play it first; it loads Main afterward.
 			// (pendingStage is static, so it survives the trip through the cutscene.)
-			var nextCutscene = Stages[next]?.Cutscene;
+			var nextCutscene = Stages[WrapStageIndex(next)]?.Cutscene;
 			if (nextCutscene?.Slides != null && nextCutscene.Slides.Length > 0) {
 				CutsceneManager.Play(this, nextCutscene, MainScenePath);
 			} else {
@@ -209,7 +227,7 @@ public partial class Main : Node2D
 		if (spawningWave) return;
 		spawningWave = true;
 		try {
-			var groups = Stages[CurrentStage].EnemyGroup;
+			var groups = Stages[StageIndex].EnemyGroup;
 			if (groups == null || groups.Length == 0) return;
 			if (hasSpawnedFirstGroup) {
 				var previous = groups[CurrentEnemyGroupWave];

@@ -22,6 +22,14 @@ public partial class Enemy : Area2D
 	[Export]
 	public float MeleeCooldown {get;set;} = 1.5f;
 	[Export]
+	public bool CanDashAttack {get;set;} = false;
+	[Export]
+	public int DashAttackDamage {get;set;} = 10;
+	[Export]
+	public float DashAttackSpeed {get;set;} = 800f;
+	[Export]
+	public float DashAttackCooldown {get;set;} = 3f;
+	[Export]
 	public MovementType MovementType {get;set;}
 	[Export]
 	public int SpawnMovementSpeed { get; set; } = 5;
@@ -42,10 +50,23 @@ public partial class Enemy : Area2D
 	// Null = nothing.
 	[Export]
 	public PackedScene DeathExplosions {get;set;}
+	// Number of small debris pieces that shoot out when this enemy is killed.
+	// 0 (or a null DebrisSprite) means no debris.
+	[Export]
+	public int DebrisReleased {get;set;} = 0;
+	[Export]
+	public Texture2D DebrisSprite {get;set;}
 	[Export]
 	public AttackDirection AttackDirection {get; set;}
+	// Pickup scenes this enemy can drop. Each pickup's own DropChance decides whether it
+	// spawns on a given roll — no separate drop resource is needed.
 	[Export]
-	public ItemDrop[] ItemDrops {get;set;}
+	public PackedScene[] ItemDrops {get;set;}
+	// Upper bound on how many items drop from this enemy. Each death rolls a shared
+	// count in [0, MaxDrops]; every drop type is then rolled that many times at its
+	// own chance, so several items of the same type can drop from one kill.
+	[Export]
+	public int MaxDrops {get;set;} = 1;
 	[Export]
 	public bool IsBoss { get; set; }
 	[Export]
@@ -122,6 +143,13 @@ public partial class Enemy : Area2D
 	public int CurrentHealth {get;set;}
 	private float GunCoolDown;
 	private float meleeCoolDown;
+	private float dashAttackCoolDown;
+	private bool isDashing = false;
+	private Vector2 dashDirection = Vector2.Zero;
+	private float dashDistanceRemaining = 0f;
+	private bool dashHitPlayer = false;
+	// How far a single dash lunge travels before it ends (if it hasn't hit the player first).
+	private const float DashAttackMaxDistance = 600f;
 	private float firePatternAngle = 0f; // accumulates for Spiral fire patterns
 	private bool telegraphActive = false;
 	private const float TelegraphLeadTime = 0.5f;
@@ -157,6 +185,13 @@ public partial class Enemy : Area2D
 		rightWallNode = GetParent()?.GetNodeOrNull<Node2D>("Right Wall Queue");
 		fallbackRightWallX = GetViewportRect().Size.X;
 		SpawnDestinationIndicator();
+		var statusDisplay = new StatusEffectDisplay();
+		statusDisplay.Controller = StatusEffects;
+		statusDisplay.YOffset = Mathf.Max(this.Size * 0.5f, 40f) + 20f;
+		AddChild(statusDisplay);
+		var healthBar = new EnemyHealthBar();
+		healthBar.Owner = this;
+		AddChild(healthBar);
 	}
 
 	// Aseprite imports these one-shot animations with loop=true, which stops
@@ -242,6 +277,21 @@ public partial class Enemy : Area2D
 	{
 		if (CurrentHealth > 0) {
 			if (ReachedPostSpawnDestination) {
+				// Dash attack takes over movement while active and gates the rest of the
+				// normal movement/AI so the enemy commits fully to the lunge.
+				if (isDashing) {
+					UpdateDash(delta);
+					Position = new Vector2(
+						Mathf.Clamp(Position.X, LeftWallX + WallMargin, RightWallX - WallMargin),
+						Position.Y
+					);
+					return;
+				}
+				if (dashAttackCoolDown > 0f) dashAttackCoolDown -= (float)delta;
+				if (this.CanDashAttack && dashAttackCoolDown <= 0f && spawnComplete && !ExternalAttackControl) {
+					TryStartDash();
+					if (isDashing) return;
+				}
 				if (this.TeleportMovement) {
 					teleportTimer -= (float)delta;
 					if (teleportTimer <= 1f && teleportTimer > 0f && !isPhasing) {
@@ -468,7 +518,8 @@ public partial class Enemy : Area2D
 		if (attack == null) return;
 		var element = (node2D is Bullet bullet) ? bullet.Element : ElementType.NonElemental;
 		int acidStacks = (node2D is Bullet ab) ? (ab.Gun?.AcidRoundsCount ?? 0) : 0;
-		TakeDamage(attack.Damage, element, acidStacks);
+		bool armorPierce = (node2D is Bullet apb) && (apb.Gun?.ArmorPierce ?? false);
+		TakeDamage(attack.Damage, element, acidStacks, armorPierce);
 		if (node2D is Bullet b && b.Gun != null && b.Gun.LifeSteal > 0f) {
 			int heal = Mathf.RoundToInt(b.Gun.LifeSteal);
 			if (heal > 0) {
@@ -486,6 +537,7 @@ public partial class Enemy : Area2D
 	}
 
 	private bool hasBeenHit = false;
+	public bool HasBeenHit => hasBeenHit;
 	private bool coreDeathTriggered = false;
 	private bool isDying = false;
 	private bool deathHandled = false;
@@ -503,13 +555,13 @@ public partial class Enemy : Area2D
 	private static PackedScene bombScene;
 	private static PackedScene mineScene;
 
-	public void TakeDamage(int damage, ElementType element, int acidStacks = 0)
+	public void TakeDamage(int damage, ElementType element, int acidStacks = 0, bool armorPierce = false)
 	{
 		int boostedReduction = Mathf.RoundToInt(scaledDamageReduction * (1f + GetLeaderBoost(LeaderType.Defense)));
 		bool isWeakness = element != ElementType.NonElemental && element == ElementalWeakness;
 		bool isResisted = element != ElementType.NonElemental && element == ElementalDefense;
 		bool hadArmor = currentArmor > 0;
-		var hit = Combat.ResolveEnemyHit(damage, isWeakness, isResisted, boostedReduction, currentArmor, acidStacks);
+		var hit = Combat.ResolveEnemyHit(damage, isWeakness, isResisted, boostedReduction, currentArmor, acidStacks, armorPierce);
 		int finalDamage = hit.HealthLoss;
 		currentArmor = hit.RemainingArmor;
 		if (hadArmor) armorShellTimer = 0.5f;
@@ -575,6 +627,7 @@ public partial class Enemy : Area2D
 		isDying = true;
 		Sfx.Play(this, DeathSound);
 		SpawnDeathExplosion();
+		Debris.Burst(this, GlobalPosition, this.DebrisReleased, this.DebrisSprite);
 		PlayDeathAnimation(animatedSprite2D);
 		var frames = animatedSprite2D?.SpriteFrames;
 		string anim = animatedSprite2D?.Animation;
@@ -705,18 +758,8 @@ public partial class Enemy : Area2D
 			var pw = GetParent()?.GetNodeOrNull<Player>("Player");
 			if (pw != null && pw.HasWeaknessInsight) DrawWeaknessIndicator();
 		}
-		if (!hasBeenHit || CurrentHealth <= 0) return;
-		var p = GetParent()?.GetNodeOrNull<Player>("Player");
-		if (p == null || !p.HasSeeEnemyHealth) return;
-		float barWidth = 100f;
-		float barHeight = 16f;
-		float yOffset = -48f;
-		float maxHealth = Mathf.Max(1, scaledMaxHealth);
-		float healthRatio = Mathf.Clamp((float)CurrentHealth / maxHealth, 0f, 1f);
-		Vector2 barPos = new Vector2(-barWidth / 2f, yOffset);
-		DrawRect(new Rect2(barPos, new Vector2(barWidth, barHeight)), new Color(0.1f, 0.1f, 0.1f, 0.85f));
-		DrawRect(new Rect2(barPos, new Vector2(barWidth * healthRatio, barHeight)), new Color(0.9f, 0.2f, 0.2f));
-		DrawRect(new Rect2(barPos, new Vector2(barWidth, barHeight)), Colors.Black, false, 1.0f);
+		// The health bar is drawn by the EnemyHealthBar child node (added in _Ready) so it
+		// renders above the sprite and above overlapping enemies via a raised ZIndex.
 	}
 
 	// Small element-colored diamond above the enemy revealing its elemental weakness
@@ -781,17 +824,32 @@ public partial class Enemy : Area2D
 	private void DropItems() {
 		if (this.ItemDrops == null) return;
 		float dropMult = GetParent()?.GetNodeOrNull<Player>("Player")?.ItemDropChanceMultiplier ?? 1f;
-		foreach (var drop in this.ItemDrops) {
-			if (drop?.Item == null) continue;
-			if (GD.Randf() < drop.Chance * dropMult) {
-				var item = drop.Item.Instantiate<Node2D>();
-				float angle = rng.RandfRange(0f, Mathf.Pi * 2f);
-				float radius = rng.RandfRange(0f, DropSpreadRadius);
-				Vector2 offset = new Vector2(Mathf.Cos(angle) * radius, Mathf.Sin(angle) * radius);
-				item.GlobalPosition = GlobalPosition + offset;
-				GetParent().AddChild(item);
+		// Roll a single shared count for this kill, then give every drop type that many
+		// chances so multiple copies of the same item can fall from one enemy.
+		int rolls = this.MaxDrops > 0 ? rng.RandiRange(0, this.MaxDrops) : 0;
+		if (rolls <= 0) return;
+		foreach (var scene in this.ItemDrops) {
+			if (scene == null) continue;
+			for (int i = 0; i < rolls; i++) {
+				// Instantiate up front so the pickup's own DropChance drives the roll,
+				// then drop it into the world on success or discard it on a miss.
+				var item = scene.Instantiate<Node2D>();
+				float chance = item is Pickup pickup ? pickup.DropChance : 1f;
+				if (GD.Randf() < chance * dropMult) {
+					PlaceDrop(item);
+				} else {
+					item.Free();
+				}
 			}
 		}
+	}
+
+	private void PlaceDrop(Node2D item) {
+		float angle = rng.RandfRange(0f, Mathf.Pi * 2f);
+		float radius = rng.RandfRange(0f, DropSpreadRadius);
+		Vector2 offset = new Vector2(Mathf.Cos(angle) * radius, Mathf.Sin(angle) * radius);
+		item.GlobalPosition = GlobalPosition + offset;
+		GetParent().AddChild(item);
 	}
 
 	private void SpawnAttackIndicator(float duration) {
@@ -825,6 +883,45 @@ public partial class Enemy : Area2D
 		PlayAttackAnimation();
 		animatedSprite2D?.Play();
 		meleeCoolDown = this.MeleeCooldown;
+	}
+
+	// Begins a dash lunge toward the player's current position. The direction is locked in
+	// at the start so the enemy commits to the charge rather than homing.
+	private void TryStartDash() {
+		var p = GetParent()?.GetNodeOrNull<Player>("Player");
+		if (p == null) return;
+		Vector2 toPlayer = p.GlobalPosition - GlobalPosition;
+		if (toPlayer == Vector2.Zero) return;
+		dashDirection = toPlayer.Normalized();
+		dashDistanceRemaining = DashAttackMaxDistance;
+		dashHitPlayer = false;
+		isDashing = true;
+		PlayAttackAnimation();
+		animatedSprite2D?.Play();
+	}
+
+	// Advances an in-progress dash: moves at DashAttackSpeed, damages the player once on
+	// contact, and ends the dash (starting the cooldown) on impact or after the max distance.
+	private void UpdateDash(double delta) {
+		float step = this.DashAttackSpeed * (float)delta;
+		if (step > dashDistanceRemaining) step = dashDistanceRemaining;
+		Position += dashDirection * step;
+		dashDistanceRemaining -= step;
+		if (!dashHitPlayer) {
+			var p = GetParent()?.GetNodeOrNull<Player>("Player");
+			if (p != null) {
+				float hitRadius = Mathf.Max(this.Size, 30f) + 20f;
+				if (GlobalPosition.DistanceTo(p.GlobalPosition) <= hitRadius) {
+					int dmg = Mathf.Max(1, Mathf.RoundToInt(this.DashAttackDamage * ComputeStageScale()));
+					p.TakeDamage(dmg);
+					dashHitPlayer = true;
+				}
+			}
+		}
+		if (dashHitPlayer || dashDistanceRemaining <= 0f) {
+			isDashing = false;
+			dashAttackCoolDown = this.DashAttackCooldown;
+		}
 	}
 
 	private static void PlayDeathAnimation(AnimatedSprite2D sprite)
@@ -889,6 +986,11 @@ public partial class Enemy : Area2D
 			Vector2 dir = baseDirection;
 			if (gun.BulletSpread > 0f) {
 				dir = dir.Rotated(Mathf.DegToRad(rng.RandfRange(0f, gun.BulletSpread)));
+			}
+			float blindCone = StatusEffects.GetBlindSpreadDegrees();
+			if (blindCone > 0f) {
+				float half = blindCone * 0.5f;
+				dir = dir.Rotated(Mathf.DegToRad(rng.RandfRange(-half, half)));
 			}
 			for (int i = 0; i < gun.BulletCount; i++) {
 				bool crit = gun.CriticalChance > 0f && rng.Randf() < gun.CriticalChance;

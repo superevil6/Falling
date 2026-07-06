@@ -1,0 +1,12 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="PackedScene" uid="uid://xfofnhaseaea" path="res://assets/enemies/CircleNose.tscn" id="1_cn"]
+[ext_resource type="Script" path="res://assets/scripts/EnemyGroup.cs" id="2_group"]
+
+[resource]
+script = ExtResource("2_group")
+Enemies = Array[PackedScene]([ExtResource("1_cn"), ExtResource("1_cn"), ExtResource("1_cn"), ExtResource("1_cn"), ExtResource("1_cn"), ExtResource("1_cn")])
+SpawnLocations = PackedVector2Array(950, -83, 1150, -83, 1150, -83, 950, -83, 750, -83, 750, -83)
+PostSpawnDestination = PackedVector2Array(950, 270, 1150, 385, 1150, 615, 950, 730, 750, 615, 750, 385)
+TimeBetweenSpawns = 0.2
+TimeBeforeNextGroup = 2.5

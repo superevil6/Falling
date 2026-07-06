@@ -1,0 +1,18 @@
+[gd_resource type="Resource" format=3 uid="uid://cnos3p0pp3rx2"]
+
+[ext_resource type="PackedScene" uid="uid://cf1pg2x8l8lpf" path="res://assets/objects/bullet.tscn" id="1_bul"]
+[ext_resource type="AudioStream" uid="uid://dvijwtqha2lcw" path="res://assets/SFX/Gun Shot.mp3" id="2_snd"]
+[ext_resource type="Script" uid="uid://cvu57cdie1j01" path="res://assets/scripts/Gun.cs" id="3_gun"]
+
+[resource]
+script = ExtResource("3_gun")
+GunDescription = "Level 1: coughs a single fat, slow shot. Big and easy to see coming, low damage."
+FireRate = 2.5
+Damage = 3
+BulletCount = 1
+BulletType = ExtResource("1_bul")
+FireSound = ExtResource("2_snd")
+BulletSpeed = 450.0
+BulletLifetime = 3.0
+BulletSize = 2.0
+GunUpgrades = null

@@ -1,3 +1,4 @@
+using Godot;
 using Xunit;
 
 // Regression tests pinning the damage arithmetic in Combat. These lock in the CURRENT
@@ -116,6 +117,25 @@ public class CombatTests
 		Assert.Equal(0, hit.RemainingArmor);
 	}
 
+	[Fact]
+	public void EnemyHit_ArmorPierceIgnoresShield_FullDamageArmorUntouched()
+	{
+		// Piercing bullet: no halving (full 10 to health) and the armor is left intact.
+		var hit = Combat.ResolveEnemyHit(10, false, false, 0, currentArmor: 100, acidStacks: 0, armorPierce: true);
+		Assert.Equal(10, hit.HealthLoss);
+		Assert.Equal(100, hit.RemainingArmor);
+	}
+
+	[Fact]
+	public void EnemyHit_ArmorPierceStillAppliesReductionAndElement()
+	{
+		// Pierce only removes the armor step; flat reduction and resist still apply.
+		// resist halves 10 -> 5, then reduction 2 -> 3, armor ignored.
+		var hit = Combat.ResolveEnemyHit(10, false, true, effectiveReduction: 2, currentArmor: 100, acidStacks: 0, armorPierce: true);
+		Assert.Equal(3, hit.HealthLoss);
+		Assert.Equal(100, hit.RemainingArmor);
+	}
+
 	// ---- Crit ----------------------------------------------------------------------
 
 	[Theory]
@@ -157,5 +177,51 @@ public class CombatTests
 	public void DotTickDamage_RoundsStacksTimesRate(int stacks, float rate, int expected)
 	{
 		Assert.Equal(expected, Combat.DotTickDamage(stacks, rate));
+	}
+
+	// ---- Blind: aim spread & darkening --------------------------------------------
+
+	[Fact]
+	public void BlindSpread_ZeroWhenNotBlinded()
+	{
+		var sec = new StatusEffectController();
+		Assert.Equal(0f, sec.GetBlindSpreadDegrees());
+	}
+
+	[Fact]
+	public void BlindSpread_ScalesWithStacks()
+	{
+		var sec = new StatusEffectController();
+		sec.AddStacks(StatusEffectType.Blind, 3);
+		Assert.Equal(3 * sec.BlindSpreadDegreesPerStack, sec.GetBlindSpreadDegrees());
+	}
+
+	[Fact]
+	public void BlindSpread_CapsAtMax()
+	{
+		var sec = new StatusEffectController();
+		sec.AddStacks(StatusEffectType.Blind, 1000);
+		Assert.Equal(sec.MaxBlindSpreadDegrees, sec.GetBlindSpreadDegrees());
+	}
+
+	[Fact]
+	public void BlindTint_DarkensTowardBlackWithStacks()
+	{
+		var sec = new StatusEffectController();
+		Assert.Equal(Colors.White, sec.GetTint());
+		sec.AddStacks(StatusEffectType.Blind, 3);
+		float mid = sec.GetTint().R;
+		sec.AddStacks(StatusEffectType.Blind, 3);
+		float darker = sec.GetTint().R;
+		Assert.True(mid < 1f, "some darkening at 3 stacks");
+		Assert.True(darker < mid, "more stacks = darker");
+	}
+
+	[Fact]
+	public void BlindTint_ReachesBlackAtFullStacks()
+	{
+		var sec = new StatusEffectController();
+		sec.AddStacks(StatusEffectType.Blind, 10);
+		Assert.Equal(Colors.Black, sec.GetTint());
 	}
 }

@@ -5,8 +5,8 @@
 [ext_resource type="Texture2D" uid="uid://cum2gpblsuglx" path="res://assets/enemies/Ball Enemy.png" id="4_rws48"]
 [ext_resource type="AudioStream" uid="uid://d1nlr5l64mmvq" path="res://assets/SFX/Explosion.wav" id="5_v8jyq"]
 [ext_resource type="PackedScene" uid="uid://dq5bq4jsc66se" path="res://assets/objects/Explosion.tscn" id="6_ppvny"]
-[ext_resource type="Resource" uid="uid://yinsm4qyoywv" path="res://assets/pickups/Health Pickup.tres" id="7_76elj"]
-[ext_resource type="Resource" uid="uid://bpi2u85b8oi7t" path="res://assets/pickups/Small EXP Pickup.tres" id="8_c0aq2"]
+[ext_resource type="PackedScene" uid="uid://kvxtmd0oovc4" path="res://assets/pickups/1hp 50.tscn" id="7_76elj"]
+[ext_resource type="PackedScene" uid="uid://bo6exbho5e01u" path="res://assets/pickups/1exp 50.tscn" id="8_c0aq2"]
 [ext_resource type="Shader" uid="uid://nej1tvi1ocse" path="res://assets/shaders/PixelArt.gdshader" id="9_bjysw"]
 [ext_resource type="SpriteFrames" uid="uid://d072v2a1vc3mg" path="res://assets/sprites/Enemies/Sword Mouth.ase" id="10_4c076"]
 
@@ -30,6 +30,10 @@ script = ExtResource("1_pxaj7")
 MaxHealth = 10
 Melee = ExtResource("3_jlnhk")
 MeleeCooldown = 1.0
+CanDashAttack = true
+DashAttackDamage = 8
+DashAttackSpeed = 700.0
+DashAttackCooldown = 3.0
 MovementType = 1
 SpawnMovementSpeed = 8
 MovementSpeed = 150.0
@@ -37,7 +41,7 @@ Size = 2.0
 EnemySprite = ExtResource("4_rws48")
 DeathSound = ExtResource("5_v8jyq")
 DeathExplosions = ExtResource("6_ppvny")
-ItemDrops = Array[Resource]([ExtResource("7_76elj"), ExtResource("8_c0aq2")])
+ItemDrops = Array[PackedScene]([ExtResource("7_76elj"), ExtResource("8_c0aq2")])
 TeleportHesitationTime = 2.0
 metadata/Enemy = false
 

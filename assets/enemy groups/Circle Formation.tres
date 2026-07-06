@@ -1,12 +1,12 @@
-[gd_resource type="Resource" load_steps=3 format=3]
+[gd_resource type="Resource" format=3 uid="uid://pc115135mmsf"]
 
 [ext_resource type="PackedScene" uid="uid://tng40x5blnrr" path="res://assets/enemies/ball_enemy.tscn" id="1_enemy"]
-[ext_resource type="Script" path="res://assets/scripts/EnemyGroup.cs" id="2_group"]
+[ext_resource type="Script" uid="uid://co2yygdrwkshm" path="res://assets/scripts/EnemyGroup.cs" id="2_group"]
 
 [resource]
 script = ExtResource("2_group")
 Enemies = Array[PackedScene]([ExtResource("1_enemy"), ExtResource("1_enemy"), ExtResource("1_enemy"), ExtResource("1_enemy"), ExtResource("1_enemy"), ExtResource("1_enemy"), ExtResource("1_enemy"), ExtResource("1_enemy")])
-SpawnLocations = PackedVector2Array(720, -50, 676, -50, 570, -50, 464, -50, 420, -50, 464, -50, 570, -50, 676, -50)
-PostSpawnDestination = PackedVector2Array(720, 300, 676, 406, 570, 450, 464, 406, 420, 300, 464, 194, 570, 150, 676, 194)
+SpawnLocations = PackedVector2Array(1200, -83, 1127, -83, 950, -83, 773, -83, 700, -83, 773, -83, 950, -83, 1127, -83)
+PostSpawnDestination = PackedVector2Array(1200, 500, 1127, 677, 950, 750, 773, 677, 700, 500, 773, 323, 950, 250, 1127, 323)
 TimeBetweenSpawns = 0.25
 TimeBeforeNextGroup = 2.5

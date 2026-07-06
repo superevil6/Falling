@@ -12,7 +12,7 @@ public partial class Player : CharacterBody2D
 	public bool HasSeeEnemyHealth = true;
 	public bool HasLaserSight = false;
 	public bool HasWeaknessInsight = false;
-	public int FireDefenseStacks = 0;
+	public int CorrosiveDefenseStacks = 0;
 	public int OrbitalShieldCount = 0;
 	private float orbitalAngle = 0f;
 	[Export]
@@ -52,7 +52,7 @@ public partial class Player : CharacterBody2D
 	public float MeleeLifeSteal = 0f;
 	// Status resistances (0..0.95); mirrored into StatusEffects via SyncResistances().
 	public float BlindResistance = 0f;
-	public float BurningResistance = 0f;
+	public float CorrosionResistance = 0f;
 	public float SlowResistance = 0f;
 	public float ShockResistance = 0f;
 	// Rechargeable shield that absorbs damage before health.
@@ -67,15 +67,22 @@ public partial class Player : CharacterBody2D
 	public int MaxHealthPerKill = 0;
 	public float ExperienceMultiplier = 1f;
 	public float ItemDropChanceMultiplier = 1f;
+	// Extra level-up choices granted by upgrades; added on top of LevelUpMenu.PickCount.
+	public int PickCountBonus = 0;
 	public StatusEffectController StatusEffects = new StatusEffectController();
 	private float wallTouchTickTimer = 0f;
 	private float gunCoolDown;
 	[Export]
 	public int Speed { get;set;} = 400;
+	// Fixed loadout capacity: 4 gun slots (the Top/Right/Bottom/Left rack and the
+	// gun_1..gun_4 hotkeys) and 4 body-mod slots. The boss-reward menu fills empty
+	// slots, so the arrays must always be this long with null holes for spare room.
+	public const int GunSlots = 4;
+	public const int BodyModSlots = 4;
 	[Export]
-	public Gun[] Guns {get;set;} = new Gun[4];
+	public Gun[] Guns {get;set;} = new Gun[GunSlots];
 	[Export]
-	public BodyMod[] BodyMods {get;set;} = new BodyMod[4];
+	public BodyMod[] BodyMods {get;set;} = new BodyMod[BodyModSlots];
 	[Export]
 	public BodyUpgrade[] BodyUpgrades {get; set;}
 	private int currentGunIndex = 0;
@@ -154,11 +161,32 @@ public partial class Player : CharacterBody2D
 				if (BodyMods[i] != null) BodyMods[i] = (BodyMod)BodyMods[i].Duplicate();
 			}
 		}
+		NormalizeLoadout();
 		GetParent().GetNode<TextureProgressBar>("Health Bar").MaxValue = MaxHealth;
 		GetParent().GetNode<TextureProgressBar>("Health Bar").Value = CurrentHealth;
 		GetParent().GetNode<Label>("Experience Counter").Text = $"XP: {CurrentExperience}";
 		UpdateGunLabel();
 		afterImageShader = GD.Load<Shader>("res://assets/shaders/AfterImage.gdshader");
+		var statusDisplay = new StatusEffectDisplay();
+		statusDisplay.Controller = StatusEffects;
+		AddChild(statusDisplay);
+	}
+
+	// Pads Guns/BodyMods up to their fixed slot counts, preserving existing entries and
+	// leaving the rest null. The scene (and older saves) can ship arrays sized exactly to
+	// their contents, which would leave the boss-reward menu no empty slot to fill.
+	private void NormalizeLoadout()
+	{
+		Guns = EnsureCapacity(Guns, GunSlots);
+		BodyMods = EnsureCapacity(BodyMods, BodyModSlots);
+	}
+
+	private static T[] EnsureCapacity<T>(T[] arr, int capacity) where T : class
+	{
+		if (arr != null && arr.Length >= capacity) return arr;
+		var grown = new T[capacity];
+		if (arr != null) System.Array.Copy(arr, grown, arr.Length);
+		return grown;
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -327,8 +355,8 @@ public partial class Player : CharacterBody2D
 			case BodyUpgradeType.LaserSight:
 				HasLaserSight = true;
 				break;
-			case BodyUpgradeType.FireDefense:
-				FireDefenseStacks++;
+			case BodyUpgradeType.CorrosiveDefense:
+				CorrosiveDefenseStacks++;
 				break;
 			case BodyUpgradeType.IceDefense:
 				IceDefenseStacks++;
@@ -363,8 +391,8 @@ public partial class Player : CharacterBody2D
 				BlindResistance = Mathf.Min(0.95f, BlindResistance + upgrade.Value / 100f);
 				SyncResistances();
 				break;
-			case BodyUpgradeType.BurningResistance:
-				BurningResistance = Mathf.Min(0.95f, BurningResistance + upgrade.Value / 100f);
+			case BodyUpgradeType.CorrosionResistance:
+				CorrosionResistance = Mathf.Min(0.95f, CorrosionResistance + upgrade.Value / 100f);
 				SyncResistances();
 				break;
 			case BodyUpgradeType.SlowResistance:
@@ -394,6 +422,9 @@ public partial class Player : CharacterBody2D
 			case BodyUpgradeType.WeaknessInsight:
 				HasWeaknessInsight = true;
 				break;
+			case BodyUpgradeType.PickCount:
+				PickCountBonus += LevelUpMath.PickCountBonusIncrement(upgrade.Value);
+				break;
 		}
 	}
 
@@ -402,7 +433,7 @@ public partial class Player : CharacterBody2D
 	private void SyncResistances()
 	{
 		StatusEffects.SetResistance(StatusEffectType.Blind, BlindResistance);
-		StatusEffects.SetResistance(StatusEffectType.DamageOverTime, BurningResistance);
+		StatusEffects.SetResistance(StatusEffectType.DamageOverTime, CorrosionResistance);
 		StatusEffects.SetResistance(StatusEffectType.Slow, SlowResistance);
 		StatusEffects.SetResistance(StatusEffectType.ReducedFireRate, ShockResistance);
 	}
@@ -433,7 +464,7 @@ public partial class Player : CharacterBody2D
 		HasSeeEnemyHealth = HasSeeEnemyHealth,
 		HasWeaknessInsight = HasWeaknessInsight,
 		HasLaserSight = HasLaserSight,
-		FireDefenseStacks = FireDefenseStacks,
+		CorrosiveDefenseStacks = CorrosiveDefenseStacks,
 		IceDefenseStacks = IceDefenseStacks,
 		ElectricDefenseStacks = ElectricDefenseStacks,
 		OrbitalShieldCount = OrbitalShieldCount,
@@ -450,7 +481,7 @@ public partial class Player : CharacterBody2D
 		MeleeSwingSpeedMultiplier = MeleeSwingSpeedMultiplier,
 		MeleeLifeSteal = MeleeLifeSteal,
 		BlindResistance = BlindResistance,
-		BurningResistance = BurningResistance,
+		CorrosionResistance = CorrosionResistance,
 		SlowResistance = SlowResistance,
 		ShockResistance = ShockResistance,
 		MaxShield = MaxShield,
@@ -458,6 +489,7 @@ public partial class Player : CharacterBody2D
 		MaxHealthPerKill = MaxHealthPerKill,
 		ExperienceMultiplier = ExperienceMultiplier,
 		ItemDropChanceMultiplier = ItemDropChanceMultiplier,
+		PickCountBonus = PickCountBonus,
 	};
 
 	// Re-applies a captured snapshot (loadout + upgrade effects) onto a freshly spawned
@@ -467,6 +499,7 @@ public partial class Player : CharacterBody2D
 		if (s == null) return;
 		Guns = s.Guns;
 		BodyMods = s.BodyMods;
+		NormalizeLoadout();
 		MaxHealth = s.MaxHealth;
 		CurrentHealth = s.CurrentHealth;
 		CurrentExperience = s.CurrentExperience;
@@ -475,7 +508,7 @@ public partial class Player : CharacterBody2D
 		HasSeeEnemyHealth = s.HasSeeEnemyHealth;
 		HasWeaknessInsight = s.HasWeaknessInsight;
 		HasLaserSight = s.HasLaserSight;
-		FireDefenseStacks = s.FireDefenseStacks;
+		CorrosiveDefenseStacks = s.CorrosiveDefenseStacks;
 		IceDefenseStacks = s.IceDefenseStacks;
 		ElectricDefenseStacks = s.ElectricDefenseStacks;
 		OrbitalShieldCount = s.OrbitalShieldCount;
@@ -492,7 +525,7 @@ public partial class Player : CharacterBody2D
 		MeleeSwingSpeedMultiplier = s.MeleeSwingSpeedMultiplier > 0f ? s.MeleeSwingSpeedMultiplier : 1f;
 		MeleeLifeSteal = s.MeleeLifeSteal;
 		BlindResistance = s.BlindResistance;
-		BurningResistance = s.BurningResistance;
+		CorrosionResistance = s.CorrosionResistance;
 		SlowResistance = s.SlowResistance;
 		ShockResistance = s.ShockResistance;
 		SyncResistances();
@@ -501,6 +534,7 @@ public partial class Player : CharacterBody2D
 		MaxHealthPerKill = s.MaxHealthPerKill;
 		ExperienceMultiplier = s.ExperienceMultiplier > 0f ? s.ExperienceMultiplier : 1f;
 		ItemDropChanceMultiplier = s.ItemDropChanceMultiplier > 0f ? s.ItemDropChanceMultiplier : 1f;
+		PickCountBonus = s.PickCountBonus;
 		var hb = GetParent()?.GetNodeOrNull<TextureProgressBar>("Health Bar");
 		if (hb != null) { hb.MaxValue = MaxHealth; hb.Value = CurrentHealth; }
 		UpdateGunLabel();
@@ -592,7 +626,7 @@ public partial class Player : CharacterBody2D
 	{
 		if (CurrentHealth <= 0) return;
 		int stacks = element switch {
-			ElementType.Fire => FireDefenseStacks,
+			ElementType.Corrosive => CorrosiveDefenseStacks,
 			ElementType.Ice => IceDefenseStacks,
 			ElementType.Electric => ElectricDefenseStacks,
 			_ => 0,
@@ -936,6 +970,7 @@ public partial class Player : CharacterBody2D
 			if (Gun.BulletSpread > 0f) {
 				dir = dir.Rotated(Mathf.DegToRad(rng.RandfRange(0f, Gun.BulletSpread)));
 			}
+			dir = ApplyBlindSpread(dir);
 			bool crit = RollCrit(Gun, out int damage, baseDamage);
 			Bullet b = Gun.BulletType.Instantiate<Bullet>();
 			b.Set("Direction", dir);
@@ -956,6 +991,15 @@ public partial class Player : CharacterBody2D
 	}
 
 	private static readonly Color CritAuraColor = new Color(1f, 0.84f, 0.1f, 0.95f);
+
+	// Deviates a fired direction by a random angle within the blind cone (0 when the
+	// player isn't blinded), so a blinded shooter can't aim straight.
+	private Vector2 ApplyBlindSpread(Vector2 dir) {
+		float cone = StatusEffects.GetBlindSpreadDegrees();
+		if (cone <= 0f) return dir;
+		float half = cone * 0.5f;
+		return dir.Rotated(Mathf.DegToRad(rng.RandfRange(-half, half)));
+	}
 
 	private bool RollCrit(Gun gun, out int damage, int baseDamage) {
 		bool crit = Combat.RollsCrit(gun.CriticalChance, rng.Randf());
@@ -995,7 +1039,7 @@ public partial class Player : CharacterBody2D
 	}
 
 	private void SpawnBulletSpread(Vector2 aimDirection) {
-		float effectiveSpread = Gun.MultiBulletAngle + StatusEffects.GetSpreadIncrease();
+		float effectiveSpread = Gun.MultiBulletAngle;
 		float halfSpread = effectiveSpread / 2f;
 		int n = Mathf.Max(1, Gun.BulletCount);
 		bool spiral = Gun.Spiral != 0f;
@@ -1013,6 +1057,7 @@ public partial class Player : CharacterBody2D
 			if (Gun.BulletSpread > 0f) {
 				direction = direction.Rotated(Mathf.DegToRad(rng.RandfRange(0f, Gun.BulletSpread)));
 			}
+			direction = ApplyBlindSpread(direction);
 			bool crit = RollCrit(Gun, out int dmg, Gun.Damage);
 			b.Set("Direction", direction);
 			b.Set("Damage", dmg);
@@ -1048,7 +1093,8 @@ public partial class Player : CharacterBody2D
 		var spaceState = GetWorld2D().DirectSpaceState;
 		Vector2 from = GlobalPosition;
 		int beamCount = Mathf.Max(1, Gun.BulletCount);
-		float effectiveSpread = Gun.MultiBulletAngle + StatusEffects.GetSpreadIncrease();
+		aimDirection = ApplyBlindSpread(aimDirection);
+		float effectiveSpread = Gun.MultiBulletAngle;
 		float halfSpread = effectiveSpread / 2f;
 		var allPaths = new List<List<Vector2>>();
 		var hitEnemies = new List<Enemy>();

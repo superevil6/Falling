@@ -1,0 +1,12 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="PackedScene" uid="uid://ctw1nsp1t0014" path="res://assets/enemies/Twin Spitter.tscn" id="1_tw"]
+[ext_resource type="Script" path="res://assets/scripts/EnemyGroup.cs" id="2_group"]
+
+[resource]
+script = ExtResource("2_group")
+Enemies = Array[PackedScene]([ExtResource("1_tw"), ExtResource("1_tw"), ExtResource("1_tw"), ExtResource("1_tw"), ExtResource("1_tw"), ExtResource("1_tw")])
+SpawnLocations = PackedVector2Array(680, -83, 680, -83, 680, -83, 1220, -83, 1220, -83, 1220, -83)
+PostSpawnDestination = PackedVector2Array(680, 300, 680, 470, 680, 640, 1220, 300, 1220, 470, 1220, 640)
+TimeBetweenSpawns = 0.2
+TimeBeforeNextGroup = 2.0

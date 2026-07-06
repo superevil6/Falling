@@ -37,11 +37,31 @@ public partial class ObstacleSpawner : Node2D
 	public override void _Ready()
 	{
 		rng.Randomize();
+		InheritStageConfig();
 		viewportHeight = GetViewportRect().Size.Y;
 		spawnTimer = rng.RandfRange(MinInterval, MaxInterval);
 		if (indicatorScene == null) {
 			indicatorScene = GD.Load<PackedScene>("res://assets/objects/SpawnIndicator.tscn");
 		}
+	}
+
+	// Pulls the obstacle pool and spawn tuning from the active Stage resource so each
+	// stage drives its own hazards. The node's own [Export] values act as fallbacks
+	// when there's no Main/Stage (e.g. running the spawner scene in isolation).
+	private void InheritStageConfig()
+	{
+		var stage = (GetParent() as Main)?.CurrentStageData();
+		if (stage == null) return;
+		Obstacles = stage.Hazards;
+		MinInterval = stage.ObstacleMinInterval;
+		MaxInterval = stage.ObstacleMaxInterval;
+		MinX = stage.ObstacleMinX;
+		MaxX = stage.ObstacleMaxX;
+		SpawnYBelow = stage.ObstacleSpawnYBelow;
+		WarningDuration = stage.ObstacleWarningDuration;
+		WarningYOffset = stage.ObstacleWarningYOffset;
+		WarningColor = stage.ObstacleWarningColor;
+		StaticSpawnMargin = stage.ObstacleStaticSpawnMargin;
 	}
 
 	public override void _Process(double delta)

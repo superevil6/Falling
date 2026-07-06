@@ -16,7 +16,7 @@ public partial class PlayerState : Resource
 	[Export] public bool HasSeeEnemyHealth {get;set;}
 	[Export] public bool HasLaserSight {get;set;}
 	[Export] public bool HasWeaknessInsight {get;set;}
-	[Export] public int FireDefenseStacks {get;set;}
+	[Export] public int CorrosiveDefenseStacks {get;set;}
 	[Export] public int IceDefenseStacks {get;set;}
 	[Export] public int ElectricDefenseStacks {get;set;}
 	[Export] public int OrbitalShieldCount {get;set;}
@@ -33,7 +33,7 @@ public partial class PlayerState : Resource
 	[Export] public float MeleeSwingSpeedMultiplier {get;set;}
 	[Export] public float MeleeLifeSteal {get;set;}
 	[Export] public float BlindResistance {get;set;}
-	[Export] public float BurningResistance {get;set;}
+	[Export] public float CorrosionResistance {get;set;}
 	[Export] public float SlowResistance {get;set;}
 	[Export] public float ShockResistance {get;set;}
 	[Export] public int MaxShield {get;set;}
@@ -41,4 +41,5 @@ public partial class PlayerState : Resource
 	[Export] public int MaxHealthPerKill {get;set;}
 	[Export] public float ExperienceMultiplier {get;set;}
 	[Export] public float ItemDropChanceMultiplier {get;set;}
+	[Export] public int PickCountBonus {get;set;}
 }

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="PackedScene" uid="uid://cl0bb3r000015" path="res://assets/enemies/Lobber.tscn" id="1_lob"]
+[ext_resource type="PackedScene" uid="uid://corbsh00t0013" path="res://assets/enemies/Orb Shooter.tscn" id="2_orb"]
+[ext_resource type="PackedScene" uid="uid://ctw1nsp1t0014" path="res://assets/enemies/Twin Spitter.tscn" id="3_tw"]
+[ext_resource type="Script" path="res://assets/scripts/EnemyGroup.cs" id="4_group"]
+
+[resource]
+script = ExtResource("4_group")
+Enemies = Array[PackedScene]([ExtResource("1_lob"), ExtResource("2_orb"), ExtResource("3_tw"), ExtResource("2_orb"), ExtResource("1_lob")])
+SpawnLocations = PackedVector2Array(650, -83, 800, -83, 950, -83, 1100, -83, 1250, -83)
+PostSpawnDestination = PackedVector2Array(650, 320, 800, 430, 950, 470, 1100, 430, 1250, 320)
+TimeBetweenSpawns = 0.3
+TimeBeforeNextGroup = 2.0

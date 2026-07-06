@@ -9,4 +9,4 @@ Type = 15
 UpgradeImage = ExtResource("1_6axxd")
 UpgradeName = "Golden Casing"
 UpgradeDescription = "Increases your chance of firing Golden Bullets."
-Value = 5.0
+Value = 0.05

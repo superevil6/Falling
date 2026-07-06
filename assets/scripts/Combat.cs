@@ -54,15 +54,16 @@ public static class Combat
 
 	// Enemy incoming damage: element weakness doubles the hit / resist halves it, then flat
 	// reduction subtracts, then armor halves what's left (rounded up) and soaks an
-	// acid-boosted amount before breaking.
-	public static EnemyHit ResolveEnemyHit(int damage, bool isWeakness, bool isResisted, int effectiveReduction, int currentArmor, int acidStacks)
+	// acid-boosted amount before breaking. armorPierce bullets ignore the shield entirely:
+	// full damage passes through and the armor is left untouched.
+	public static EnemyHit ResolveEnemyHit(int damage, bool isWeakness, bool isResisted, int effectiveReduction, int currentArmor, int acidStacks, bool armorPierce = false)
 	{
 		float dmg = damage;
 		if (isWeakness) dmg *= 2f;
 		else if (isResisted) dmg *= 0.5f;
 		int finalDamage = Mathf.Max(0, Mathf.RoundToInt(dmg) - effectiveReduction);
 		int armor = currentArmor;
-		if (armor > 0) {
+		if (armor > 0 && !armorPierce) {
 			finalDamage = Mathf.CeilToInt(finalDamage * 0.5f);
 			int armorDmg = finalDamage * (1 + acidStacks);
 			armor = Mathf.Max(0, armor - armorDmg);

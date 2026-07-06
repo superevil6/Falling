@@ -4,9 +4,9 @@
 [ext_resource type="Resource" uid="uid://d3fltykpxnmkp" path="res://assets/weapons/Flame Thrower.tres" id="2_hiqrn"]
 [ext_resource type="Resource" uid="uid://t4f5lqyn51u2" path="res://assets/weapons/Simple Sword.tres" id="3_r1q38"]
 [ext_resource type="AudioStream" uid="uid://d1nlr5l64mmvq" path="res://assets/SFX/Explosion.wav" id="4_r1q38"]
-[ext_resource type="Resource" uid="uid://yinsm4qyoywv" path="res://assets/pickups/Health Pickup.tres" id="5_n87lj"]
+[ext_resource type="PackedScene" uid="uid://kvxtmd0oovc4" path="res://assets/pickups/1hp 50.tscn" id="5_n87lj"]
 [ext_resource type="PackedScene" uid="uid://dq5bq4jsc66se" path="res://assets/objects/Explosion.tscn" id="5_ql8tw"]
-[ext_resource type="Resource" uid="uid://bpi2u85b8oi7t" path="res://assets/pickups/Small EXP Pickup.tres" id="6_ctn8d"]
+[ext_resource type="PackedScene" uid="uid://bo6exbho5e01u" path="res://assets/pickups/1exp 50.tscn" id="6_ctn8d"]
 [ext_resource type="Shader" uid="uid://nej1tvi1ocse" path="res://assets/shaders/PixelArt.gdshader" id="7_h1fxx"]
 [ext_resource type="SpriteFrames" uid="uid://cr2mxt0cverj2" path="res://assets/sprites/Enemies/Flame Nose.aseprite" id="8_vkk7e"]
 
@@ -37,7 +37,7 @@ MovementSpeed = 150.0
 Size = 2.0
 DeathSound = ExtResource("4_r1q38")
 DeathExplosions = ExtResource("5_ql8tw")
-ItemDrops = Array[Resource]([ExtResource("5_n87lj"), ExtResource("6_ctn8d")])
+ItemDrops = Array[PackedScene]([ExtResource("5_n87lj"), ExtResource("6_ctn8d")])
 TeleportHesitationTime = 2.0
 metadata/Enemy = false
 

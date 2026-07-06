@@ -145,6 +145,8 @@ public partial class LevelUpMenu : CanvasLayer
 			if (up.Type == GunUpgradeType.Explode && gun.Explode) continue;
 			if (up.Type == GunUpgradeType.ExplosionRadius && !gun.Explode) continue;
 			if (up.Type == GunUpgradeType.Element && gun.Element != ElementType.NonElemental) continue;
+			if (up.Type == GunUpgradeType.AcidRounds && gun.AcidRoundsCount > 0) continue;
+			if (up.Type == GunUpgradeType.AuraBullets && gun.AuraDamages) continue;
 			applicable.Add(up);
 		}
 		if (applicable.Count == 0) {
@@ -153,7 +155,7 @@ public partial class LevelUpMenu : CanvasLayer
 		}
 		var rng = new RandomNumberGenerator();
 		rng.Randomize();
-		var picked = PickByRarity(applicable, gun.CurrentLevel, PickCount, rng);
+		var picked = PickByRarity(applicable, gun.CurrentLevel, EffectivePickCount(), rng);
 		int take = picked.Count;
 		currentGunUpgrades = new GunUpgrade[take];
 		currentUpgrades = new Upgrade[take];
@@ -193,7 +195,7 @@ public partial class LevelUpMenu : CanvasLayer
 		}
 		var rng = new RandomNumberGenerator();
 		rng.Randomize();
-		var picked = PickByRarity(applicable, mod.Level, PickCount, rng);
+		var picked = PickByRarity(applicable, mod.Level, EffectivePickCount(), rng);
 		int take = picked.Count;
 		currentBodyUpgrades = new BodyUpgrade[take];
 		currentUpgrades = new Upgrade[take];
@@ -205,6 +207,13 @@ public partial class LevelUpMenu : CanvasLayer
 				? picked[i].UpgradeName
 				: "Upgrade";
 		}
+	}
+
+	// Base PickCount plus any bonus the player has earned from body upgrades.
+	private int EffectivePickCount()
+	{
+		var player = GetTree().CurrentScene?.GetNodeOrNull<Player>("Player");
+		return LevelUpMath.EffectivePickCount(PickCount, player?.PickCountBonus ?? 0);
 	}
 
 	private List<T> PickByRarity<T>(List<T> applicable, int level, int pickCount, RandomNumberGenerator rng) where T : Upgrade

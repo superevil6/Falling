@@ -1,0 +1,20 @@
+[gd_resource type="Resource" format=3 uid="uid://ctw1nv0ll0011"]
+
+[ext_resource type="PackedScene" uid="uid://cf1pg2x8l8lpf" path="res://assets/objects/bullet.tscn" id="1_bul"]
+[ext_resource type="AudioStream" uid="uid://dvijwtqha2lcw" path="res://assets/SFX/Gun Shot.mp3" id="2_snd"]
+[ext_resource type="Resource" uid="uid://csprd4x40xk004" path="res://assets/fire patterns/Spread 4-40.tres" id="3_pat"]
+[ext_resource type="Script" uid="uid://cvu57cdie1j01" path="res://assets/scripts/Gun.cs" id="4_gun"]
+
+[resource]
+script = ExtResource("4_gun")
+GunDescription = "Stage 2: fires a 4-shot fan aimed at the player. More bullets, faster, more damage."
+FireRate = 1.6
+Damage = 6
+BulletCount = 1
+FirePattern = ExtResource("3_pat")
+BulletType = ExtResource("1_bul")
+FireSound = ExtResource("2_snd")
+BulletSpeed = 560.0
+BulletLifetime = 2.5
+BulletSize = 1.5
+GunUpgrades = null

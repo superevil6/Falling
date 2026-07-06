@@ -30,7 +30,7 @@ public partial class WallQueue : Node2D
 		AnchorToEdge(viewport.X);
 		var main = GetParent() as Main;
 		if (main == null || main.Stages == null || main.Stages.Length == 0) return;
-		var stage = main.Stages[main.CurrentStage];
+		var stage = main.Stages[main.StageIndex];
 		speed = stage.ScrollSpeed;
 		var stageChunks = IsRightSide ? stage.RightWallChunks : stage.LeftWallChunks;
 		if (stageChunks != null && stageChunks.Length > 0) {

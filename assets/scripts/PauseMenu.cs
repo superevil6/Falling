@@ -144,7 +144,7 @@ public partial class PauseMenu : CanvasLayer
 	{
 		var label = new Label();
 		label.Text = $"Health: {player.CurrentHealth}/{player.MaxHealth}    Damage Reduction: {player.DamageReduction}\n"
-			+ $"Fire Def: {player.FireDefenseStacks}    Ice Def: {player.IceDefenseStacks}    Electric Def: {player.ElectricDefenseStacks}";
+			+ $"Corrosive Def: {player.CorrosiveDefenseStacks}    Ice Def: {player.IceDefenseStacks}    Electric Def: {player.ElectricDefenseStacks}";
 		return label;
 	}
 

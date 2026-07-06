@@ -9,4 +9,4 @@ Type = 16
 UpgradeImage = ExtResource("1_rmcps")
 UpgradeName = "Golden Powder"
 UpgradeDescription = "Increases the power of Golden Bullets."
-Value = 1.0
+Value = 0.5

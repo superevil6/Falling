@@ -1,0 +1,18 @@
+[remap]
+
+importer="aseprite_wizard.plugin"
+type="SpriteFrames"
+uid="uid://dblf07libnvko"
+path="res://.godot/imported/Item Drop.aseprite-1cb5c3a0b6e311fa21878817ba1c84cb.res"
+
+[deps]
+
+source_file="res://assets/sprites/Item Drop.aseprite"
+dest_files=["res://.godot/imported/Item Drop.aseprite-1cb5c3a0b6e311fa21878817ba1c84cb.res"]
+
+[params]
+
+split_layers=false
+exclude_layers_pattern=""
+only_visible_layers=false
+sheet_type="Packed"
