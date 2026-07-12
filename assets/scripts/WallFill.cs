@@ -10,6 +10,7 @@ public partial class WallFill : Node2D
 	private Texture2D[] tiles;
 	private float tileSize = 64f;
 	private float halfWidth;
+	private Color modulate = Colors.White;
 	private int cols;
 	private int rows;
 	private int[] grid; // cols*rows of random tile indices, stable so the pattern is fixed
@@ -20,12 +21,16 @@ public partial class WallFill : Node2D
 
 	// Stores config only. The grid is built in _Ready, once this node is in the tree
 	// and the viewport size is actually available.
-	public void Initialize(WallQueue wallQueue, Texture2D[] fillTiles, float cellSize, float wallHalfWidth)
+	public void Initialize(WallQueue wallQueue, Texture2D[] fillTiles, float cellSize, float wallHalfWidth, float darkness = 0f)
 	{
 		queue = wallQueue;
 		tiles = fillTiles;
 		tileSize = cellSize > 0f ? cellSize : 64f;
 		halfWidth = wallHalfWidth;
+		// Reproduce the PixelArt shader's darkness term (rgb *= 1 - darkness) as a
+		// draw-time modulate, so the fill can be dimmed without a shader material.
+		float shade = 1f - Mathf.Clamp(darkness, 0f, 1f);
+		modulate = new Color(shade, shade, shade, 1f);
 	}
 
 	public override void _Ready()
@@ -101,7 +106,7 @@ public partial class WallFill : Node2D
 				float texH = tex.GetHeight();
 				var dest = new Rect2(worldX, worldY, cellW, tileSize);
 				var src = new Rect2(regionXFrac * texW, 0f, fracW * texW, texH);
-				DrawTextureRectRegion(tex, dest, src);
+				DrawTextureRectRegion(tex, dest, src, modulate);
 			}
 		}
 	}

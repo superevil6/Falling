@@ -1,10 +1,11 @@
-[gd_resource type="Resource" load_steps=2 format=3 uid="uid://dx5n6or0rm1b"]
+[gd_resource type="Resource" format=3 uid="uid://dx5n6or0rm1b"]
 
 [ext_resource type="Script" uid="uid://1j6fi2jij0hu" path="res://assets/scripts/BodyMod.cs" id="1_2au4l"]
+[ext_resource type="Texture2D" uid="uid://puyr7nekrdu3" path="res://assets/sprites/Power Up Icons/Body Mod.aseprite" id="1_yqkp2"]
 
 [resource]
 script = ExtResource("1_2au4l")
 type = 1
+ModImage = ExtResource("1_yqkp2")
+ModDescription = "Improve your mass and defensive capabilities."
 Name = "Body"
-ExperiencePerLevel = 1
-ExperienceCurveStep = 1

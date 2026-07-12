@@ -4,5 +4,5 @@ public enum ElementType
     Corrosive = 1,
     Ice = 2,
     Electric = 3,
-    Poison = 4 
+    Grease = 4
 }

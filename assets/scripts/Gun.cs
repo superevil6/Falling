@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 public partial class Gun : Resource
 {
+	[Export]
 	public string SourceName {get;set;}
 	public List<GunUpgrade> AppliedUpgrades {get;set;} = new List<GunUpgrade>();
 	[Export]

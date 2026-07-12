@@ -20,6 +20,8 @@ collision_mask = 3
 script = ExtResource("1_afncw")
 Type = 1
 DropChance = 0.5
+PickupScale = 0.8
+ExpireTime = 10.0
 PickupSound = ExtResource("2_3b7j0")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=35789444]

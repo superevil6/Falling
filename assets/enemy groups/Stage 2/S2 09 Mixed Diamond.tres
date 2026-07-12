@@ -1,0 +1,15 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="PackedScene" uid="uid://lvklykjb7i4h" path="res://assets/enemies/Stage 2/S2 Sniper Gun Hand.tscn" id="1_sniper"]
+[ext_resource type="PackedScene" uid="uid://chy4g7pnub38u" path="res://assets/enemies/Stage 2/S2 Mouth Gun.tscn" id="2_mouth"]
+[ext_resource type="PackedScene" uid="uid://bb41cicd8h42y" path="res://assets/enemies/Stage 2/S2 Sword Mouth.tscn" id="3_sword"]
+[ext_resource type="PackedScene" uid="uid://dbi0j8vm46c4i" path="res://assets/enemies/Stage 2/S2 Double Shot Split Face.tscn" id="4_split"]
+[ext_resource type="Script" uid="uid://co2yygdrwkshm" path="res://assets/scripts/EnemyGroup.cs" id="5_group"]
+
+[resource]
+script = ExtResource("5_group")
+Enemies = Array[PackedScene]([ExtResource("1_sniper"), ExtResource("2_mouth"), ExtResource("2_mouth"), ExtResource("3_sword"), ExtResource("4_split")])
+SpawnLocations = PackedVector2Array(950, -83, 720, -83, 1180, -83, 950, -83, 950, -83)
+PostSpawnDestination = PackedVector2Array(950, 280, 720, 500, 1180, 500, 950, 720, 950, 500)
+TimeBetweenSpawns = 0.3
+TimeBeforeNextGroup = 2.0

@@ -1,0 +1,16 @@
+[remap]
+
+importer="aseprite_wizard.plugin.static-texture"
+type="AtlasTexture"
+uid="uid://ka37l2dvrptm"
+path="res://.godot/imported/Gas Gun.aseprite-b5e7a3dd5dac7eefcc057e5481513600.res"
+
+[deps]
+
+source_file="res://assets/sprites/Weapons/Gas Gun.aseprite"
+dest_files=["res://.godot/imported/Gas Gun.aseprite-b5e7a3dd5dac7eefcc057e5481513600.res"]
+
+[params]
+
+exclude_layers_pattern=""
+only_visible_layers=false

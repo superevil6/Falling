@@ -1,10 +1,12 @@
-[gd_resource type="Resource" load_steps=2 format=3 uid="uid://dkjbvxqqbuwho"]
+[gd_resource type="Resource" format=3 uid="uid://dkjbvxqqbuwho"]
 
+[ext_resource type="Texture2D" uid="uid://c0rd62i11l4y0" path="res://assets/sprites/Power Up Icons/Item Magnet.png" id="1_1jg7b"]
 [ext_resource type="Script" uid="uid://c16jiuasboxwv" path="res://assets/scripts/BodyUpgrade.cs" id="1_8v6is"]
 
 [resource]
 script = ExtResource("1_8v6is")
 BodyUpgradeType = 3
+UpgradeImage = ExtResource("1_1jg7b")
 UpgradeName = "Magnetism"
 UpgradeDescription = "Draw in more pickup items such as health and mercury."
 Value = 1.5

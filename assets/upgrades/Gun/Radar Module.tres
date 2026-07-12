@@ -9,5 +9,5 @@ Type = 11
 UpgradeImage = ExtResource("1_ggi2x")
 UpgradeName = "Radar Module"
 UpgradeDescription = "Bullets gain a small amount of heat seeking property, and will follow enemies."
-Value = 3.0
+Value = 1.0
 Rarity = 1

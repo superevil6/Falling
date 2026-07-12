@@ -31,6 +31,7 @@ public partial class PlayerState : Resource
 	[Export] public float MeleeRangeBonus {get;set;}
 	[Export] public float MeleeArcBonus {get;set;}
 	[Export] public float MeleeSwingSpeedMultiplier {get;set;}
+	[Export] public float MeleeCooldownMultiplier {get;set;}
 	[Export] public float MeleeLifeSteal {get;set;}
 	[Export] public float BlindResistance {get;set;}
 	[Export] public float CorrosionResistance {get;set;}

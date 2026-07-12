@@ -2,9 +2,9 @@ shader_type canvas_item;
 
 uniform float speed : hint_range(0.0, 10.0) = 3.0;
 uniform float noise_scale : hint_range(0.5, 8.0) = 3.0;
-uniform vec3 color_hot : source_color = vec3(1.0, 1.0, 0.7);
-uniform vec3 color_warm : source_color = vec3(1.0, 0.45, 0.0);
-uniform vec3 color_cool : source_color = vec3(0.7, 0.0, 0.0);
+uniform vec3 color_hot : source_color = vec3(0.85, 1.0, 0.45);
+uniform vec3 color_warm : source_color = vec3(0.4, 0.85, 0.15);
+uniform vec3 color_cool : source_color = vec3(0.1, 0.3, 0.05);
 
 float hash(vec2 p) {
 	return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
@@ -35,7 +35,7 @@ void fragment() {
 	vec2 p = UV * noise_scale;
 	p.y -= TIME * speed;
 	float n = fbm(p);
-	vec3 fire = mix(color_cool, color_warm, smoothstep(0.2, 0.55, n));
-	fire = mix(fire, color_hot, smoothstep(0.55, 0.85, n));
-	COLOR = vec4(fire, tex.a);
+	vec3 corrosion = mix(color_cool, color_warm, smoothstep(0.2, 0.55, n));
+	corrosion = mix(corrosion, color_hot, smoothstep(0.55, 0.85, n));
+	COLOR = vec4(corrosion, tex.a);
 }

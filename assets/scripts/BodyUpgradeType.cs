@@ -29,5 +29,6 @@ public enum BodyUpgradeType
     ExpGainUp = 26,
     DashCooldownReduction = 27,
     WeaknessInsight = 28,
-    PickCount = 29
+    PickCount = 29,
+    MeleeCooldownReduction = 30
 }

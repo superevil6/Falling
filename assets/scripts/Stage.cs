@@ -11,6 +11,14 @@ public partial class Stage : Resource
 	[Export]
 	public EnemyGroup[] EnemyGroup {get;set;}
 
+	// Shown once this stage's boss is beaten and the player has picked their reward:
+	// LevelEndText flashes in large red text while the whole screen (gameplay, HUD and
+	// player) fades to LevelEndColor, right before the next stage loads.
+	[Export]
+	public string LevelEndText {get;set;}
+	[Export]
+	public Color LevelEndColor {get;set;} = new Color(0f, 0f, 0f, 1f);
+
 	// --- Obstacle spawner ---
 	// The ObstacleSpawner node inherits these at runtime (see ObstacleSpawner._Ready).
 	// Hazards is the pool of obstacle scenes it cycles through; an empty pool leaves the
@@ -45,6 +53,10 @@ public partial class Stage : Resource
 	public Texture2D[] WallFillTiles {get;set;}
 	[Export]
 	public float WallFillTileSize {get;set;} = 64f;
+	// Darkens the wall-fill tiles (0 = untouched, 1 = black), matching the darkness
+	// term of the PixelArt shader used for backgrounds. Applied uniformly to the fill.
+	[Export(PropertyHint.Range, "0,1,0.05")]
+	public float WallFillTileDarkness {get;set;} = 0f;
 	// The wall sprite is centred on its queue position and the wall graphic is drawn
 	// from the texture's left edge, so the graphic's outer edge sits half a sprite
 	// width out from the boundary. The fill stops at that edge (not at the boundary)

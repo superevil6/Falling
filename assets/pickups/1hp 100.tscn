@@ -19,6 +19,8 @@ shader_parameter/darkness = 0.0
 collision_mask = 3
 script = ExtResource("1_o63c0")
 Type = 1
+PickupScale = 0.5
+ExpireTime = 10.0
 PickupSound = ExtResource("2_c2lpm")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=35789444]

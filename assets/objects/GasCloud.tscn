@@ -12,6 +12,7 @@ Duration = 4.0
 DamageInterval = 0.5
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+self_modulate = Color(1, 1, 1, 0.5)
 sprite_frames = ExtResource("2_frames")
 animation = &"default"
 autoplay = "default"

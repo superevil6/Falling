@@ -12,7 +12,7 @@ radius = 36.013885
 shader = ExtResource("3_6k1ex")
 shader_parameter/pixel_size = 2.0000000475
 shader_parameter/color_steps = 8
-shader_parameter/hue_shift = -0.028999953877499984
+shader_parameter/hue_shift = -0.02899995387749998
 shader_parameter/darkness = 0.0
 
 [node name="Area2D" type="Area2D" unique_id=1512677478]
@@ -20,6 +20,8 @@ collision_mask = 3
 script = ExtResource("1_ni2o4")
 Type = 1
 DropChance = 0.5
+PickupScale = 0.65
+ExpireTime = 10.0
 PickupSound = ExtResource("2_aortl")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=35789444]

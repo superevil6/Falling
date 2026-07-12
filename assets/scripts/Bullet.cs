@@ -38,6 +38,10 @@ public partial class Bullet : Attack
 	private int ExplosionDamage;
 	private int RemainingRicochets;
 	private ulong spawnPhysicsFrame;
+	// Bodies (walls) the bullet was already overlapping when it spawned — e.g. the player
+	// firing while a contracting wall overlaps them. Collisions with these are ignored
+	// until the bullet exits them, so it can't vanish/detonate on the wall it was born in.
+	private readonly System.Collections.Generic.HashSet<ulong> spawnOverlapBodies = new System.Collections.Generic.HashSet<ulong>();
 	private double subBulletTime;
 	private float subBulletSpinAccum;
 
@@ -47,11 +51,12 @@ public partial class Bullet : Attack
 	public override void _Ready()
 	{
 		spawnPhysicsFrame = Engine.GetPhysicsFrames();
+		RecordSpawnOverlaps();
 		string shaderPath = Element switch {
 			ElementType.Corrosive => "res://assets/shaders/Fire.gdshader",
 			ElementType.Ice => "res://assets/shaders/Ice.gdshader",
 			ElementType.Electric => "res://assets/shaders/Lightning.gdshader",
-			ElementType.Poison => "res://assets/shaders/Poison.gdshader",
+			ElementType.Grease => "res://assets/shaders/Grease.gdshader",
 			_ => null
 		};
 		if (shaderPath != null) {
@@ -293,13 +298,50 @@ public partial class Bullet : Attack
 		if (IsBoomerang) return;
 		HandleHit(true);
 	}
+	// Records the walls the bullet spawns already overlapping so it isn't destroyed by
+	// them (see spawnOverlapBodies). A point query is used instead of relying on
+	// physics-frame timing: the spawnPhysicsFrame grace window can miss a body_entered
+	// that arrives two or more physics frames after spawn (frame hitches, or render
+	// running ahead of physics), which made bullets fired against a wall vanish.
+	private void RecordSpawnOverlaps() {
+		var space = GetWorld2D()?.DirectSpaceState;
+		if (space == null) return;
+		var query = new PhysicsPointQueryParameters2D();
+		query.Position = GlobalPosition;
+		query.CollisionMask = CollisionMask;
+		query.CollideWithBodies = true;
+		query.CollideWithAreas = false;
+		foreach (var hit in space.IntersectPoint(query)) {
+			if (hit["collider"].As<GodotObject>() is GodotObject collider) {
+				spawnOverlapBodies.Add(collider.GetInstanceId());
+			}
+		}
+	}
+
 	private void _on_body_entered(Node2D node) {
 		if (IsBoomerang) return;
-		// Ignore the wall the bullet spawned inside (e.g. the player shooting while
-		// pressed against a wall) so exploding bullets don't detonate on spawn. Walls
-		// hit later, after the bullet has travelled, still trigger normally.
-		if (Engine.GetPhysicsFrames() <= spawnPhysicsFrame + 1) return;
+		// Player hits are dealt (and the bullet despawned) via the player's hurtbox
+		// Area2D in _on_area_entered. The physics body is a slightly different size, so
+		// letting it destroy the bullet here would eat hits in the sliver between the two
+		// shapes — the bullet would vanish on the player without ever dealing damage.
+		if (node is Player) return;
+		// Ignore any wall the bullet spawned inside (e.g. the player shooting while a
+		// contracting wall overlaps them) so it doesn't vanish or detonate on spawn.
+		// spawnOverlapBodies is seeded at spawn; the spawnPhysicsFrame window is a
+		// fallback that also catches (and remembers) a spawn overlap the query missed.
+		ulong id = node.GetInstanceId();
+		if (spawnOverlapBodies.Contains(id)) return;
+		if (Engine.GetPhysicsFrames() <= spawnPhysicsFrame + 1) {
+			spawnOverlapBodies.Add(id);
+			return;
+		}
 		HandleHit(false);
+	}
+
+	// Once the bullet clears a wall it was born in, stop ignoring that wall — so it dies
+	// normally if it flies back into it (e.g. after a ricochet).
+	private void _on_body_exited(Node2D node) {
+		spawnOverlapBodies.Remove(node.GetInstanceId());
 	}
 
 	private void HandleHit(bool hitEnemy) {
@@ -329,11 +371,15 @@ public partial class Bullet : Attack
 		QueueFree();
 	}
 
-	private void SpawnSplitBullets()
+	private void SpawnSplitBullets() =>
+		SpawnSplitBulletsAt(GetParent(), Position, Damage, Element, CollisionLayer, CollisionMask);
+
+	// Spawns Gun.Split+1 fan-out bullets at a point. Public so beam weapons (laser/lightning),
+	// which have no travelling projectile, can trigger the same Split mod at their impact points.
+	// The split bullets carry no Gun, so they never recurse.
+	public void SpawnSplitBulletsAt(Node parent, Vector2 position, int damage, ElementType element, uint collisionLayer, uint collisionMask)
 	{
-		if (Gun?.BulletType == null) return;
-		var parent = GetParent();
-		if (parent == null) return;
+		if (Gun?.BulletType == null || parent == null) return;
 		var rng = new RandomNumberGenerator();
 		rng.Randomize();
 		int count = Gun.Split + 1;
@@ -341,13 +387,13 @@ public partial class Bullet : Attack
 			var b = Gun.BulletType.Instantiate<Bullet>();
 			float angle = rng.RandfRange(0, Mathf.Pi * 2f);
 			b.Direction = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
-			b.Damage = Damage;
+			b.Damage = damage;
 			b.BulletLifetime = Gun.BulletLifetime > 0 ? Gun.BulletLifetime : 1f;
-			b.Element = Element;
-			b.Position = Position;
+			b.Element = element;
+			b.Position = position;
 			b.Rotation = b.Direction.Angle();
-			b.CollisionLayer = CollisionLayer;
-			b.CollisionMask = CollisionMask;
+			b.CollisionLayer = collisionLayer;
+			b.CollisionMask = collisionMask;
 			parent.CallDeferred("add_child", b);
 		}
 	}
@@ -368,31 +414,43 @@ public partial class Bullet : Attack
 		return (closest.GlobalPosition - GlobalPosition).Normalized();
 	}
 
-	private void GenerateExplosion() {
+	private void GenerateExplosion() => SpawnExplosionAt(GetParent(), Position, Damage);
+
+	// Spawns this bullet's explosion scene at a point, dealing `damage`. Public so beam
+	// weapons (laser/lightning), which have no travelling projectile, can trigger the same
+	// Explode mod at their impact points.
+	public void SpawnExplosionAt(Node parent, Vector2 position, int damage) {
+		if (Explosion == null || parent == null) return;
 		if (!global::Explosion.CanSpawn()) return;
 		Explosion e = Explosion.Instantiate<Explosion>();
-		e.Position = Position;
-		e.Damage = Damage;
+		e.Position = position;
+		e.Damage = damage;
 		if (Gun != null && Gun.ExplosionRadius > 0f) {
 			float s = 1f + Gun.ExplosionRadius;
 			e.Scale = new Vector2(s, s);
 		}
-		GetParent().AddChild(e);
+		parent.AddChild(e);
 	}
 
-	private void GenerateGasCloud() {
-		if (GasCloud == null || Gun == null) return;
+	private void GenerateGasCloud() =>
+		SpawnGasCloudAt(GetParent(), Position, Damage, Element, GetCollisionLayerValue(4));
+
+	// Spawns this bullet's gas cloud at a point, sized from the Gun's gas settings. Public so
+	// beam weapons can trigger the same Gas mod at their impact points. `damagesEnemies`
+	// mirrors the layer check below: player beams pass true, enemy beams false.
+	public void SpawnGasCloudAt(Node parent, Vector2 position, int damage, ElementType element, bool damagesEnemies) {
+		if (GasCloud == null || Gun == null || parent == null) return;
 		if (!global::GasCloud.CanSpawn()) return;
 		GasCloud cloud = GasCloud.Instantiate<GasCloud>();
-		cloud.Position = Position;
+		cloud.Position = position;
 		cloud.Radius = Gun.GasRadius;
 		cloud.Duration = Gun.GasDuration;
 		cloud.DamageInterval = Gun.GasDamageInterval;
-		cloud.Damage = Gun.GasDamage > 0 ? Gun.GasDamage : Mathf.Max(1, Damage / 4);
-		if (Element != ElementType.NonElemental) cloud.Element = Element;
+		cloud.Damage = Gun.GasDamage > 0 ? Gun.GasDamage : Mathf.Max(1, damage / 4);
+		if (element != ElementType.NonElemental) cloud.Element = element;
 		// Layer 4 = player attack, layer 5 = enemy attack. The bullet's own layer
 		// decides who the cloud is hostile to, so player and enemy gas mirror correctly.
-		cloud.DamagesEnemies = GetCollisionLayerValue(4);
-		GetParent().AddChild(cloud);
+		cloud.DamagesEnemies = damagesEnemies;
+		parent.AddChild(cloud);
 	}
 }

@@ -31,6 +31,12 @@ public partial class BackgroundQueue : Node2D
 	private float[] tileDarkness;
 	private int nextTileIndex = 0;
 	private List<Sprite2D> activeTiles = new List<Sprite2D>();
+	// Smooth (sub-pixel) global positions, one per active tile. These are the source
+	// of truth for scroll/spawn/despawn; the sprites themselves are rendered snapped to
+	// the pixel grid so abutting strip edges never land on a fractional pixel (which
+	// produces hairline seams while scrolling). Keeping the float here means slow
+	// scroll (e.g. the 0.4x middle column) still advances instead of stalling on a round.
+	private List<Vector2> tilePositions = new List<Vector2>();
 	private float viewportHeight;
 	private float targetTileWidth;
 	private WallQueue scrollSource;
@@ -79,15 +85,17 @@ public partial class BackgroundQueue : Node2D
 
 		Vector2 movement = (scrollSource?.GetCurrentScrollMovement(delta) ?? Vector2.Zero) * ScrollSpeedMultiplier;
 		for (int i = 0; i < activeTiles.Count; i++) {
-			activeTiles[i].Position += movement;
+			tilePositions[i] += movement;
+			activeTiles[i].GlobalPosition = tilePositions[i].Round();
 		}
 
 		while (activeTiles.Count > 0) {
 			var top = activeTiles[0];
-			float topBottomEdge = top.GlobalPosition.Y + GetTileHeight(top) / 2f;
+			float topBottomEdge = tilePositions[0].Y + GetTileHeight(top) / 2f;
 			if (topBottomEdge < 0) {
 				top.QueueFree();
 				activeTiles.RemoveAt(0);
+				tilePositions.RemoveAt(0);
 			} else break;
 		}
 
@@ -100,7 +108,7 @@ public partial class BackgroundQueue : Node2D
 	{
 		if (activeTiles.Count == 0) return true;
 		var bottom = activeTiles[activeTiles.Count - 1];
-		float bottomEdge = bottom.GlobalPosition.Y + GetTileHeight(bottom) / 2f;
+		float bottomEdge = tilePositions[activeTiles.Count - 1].Y + GetTileHeight(bottom) / 2f;
 		return bottomEdge < viewportHeight;
 	}
 
@@ -114,6 +122,9 @@ public partial class BackgroundQueue : Node2D
 		var tile = new Sprite2D {
 			Texture = texture,
 			TextureRepeat = CanvasItem.TextureRepeatEnum.Enabled,
+			// Nearest filtering keeps strip edges crisp; linear filtering bleeds across the
+			// abutting edge of stacked strips and reads as a seam. Matches the pixel-art look.
+			TextureFilter = CanvasItem.TextureFilterEnum.Nearest,
 			Material = BuildMaterial(tileIndex),
 		};
 		ApplyTiling(tile, texture);
@@ -124,10 +135,12 @@ public partial class BackgroundQueue : Node2D
 		if (activeTiles.Count == 0) {
 			globalY = height / 2f;
 		} else {
-			var prev = activeTiles[activeTiles.Count - 1];
-			globalY = prev.GlobalPosition.Y + GetTileHeight(prev) / 2f + height / 2f;
+			float prevY = tilePositions[activeTiles.Count - 1].Y;
+			globalY = prevY + GetTileHeight(activeTiles[activeTiles.Count - 1]) / 2f + height / 2f;
 		}
-		tile.GlobalPosition = new Vector2(GlobalPosition.X, globalY);
+		var smoothPos = new Vector2(GlobalPosition.X, globalY);
+		tilePositions.Add(smoothPos);
+		tile.GlobalPosition = smoothPos.Round();
 		activeTiles.Add(tile);
 	}
 

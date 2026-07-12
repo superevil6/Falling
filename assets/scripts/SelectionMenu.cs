@@ -74,6 +74,7 @@ public partial class SelectionMenu : CanvasLayer
 	{
 		if (IsPlayerGunsFull() && IsPlayerBodyModsFull()) return false;
 		BuildPicksFromArrays();
+		if (currentPicks == null || currentPicks.Length == 0) return false;
 		BuildOptions();
 		selectedIndex = 0;
 		UpdateHighlight();
@@ -116,6 +117,7 @@ public partial class SelectionMenu : CanvasLayer
 		}
 		if (pool.Count == 0) {
 			currentPicks = null;
+			Options = [];
 			return;
 		}
 		var rng = new RandomNumberGenerator();

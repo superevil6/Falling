@@ -30,6 +30,10 @@ public partial class WallQueue : Node2D
 		AnchorToEdge(viewport.X);
 		var main = GetParent() as Main;
 		if (main == null || main.Stages == null || main.Stages.Length == 0) return;
+		// Demo-loop colour wash. Set on the queue so it propagates to every wall chunk
+		// spawned as a child (the PixelArt shader preserves modulate); the fill below is
+		// parented to Main, so it gets the tint applied directly.
+		Modulate = main.LoopTint;
 		var stage = main.Stages[main.StageIndex];
 		speed = stage.ScrollSpeed;
 		var stageChunks = IsRightSide ? stage.RightWallChunks : stage.LeftWallChunks;
@@ -39,7 +43,8 @@ public partial class WallQueue : Node2D
 		if (stage.WallFillTiles != null && stage.WallFillTiles.Length > 0) {
 			var fill = new WallFill();
 			fill.ZIndex = -5; // behind the wall chunks and gameplay, above the background
-			fill.Initialize(this, stage.WallFillTiles, stage.WallFillTileSize, stage.WallSpriteHalfWidth);
+			fill.Initialize(this, stage.WallFillTiles, stage.WallFillTileSize, stage.WallSpriteHalfWidth, stage.WallFillTileDarkness);
+			fill.Modulate = main.LoopTint; // matches the wall chunks' wash (fill is parented to Main, not this queue)
 			// Deferred: this runs during Main's own _Ready, when AddChild is rejected.
 			GetParent().CallDeferred(Node.MethodName.AddChild, fill);
 		}

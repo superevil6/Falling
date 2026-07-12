@@ -13,7 +13,7 @@ public partial class GasCloud : Area2D
 	[Export]
 	public float DamageInterval {get;set;} = 0.5f;
 	[Export]
-	public ElementType Element {get;set;} = ElementType.Poison;
+	public ElementType Element {get;set;} = ElementType.Grease;
 	// Damage applied to each valid target every DamageInterval seconds.
 	public int Damage {get;set;} = 5;
 	// true  → player-fired cloud, damages enemies.

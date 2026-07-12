@@ -12,7 +12,7 @@ radius = 36.013885
 shader = ExtResource("2_86ael")
 shader_parameter/pixel_size = 2.0000000475
 shader_parameter/color_steps = 8
-shader_parameter/hue_shift = 0.0010000475475000492
+shader_parameter/hue_shift = 0.00100004754750004
 shader_parameter/darkness = 0.0
 
 [node name="Area2D" type="Area2D" unique_id=1512677478]
@@ -20,7 +20,7 @@ collision_mask = 3
 script = ExtResource("1_86ael")
 Type = 1
 DropChance = 0.5
-PickupScale = 0.35
+PickupScale = 0.5
 ExpireTime = 10.0
 PickupSound = ExtResource("2_xqkwk")
 

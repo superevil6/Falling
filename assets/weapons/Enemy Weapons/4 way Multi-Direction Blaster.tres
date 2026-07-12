@@ -9,13 +9,14 @@
 script = ExtResource("4_ulku5")
 GunImage = ExtResource("3_e262n")
 FireRate = 0.5
-Damage = 10
+Damage = 8
 BulletCount = 4
 DirectionalCount = 4
 DirectionalAngle = 90.0
 MultiBulletAngle = 0.3
 BulletType = ExtResource("1_766c3")
 FireSound = ExtResource("2_r34yy")
+BulletSpeed = 1000.0
 BulletLifetime = 1.0
 BulletSize = 2.0
 GunUpgrades = null

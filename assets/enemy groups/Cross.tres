@@ -1,6 +1,6 @@
 [gd_resource type="Resource" format=3 uid="uid://cxkaq23wodoq8"]
 
-[ext_resource type="PackedScene" uid="uid://rwdplcylr5en" path="res://assets/enemies/NoseFlame.tscn" id="1_daa03"]
+[ext_resource type="PackedScene" uid="uid://rwdplcylr5en" path="res://assets/enemies/Stage 2/S2 NoseFlame.tscn" id="1_daa03"]
 [ext_resource type="Script" uid="uid://co2yygdrwkshm" path="res://assets/scripts/EnemyGroup.cs" id="2_group"]
 
 [resource]

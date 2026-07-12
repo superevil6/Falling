@@ -1,0 +1,23 @@
+[gd_resource type="Resource" format=3 uid="uid://cbqfw1po0i7hs"]
+
+[ext_resource type="SpriteFrames" uid="uid://cdteqirtl0nkv" path="res://assets/sprites/Weapons/Spiral Bullet.aseprite" id="1_3c8q8"]
+[ext_resource type="PackedScene" uid="uid://cf1pg2x8l8lpf" path="res://assets/objects/bullet.tscn" id="2_s0qqy"]
+[ext_resource type="AudioStream" uid="uid://dvijwtqha2lcw" path="res://assets/SFX/Gun Shot.mp3" id="3_31jbw"]
+[ext_resource type="Script" uid="uid://cvu57cdie1j01" path="res://assets/scripts/Gun.cs" id="4_w3qcc"]
+
+[resource]
+script = ExtResource("4_w3qcc")
+GunType = 9
+GunDescription = "Fires bullets that spiral outwards."
+FireRate = 0.7
+Damage = 4
+BulletCount = 2
+MultiBulletAngle = 0.3
+BulletType = ExtResource("2_s0qqy")
+FireSound = ExtResource("3_31jbw")
+BulletSpeed = 500.0
+BulletSpriteFrames = ExtResource("1_3c8q8")
+BulletLifetime = 3.0
+BulletSize = 2.0
+Spiral = 12.5
+GunUpgrades = null

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" format=3 uid="uid://ccigxhikigc38"]
+
+[ext_resource type="Texture2D" uid="uid://dh88hh5upnsfc" path="res://assets/sprites/Power Up Icons/Poison Bullet.png" id="1_1nkql"]
+[ext_resource type="Script" uid="uid://cjvebtbs1ft7k" path="res://assets/scripts/GunUpgrade.cs" id="1_us4an"]
+
+[resource]
+script = ExtResource("1_us4an")
+Type = 14
+Element = 4
+UpgradeImage = ExtResource("1_1nkql")
+UpgradeName = "Grease Bullets"
+UpgradeDescription = "Honestly, not sure what these do at this point. Think of something."
+Value = 1.0
+Rarity = 1

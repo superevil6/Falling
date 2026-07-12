@@ -10,6 +10,9 @@ public partial class MeleeWeapon : Resource
 	public int Damage {get;set;}
 	[Export]
 	public float SwingDuration {get;set;} = 0.3f;
+	// Minimum time between swings. Also scaled by the player's swing-speed upgrades.
+	[Export]
+	public float SwingCooldown {get;set;} = 0.5f;
 	[Export]
 	public float WidthMultiplier {get;set;}
 	[Export]

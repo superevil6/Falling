@@ -1,0 +1,79 @@
+[gd_scene format=3 uid="uid://lvklykjb7i4h"]
+
+[ext_resource type="Script" uid="uid://b3od7f8efylhu" path="res://assets/scripts/Enemy.cs" id="1_ld20d"]
+[ext_resource type="Resource" uid="uid://dech0up8m10ox" path="res://assets/weapons/Enemy Weapons/S2 Sniper Hand Gun Sniper Rifle.tres" id="2_1d56c"]
+[ext_resource type="Resource" uid="uid://t4f5lqyn51u2" path="res://assets/weapons/Simple Sword.tres" id="3_bbfdb"]
+[ext_resource type="AudioStream" uid="uid://d1nlr5l64mmvq" path="res://assets/SFX/Explosion.wav" id="4_weprj"]
+[ext_resource type="PackedScene" uid="uid://dq5bq4jsc66se" path="res://assets/objects/Explosion.tscn" id="5_ittco"]
+[ext_resource type="Texture2D" uid="uid://cq6apb7nvwyxj" path="res://assets/sprites/Debris.aseprite" id="6_b3i7k"]
+[ext_resource type="PackedScene" uid="uid://xavg5hqw8ck3" path="res://assets/pickups/1exp 100.tscn" id="7_ixxlk"]
+[ext_resource type="Texture2D" uid="uid://6edh5g64j6wd" path="res://assets/sprites/Debris 2.aseprite" id="7_uo2rx"]
+[ext_resource type="PackedScene" uid="uid://bo6exbho5e01u" path="res://assets/pickups/1exp 50.tscn" id="8_a0ock"]
+[ext_resource type="PackedScene" uid="uid://kvxtmd0oovc4" path="res://assets/pickups/1hp 50.tscn" id="9_3ityo"]
+[ext_resource type="Shader" uid="uid://nej1tvi1ocse" path="res://assets/shaders/PixelArt.gdshader" id="10_bj025"]
+[ext_resource type="SpriteFrames" uid="uid://c6ga6s7n0na43" path="res://assets/sprites/Enemies/Gun Hand.ase" id="11_24k7h"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_58uc7"]
+shader = ExtResource("10_bj025")
+shader_parameter/pixel_size = 4.0
+shader_parameter/color_steps = 8
+shader_parameter/hue_shift = 0.0
+shader_parameter/darkness = 0.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_kihfr"]
+radius = 3.6999216
+height = 17.91021
+
+[node name="Gun Hand" type="Area2D" unique_id=1848100956 groups=["Enemy"]]
+position = Vector2(2, -1)
+scale = Vector2(0.28414735, 0.28639436)
+collision_layer = 4
+collision_mask = 8
+script = ExtResource("1_ld20d")
+MaxHealth = 10
+Armor = 10
+Gun = ExtResource("2_1d56c")
+CanMelee = false
+Melee = ExtResource("3_bbfdb")
+MovementType = 2
+SpawnMovementSpeed = 8
+MovementSpeed = 150.0
+Size = 2.0
+DeathSound = ExtResource("4_weprj")
+DeathExplosions = ExtResource("5_ittco")
+DebrisReleased = 1
+DebrisSprites = Array[Texture2D]([ExtResource("6_b3i7k"), ExtResource("7_uo2rx")])
+ItemDrops = Array[PackedScene]([ExtResource("7_ixxlk"), ExtResource("8_a0ock"), ExtResource("9_3ityo")])
+TeleportHesitationTime = 2.0
+metadata/Enemy = false
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=478346089]
+texture_filter = 1
+material = SubResource("ShaderMaterial_58uc7")
+position = Vector2(-7.033634, 3.4707038)
+scale = Vector2(1.658356, 2.155334)
+sprite_frames = ExtResource("11_24k7h")
+animation = &"Prespawn"
+metadata/_aseprite_wizard_config_ = {
+"layer": "",
+"o_ex_p": "",
+"o_folder": "",
+"o_name": "",
+"only_visible": false,
+"slice": "",
+"source": "res://assets/sprites/Ball Enemy.aseprite"
+}
+metadata/_aseprite_wizard_source_file_hash_ = "50dde8af9d7688233b8f7db3e27ef890"
+metadata/_aseprite_wizard_interface_config_ = {
+"layer_section": false,
+"output_section": false,
+"slice_section": false
+}
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=61089569]
+position = Vector2(-7.0336347, 3.470704)
+scale = Vector2(32.127278, -19.145814)
+shape = SubResource("CapsuleShape2D_kihfr")
+
+[connection signal="area_entered" from="." to="." method="_on_area_entered"]
+[connection signal="animation_finished" from="AnimatedSprite2D" to="." method="_on_animated_sprite_2d_animation_finished"]

@@ -11,26 +11,32 @@ script = ExtResource("2")
 Duration = 1.0
 OverrideGun = ExtResource("1_whge5")
 SummonScenes = null
+MineDamage = 20
+MineRadius = 300.0
 
 [sub_resource type="Resource" id="BossAction_b"]
 script = ExtResource("2")
 Duration = 1.0
 AimOffsetDegrees = 20.0
 SummonScenes = null
+MineDamage = 20
+MineRadius = 300.0
 
 [sub_resource type="Resource" id="BossAction_tele_mine"]
 script = ExtResource("2")
 Type = 1
 Duration = 0.8
 SummonScenes = null
+MineDamage = 20
+MineRadius = 300.0
 
 [sub_resource type="Resource" id="BossAction_mine"]
 script = ExtResource("2")
 Type = 6
 Duration = 1.2
 SummonScenes = null
-MineDamage = 45
-MineRadius = 190.0
+MineDamage = 20
+MineRadius = 300.0
 AttackNumber = 1
 
 [sub_resource type="Resource" id="BossAction_bubble"]

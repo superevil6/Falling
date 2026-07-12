@@ -1,7 +1,7 @@
-[gd_resource type="Resource" format=3]
+[gd_resource type="Resource" format=3 uid="uid://bwffdxn674ic6"]
 
-[ext_resource type="PackedScene" uid="uid://xfofnhaseaea" path="res://assets/enemies/CircleNose.tscn" id="1_cn"]
-[ext_resource type="Script" path="res://assets/scripts/EnemyGroup.cs" id="2_group"]
+[ext_resource type="PackedScene" uid="uid://xfofnhaseaea" path="res://assets/enemies/Stage 1/CircleNose.tscn" id="1_cn"]
+[ext_resource type="Script" uid="uid://co2yygdrwkshm" path="res://assets/scripts/EnemyGroup.cs" id="2_group"]
 
 [resource]
 script = ExtResource("2_group")

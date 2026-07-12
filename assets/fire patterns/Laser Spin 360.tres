@@ -7,4 +7,5 @@ script = ExtResource("1")
 Type = 3
 AimAtPlayer = false
 FixedAngleDegrees = 0.0
+Count = 10
 SpinDegrees = 30.0

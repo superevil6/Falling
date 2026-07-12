@@ -1,0 +1,20 @@
+[gd_resource type="Resource" format=3 uid="uid://dtij2bloc678i"]
+
+[ext_resource type="SpriteFrames" uid="uid://cdnsfh2ue3mr4" path="res://assets/sprites/Weapons/Flame Bullet.aseprite" id="1_1jagq"]
+[ext_resource type="PackedScene" uid="uid://cf1pg2x8l8lpf" path="res://assets/objects/bullet.tscn" id="2_8gat5"]
+[ext_resource type="Texture2D" uid="uid://7pb7fmgdtdwx" path="res://assets/sprites/Weapons/Flame Thrower.png" id="3_by1c5"]
+[ext_resource type="Script" uid="uid://cvu57cdie1j01" path="res://assets/scripts/Gun.cs" id="4_mw3hf"]
+
+[resource]
+script = ExtResource("4_mw3hf")
+GunImage = ExtResource("3_by1c5")
+GunType = 3
+FireRate = 0.05
+Damage = 2
+BulletCount = 1
+MultiBulletAngle = 1.0
+BulletType = ExtResource("2_8gat5")
+BulletSpriteFrames = ExtResource("1_1jagq")
+BulletLifetime = 0.05
+BulletSize = 4.0
+GunUpgrades = null

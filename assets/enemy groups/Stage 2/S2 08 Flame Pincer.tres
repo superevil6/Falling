@@ -1,0 +1,13 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="PackedScene" uid="uid://bb41cicd8h42y" path="res://assets/enemies/Stage 2/S2 Sword Mouth.tscn" id="1_sword"]
+[ext_resource type="PackedScene" uid="uid://rwdplcylr5en" path="res://assets/enemies/Stage 2/S2 NoseFlame.tscn" id="2_flame"]
+[ext_resource type="Script" uid="uid://co2yygdrwkshm" path="res://assets/scripts/EnemyGroup.cs" id="3_group"]
+
+[resource]
+script = ExtResource("3_group")
+Enemies = Array[PackedScene]([ExtResource("1_sword"), ExtResource("1_sword"), ExtResource("2_flame"), ExtResource("2_flame")])
+SpawnLocations = PackedVector2Array(680, -83, 1220, -83, 860, -83, 1040, -83)
+PostSpawnDestination = PackedVector2Array(680, 450, 1220, 450, 860, 300, 1040, 300)
+TimeBetweenSpawns = 0.25
+TimeBeforeNextGroup = 2.0

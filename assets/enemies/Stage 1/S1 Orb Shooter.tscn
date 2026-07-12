@@ -1,0 +1,63 @@
+[gd_scene format=3 uid="uid://dhyesmypsy8n5"]
+
+[ext_resource type="Script" uid="uid://b3od7f8efylhu" path="res://assets/scripts/Enemy.cs" id="1_enemy"]
+[ext_resource type="Resource" uid="uid://blqgnmjpqrm35" path="res://assets/weapons/Enemy Weapons/Orb Pistol.tres" id="2_gun"]
+[ext_resource type="Resource" uid="uid://t4f5lqyn51u2" path="res://assets/weapons/Simple Sword.tres" id="3_melee"]
+[ext_resource type="AudioStream" uid="uid://d1nlr5l64mmvq" path="res://assets/SFX/Explosion.wav" id="4_death"]
+[ext_resource type="PackedScene" uid="uid://dq5bq4jsc66se" path="res://assets/objects/Explosion.tscn" id="5_boom"]
+[ext_resource type="PackedScene" uid="uid://kvxtmd0oovc4" path="res://assets/pickups/1hp 50.tscn" id="6_hp"]
+[ext_resource type="Texture2D" uid="uid://cq6apb7nvwyxj" path="res://assets/sprites/Debris.aseprite" id="7_a5urm"]
+[ext_resource type="PackedScene" uid="uid://xavg5hqw8ck3" path="res://assets/pickups/1exp 100.tscn" id="7_daerb"]
+[ext_resource type="PackedScene" uid="uid://bo6exbho5e01u" path="res://assets/pickups/1exp 50.tscn" id="7_exp"]
+[ext_resource type="Shader" uid="uid://nej1tvi1ocse" path="res://assets/shaders/PixelArt.gdshader" id="8_shader"]
+[ext_resource type="Texture2D" uid="uid://6edh5g64j6wd" path="res://assets/sprites/Debris 2.aseprite" id="8_w1xjd"]
+[ext_resource type="Texture2D" uid="uid://cum2gpblsuglx" path="res://assets/enemies/Ball Enemy.png" id="9_png"]
+[ext_resource type="SpriteFrames" uid="uid://b6cptk12014rw" path="res://assets/sprites/Ball Enemy.aseprite" id="10_frames"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_kihfr"]
+radius = 6.50781
+height = 23.0873
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_58uc7"]
+shader = ExtResource("8_shader")
+shader_parameter/pixel_size = 4.0
+shader_parameter/color_steps = 8
+shader_parameter/hue_shift = 0.0
+shader_parameter/darkness = 0.0
+
+[node name="Orb Shooter" type="Area2D" unique_id=1848100957 groups=["Enemy"]]
+position = Vector2(2, -1)
+scale = Vector2(0.60434794, 0.6081258)
+collision_layer = 4
+collision_mask = 8
+script = ExtResource("1_enemy")
+MaxHealth = 8
+Gun = ExtResource("2_gun")
+CanMelee = false
+Melee = ExtResource("3_melee")
+MovementType = 9
+SpawnMovementSpeed = 8
+MovementSpeed = 110.0
+Size = 2.0
+EnemySprite = ExtResource("9_png")
+DeathSound = ExtResource("4_death")
+DeathExplosions = ExtResource("5_boom")
+DebrisReleased = 2
+DebrisSprites = Array[Texture2D]([ExtResource("7_a5urm"), ExtResource("8_w1xjd")])
+ItemDrops = Array[PackedScene]([ExtResource("7_daerb"), ExtResource("7_exp"), ExtResource("6_hp")])
+TeleportHesitationTime = 2.0
+metadata/Enemy = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=61089570]
+scale = Vector2(14.58249, 10.553166)
+shape = SubResource("CapsuleShape2D_kihfr")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=478346090]
+scale = Vector2(1.3, 1.3)
+texture_filter = 1
+material = SubResource("ShaderMaterial_58uc7")
+sprite_frames = ExtResource("10_frames")
+animation = &"Shoot"
+
+[connection signal="area_entered" from="." to="." method="_on_area_entered"]
+[connection signal="animation_finished" from="AnimatedSprite2D" to="." method="_on_animated_sprite_2d_animation_finished"]

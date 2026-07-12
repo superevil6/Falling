@@ -17,7 +17,7 @@ height = 23.0873
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_58uc7"]
 shader = ExtResource("9_63e6s")
-shader_parameter/pixel_size = 4.0
+shader_parameter/pixel_size = 1.0
 shader_parameter/color_steps = 8
 shader_parameter/hue_shift = 0.0
 shader_parameter/darkness = 0.0
@@ -44,14 +44,14 @@ TeleportHesitationTime = 2.0
 metadata/Enemy = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=61089569]
-scale = Vector2(24.713291, -14.727549)
+scale = Vector2(32.127278, -19.145814)
 shape = SubResource("CapsuleShape2D_kihfr")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=478346089]
 texture_filter = 1
 material = SubResource("ShaderMaterial_58uc7")
 position = Vector2(42.201805, 17.35352)
-scale = Vector2(2.2527668, 2.529917)
+scale = Vector2(2.928597, 3.288892)
 sprite_frames = ExtResource("10_uwv70")
 animation = &"Explode"
 metadata/_aseprite_wizard_config_ = {

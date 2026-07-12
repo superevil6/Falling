@@ -2,33 +2,40 @@
 
 [ext_resource type="Texture2D" uid="uid://s1c3vx5gec2y" path="res://assets/sprites/Walls/Neptune Background 3.png" id="1_y8suu"]
 [ext_resource type="Texture2D" uid="uid://bm3c4n8jk67so" path="res://assets/sprites/Walls/Neptune Background 4.png" id="2_wx81d"]
-[ext_resource type="Resource" path="res://assets/enemy groups/S2 01 Orb Volley Line.tres" id="3_i5lxy"]
-[ext_resource type="Resource" path="res://assets/enemy groups/S2 02 Rapid Wedge.tres" id="4_3tguv"]
-[ext_resource type="Resource" path="res://assets/enemy groups/S2 03 Twin Wall.tres" id="5_uxpm7"]
-[ext_resource type="Resource" path="res://assets/enemy groups/S2 04 Heavy Diamond.tres" id="6_ifa0x"]
-[ext_resource type="Resource" path="res://assets/enemy groups/S2 05 Cross.tres" id="7_5ujgn"]
-[ext_resource type="Resource" path="res://assets/enemy groups/S2 06 Pincer Columns.tres" id="8_w8oko"]
-[ext_resource type="Resource" path="res://assets/enemy groups/S2 07 Ring of Eight.tres" id="9_j5ui3"]
+[ext_resource type="Resource" path="res://assets/enemy groups/Stage 2/S2 03 Flame Wall.tres" id="3_i5lxy"]
+[ext_resource type="AudioStream" uid="uid://cujpygrvt3wmc" path="res://assets/Test Music/smt2 boss.mp3" id="3_uxpm7"]
+[ext_resource type="Resource" path="res://assets/enemy groups/Stage 2/S2 04 Sniper Nest.tres" id="4_3tguv"]
+[ext_resource type="Resource" path="res://assets/enemy groups/Stage 2/S2 05 Split Trio.tres" id="5_uxpm7"]
+[ext_resource type="Resource" path="res://assets/enemy groups/Stage 2/S2 06 Mouth Volley.tres" id="6_ifa0x"]
+[ext_resource type="Resource" path="res://assets/enemy groups/Stage 2/S2 07 Sword Flank.tres" id="7_5ujgn"]
+[ext_resource type="Resource" path="res://assets/enemy groups/Stage 2/S2 08 Flame Pincer.tres" id="8_w8oko"]
+[ext_resource type="Resource" path="res://assets/enemy groups/Stage 2/S2 09 Mixed Diamond.tres" id="9_j5ui3"]
 [ext_resource type="PackedScene" uid="uid://b6bqvnkrgxmt7" path="res://assets/stages/Neptune/Walls/Neptune Wall.tscn" id="9_wx81d"]
 [ext_resource type="Texture2D" uid="uid://tqcuxstjx4ay" path="res://assets/sprites/Walls/Neptune Inner Wall.png" id="10_axs76"]
-[ext_resource type="Resource" path="res://assets/enemy groups/S2 08 Staggered Double Line.tres" id="10_vl4ux"]
-[ext_resource type="Resource" path="res://assets/enemy groups/S2 09 Arrowhead.tres" id="11_wtmnj"]
-[ext_resource type="Resource" path="res://assets/enemy groups/S2 10 Lobber Battery.tres" id="12_45ffl"]
+[ext_resource type="Resource" path="res://assets/enemy groups/Stage 2/S2 10 Staggered Line.tres" id="10_vl4ux"]
+[ext_resource type="Resource" path="res://assets/enemy groups/Stage 2/S2 Melee Rush.tres" id="11_wtmnj"]
+[ext_resource type="Resource" path="res://assets/enemy groups/Stage 2/S2 Sniper Overwatch.tres" id="12_45ffl"]
 [ext_resource type="Script" uid="uid://byqq3mnl0fxbu" path="res://assets/scripts/Stage.cs" id="12_t7hlp"]
-[ext_resource type="Resource" path="res://assets/enemy groups/S2 11 Assault Swarm.tres" id="13_0ohbr"]
-[ext_resource type="Resource" path="res://assets/enemy groups/S2 12 Final Gauntlet.tres" id="14_b720r"]
 [ext_resource type="Resource" uid="uid://bcxjsgo70q2we" path="res://assets/enemy groups/S2 BOSS SnorkleFace.tres" id="15_i05j3"]
+[ext_resource type="PackedScene" uid="uid://cmvrne8gbig5f" path="res://assets/stages/Neptune/Walls/Neptune Wall 2.tscn" id="17_uxpm7"]
+[ext_resource type="AudioStream" uid="uid://q3br1xc37eh7" path="res://assets/Test Music/smt2 battle.mp3" id="18_5ujgn"]
+[ext_resource type="PackedScene" uid="uid://cy2nn4xphi7ja" path="res://assets/stages/Neptune/Walls/Neptune Wall 3.tscn" id="18_ifa0x"]
 
 [resource]
 script = ExtResource("12_t7hlp")
 Name = "Neptune"
-EnemyGroup = Array[Resource]([ExtResource("3_i5lxy"), ExtResource("4_3tguv"), ExtResource("5_uxpm7"), ExtResource("6_ifa0x"), ExtResource("7_5ujgn"), ExtResource("8_w8oko"), ExtResource("9_j5ui3"), ExtResource("10_vl4ux"), ExtResource("11_wtmnj"), ExtResource("12_45ffl"), ExtResource("13_0ohbr"), ExtResource("14_b720r"), ExtResource("15_i05j3")])
+EnemyGroup = Array[Resource]([ExtResource("3_i5lxy"), ExtResource("4_3tguv"), ExtResource("5_uxpm7"), ExtResource("6_ifa0x"), ExtResource("7_5ujgn"), ExtResource("8_w8oko"), ExtResource("9_j5ui3"), ExtResource("10_vl4ux"), ExtResource("11_wtmnj"), ExtResource("12_45ffl"), ExtResource("15_i05j3")])
+LevelEndText = "CORE IMMANENT"
+LevelEndColor = Color(1, 1, 1, 1)
 Hazards = Array[PackedScene]([])
-LeftWallChunks = Array[PackedScene]([ExtResource("9_wx81d")])
-RightWallChunks = Array[PackedScene]([ExtResource("9_wx81d")])
+LeftWallChunks = Array[PackedScene]([ExtResource("9_wx81d"), ExtResource("17_uxpm7"), ExtResource("18_ifa0x")])
+RightWallChunks = Array[PackedScene]([ExtResource("9_wx81d"), ExtResource("17_uxpm7"), ExtResource("18_ifa0x")])
 WallFillTiles = Array[Texture2D]([ExtResource("10_axs76")])
+ScrollSpeed = 350.0
 BackgroundImages = Array[Texture2D]([ExtResource("1_y8suu")])
 BackgroundDarkness = PackedFloat32Array(0.4)
 Background2Images = Array[Texture2D]([ExtResource("2_wx81d")])
 Background2Darkness = PackedFloat32Array(0.6)
 StageEvents = null
+StageMusic = ExtResource("18_5ujgn")
+BossMusic = ExtResource("3_uxpm7")

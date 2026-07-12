@@ -1,0 +1,16 @@
+[remap]
+
+importer="aseprite_wizard.plugin.static-texture"
+type="AtlasTexture"
+uid="uid://dvbs4by5c52go"
+path="res://.godot/imported/Head Mod.aseprite-b5f91d92f0857a8703e9363bbaca63db.res"
+
+[deps]
+
+source_file="res://assets/sprites/Power Up Icons/Head Mod.aseprite"
+dest_files=["res://.godot/imported/Head Mod.aseprite-b5f91d92f0857a8703e9363bbaca63db.res"]
+
+[params]
+
+exclude_layers_pattern=""
+only_visible_layers=false

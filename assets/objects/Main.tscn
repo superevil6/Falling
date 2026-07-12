@@ -80,6 +80,20 @@
 [ext_resource type="Resource" path="res://assets/upgrades/Body/Predatory Growth.tres" id="56_p70wi"]
 [ext_resource type="Resource" path="res://assets/upgrades/Body/Insulation.tres" id="57_1uj2e"]
 [ext_resource type="Resource" path="res://assets/upgrades/Head/Foresight.tres" id="58_frsgt"]
+[ext_resource type="Resource" path="res://assets/upgrades/Limbs/Reflex Servo.tres" id="59_rflxs"]
+[ext_resource type="Resource" uid="uid://dq3psdjhaotip" path="res://assets/weapons/Multi-Direction Blaster.tres" id="70_wu20y"]
+[ext_resource type="Resource" uid="uid://dib52vs6i4eql" path="res://assets/weapons/Bubbler.tres" id="71_s3m7o"]
+[ext_resource type="Resource" uid="uid://wbajl8smb0i2" path="res://assets/weapons/Charge Blast.tres" id="72_p70wi"]
+[ext_resource type="Resource" uid="uid://d3fltykpxnmkp" path="res://assets/weapons/Flame Thrower.tres" id="73_1uj2e"]
+[ext_resource type="Resource" uid="uid://chpqx3ssxn3se" path="res://assets/weapons/Gas Gun.tres" id="74_hlnyb"]
+[ext_resource type="Resource" uid="uid://bqsre2ne73xct" path="res://assets/weapons/GrowShot.tres" id="75_2uv0a"]
+[ext_resource type="Resource" uid="uid://likngwjw3bfh" path="res://assets/weapons/Heat Seeking Pistol.tres" id="76_eqtfs"]
+[ext_resource type="Resource" uid="uid://crt30p2jp82qs" path="res://assets/weapons/Rocket Launcher.tres" id="77_prmeo"]
+[ext_resource type="Resource" uid="uid://c8b2ycj85fkc5" path="res://assets/weapons/Slicer.tres" id="78_weqqj"]
+[ext_resource type="Resource" uid="uid://ktyac25vkuh7" path="res://assets/weapons/Sniper Rifle.tres" id="79_yehpj"]
+[ext_resource type="Resource" uid="uid://1eafuo1ik2ym" path="res://assets/weapons/Spiraler.tres" id="80_pniyr"]
+[ext_resource type="Resource" uid="uid://svn642061r6v" path="res://assets/weapons/Swarm Cannon.tres" id="81_1lfet"]
+[ext_resource type="Resource" uid="uid://bp6mqrys7v0op" path="res://assets/weapons/Tesla Coil.tres" id="82_bjjd1"]
 
 [node name="Main" type="Node2D" unique_id=1790341003]
 script = ExtResource("1_yeolr")
@@ -89,7 +103,7 @@ DemoLoop = true
 EnemyInputDriftSpeed = 500.0
 Player = ExtResource("2_s1fia")
 PossibleGunUpgrades = Array[Resource]([ExtResource("9_v7bso"), ExtResource("4_8ru6o"), ExtResource("5_k6r8o"), ExtResource("6_ls1xt"), ExtResource("7_37xpp"), ExtResource("8_f63cm"), ExtResource("10_v7bso"), ExtResource("11_3axhc"), ExtResource("12_6wb3h"), ExtResource("13_5u4eo"), ExtResource("14_5u4eo"), ExtResource("15_0rsmt"), ExtResource("16_e2dss"), ExtResource("17_pje3t"), ExtResource("18_o0s6g"), ExtResource("19_jlmw8"), ExtResource("20_5bm0m"), ExtResource("21_gndpi"), ExtResource("22_w6tnj"), ExtResource("23_afvbr"), ExtResource("24_afvbr"), ExtResource("27_rynx1"), ExtResource("28_o4lw6"), ExtResource("29_p2m5n"), ExtResource("30_fn1tl")])
-PossibleBodyUpgrades = Array[Resource]([ExtResource("8_xkqye"), ExtResource("9_37xpp"), ExtResource("11_f63cm"), ExtResource("20_5u4eo"), ExtResource("23_8dkcs"), ExtResource("28_k1tc0"), ExtResource("29_h8ve5"), ExtResource("30_wp461"), ExtResource("31_4vp71"), ExtResource("32_h8ve5"), ExtResource("35_icdfd"), ExtResource("36_fqi5e"), ExtResource("37_kdnkw"), ExtResource("38_afvbr"), ExtResource("39_icdfd"), ExtResource("46_oupb3"), ExtResource("47_34l1d"), ExtResource("48_00gqj"), ExtResource("58_frsgt"), ExtResource("49_pvvya"), ExtResource("50_3kmpk"), ExtResource("51_eb5ls"), ExtResource("52_yxee5"), ExtResource("53_yxnmk"), ExtResource("54_wu20y"), ExtResource("55_s3m7o"), ExtResource("56_p70wi"), ExtResource("57_1uj2e")])
+PossibleBodyUpgrades = Array[Resource]([ExtResource("8_xkqye"), ExtResource("9_37xpp"), ExtResource("11_f63cm"), ExtResource("20_5u4eo"), ExtResource("23_8dkcs"), ExtResource("28_k1tc0"), ExtResource("29_h8ve5"), ExtResource("30_wp461"), ExtResource("31_4vp71"), ExtResource("32_h8ve5"), ExtResource("35_icdfd"), ExtResource("36_fqi5e"), ExtResource("37_kdnkw"), ExtResource("38_afvbr"), ExtResource("39_icdfd"), ExtResource("46_oupb3"), ExtResource("47_34l1d"), ExtResource("48_00gqj"), ExtResource("58_frsgt"), ExtResource("49_pvvya"), ExtResource("50_3kmpk"), ExtResource("51_eb5ls"), ExtResource("52_yxee5"), ExtResource("53_yxnmk"), ExtResource("54_wu20y"), ExtResource("55_s3m7o"), ExtResource("56_p70wi"), ExtResource("57_1uj2e"), ExtResource("59_rflxs")])
 
 [node name="Upgrade Menu" parent="." unique_id=1389884953 instance=ExtResource("4_uq32a")]
 
@@ -97,7 +111,7 @@ PossibleBodyUpgrades = Array[Resource]([ExtResource("8_xkqye"), ExtResource("9_3
 
 [node name="Selection Menu" parent="." unique_id=106583061 instance=ExtResource("11_select")]
 BodyMods = Array[Resource]([ExtResource("7_xuisg"), ExtResource("8_0x35d"), ExtResource("10_3yxs6")])
-Guns = Array[Resource]([ExtResource("7_g572a"), ExtResource("8_gvlvn"), ExtResource("9_arsnc"), ExtResource("10_dyp24")])
+Guns = Array[Resource]([ExtResource("7_g572a"), ExtResource("8_gvlvn"), ExtResource("9_arsnc"), ExtResource("10_dyp24"), ExtResource("70_wu20y"), ExtResource("71_s3m7o"), ExtResource("72_p70wi"), ExtResource("73_1uj2e"), ExtResource("74_hlnyb"), ExtResource("75_2uv0a"), ExtResource("76_eqtfs"), ExtResource("77_prmeo"), ExtResource("78_weqqj"), ExtResource("79_yehpj"), ExtResource("80_pniyr"), ExtResource("81_1lfet"), ExtResource("82_bjjd1")])
 
 [node name="Level Up Menu" parent="." unique_id=1390674379 instance=ExtResource("12_levelup")]
 PickCount = 3

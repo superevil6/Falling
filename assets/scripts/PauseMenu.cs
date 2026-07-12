@@ -2,18 +2,54 @@ using Godot;
 
 public partial class PauseMenu : CanvasLayer
 {
+	private const string TitleScenePath = "res://assets/objects/TitleScreen.tscn";
+
 	private VBoxContainer gunsList;
 	private VBoxContainer modsList;
 	private Player player;
+	private ConfirmationDialog quitConfirm;
 
 	public override void _Ready()
 	{
 		gunsList = GetNodeOrNull<VBoxContainer>("GunsPanel/List");
 		modsList = GetNodeOrNull<VBoxContainer>("BodyModsPanel/Scroll/List");
+		var quitButton = GetNodeOrNull<Button>("VBoxContainer/Quit");
+		if (quitButton != null) quitButton.Pressed += OnQuitPressed;
 		Helpers.CenterMenu(this);
 		// Start hidden; _Process toggles this on the pause input. The scene root has no
 		// explicit visibility set, so it would otherwise show at stage start.
 		Visible = false;
+	}
+
+	// Quit asks for confirmation first, defaulting to "No" so an accidental click
+	// can't drop the player out of their run.
+	private void OnQuitPressed()
+	{
+		Sfx.PlaySelect(this);
+		if (quitConfirm == null) {
+			quitConfirm = new ConfirmationDialog();
+			quitConfirm.Title = "Quit";
+			quitConfirm.DialogText = "Are you sure you want to quit to the title screen?";
+			quitConfirm.GetOkButton().Text = "Yes";
+			quitConfirm.GetCancelButton().Text = "No";
+			// The tree is paused while the menu is up, so the dialog must keep processing.
+			quitConfirm.ProcessMode = Node.ProcessModeEnum.Always;
+			quitConfirm.Confirmed += OnQuitConfirmed;
+			// Focus "No" each time it opens (the OK button grabs focus by default).
+			quitConfirm.AboutToPopup += () =>
+				quitConfirm.GetCancelButton().CallDeferred(Control.MethodName.GrabFocus);
+			AddChild(quitConfirm);
+		}
+		quitConfirm.PopupCentered();
+	}
+
+	private void OnQuitConfirmed()
+	{
+		Sfx.PlaySelect(this);
+		// Clear the pause the menu applied, or the title starts frozen.
+		GetTree().Paused = false;
+		Engine.TimeScale = 1f;
+		GetTree().ChangeSceneToFile(TitleScenePath);
 	}
 
 	public override void _Process(double delta)
@@ -21,6 +57,9 @@ public partial class PauseMenu : CanvasLayer
 		if (Input.IsActionJustPressed("pause"))
 		{
 			if (AnyOtherMenuOpen()) return;
+			// Don't toggle the pause while the quit confirmation is up, or it would
+			// hide the menu and leave the dialog floating over gameplay.
+			if (quitConfirm != null && quitConfirm.Visible) return;
 			GetTree().Paused = !GetTree().Paused;
 			if (GetTree().Paused)
 			{

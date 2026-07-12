@@ -1,16 +1,15 @@
-[gd_resource type="Resource" format=3]
+[gd_resource type="Resource" format=3 uid="uid://dexsr5xuuf8fi"]
 
-[ext_resource type="PackedScene" uid="uid://bchvagycxq32k" path="res://assets/enemies/Gun Hand.tscn" id="1_gh"]
-[ext_resource type="PackedScene" uid="uid://xfofnhaseaea" path="res://assets/enemies/CircleNose.tscn" id="2_cn"]
-[ext_resource type="PackedScene" uid="uid://ctw1nsp1t0014" path="res://assets/enemies/Twin Spitter.tscn" id="3_tw"]
-[ext_resource type="PackedScene" uid="uid://corbsh00t0013" path="res://assets/enemies/Orb Shooter.tscn" id="4_orb"]
-[ext_resource type="PackedScene" uid="uid://cl0bb3r000015" path="res://assets/enemies/Lobber.tscn" id="5_lob"]
-[ext_resource type="Script" path="res://assets/scripts/EnemyGroup.cs" id="6_group"]
+[ext_resource type="PackedScene" uid="uid://bchvagycxq32k" path="res://assets/enemies/Stage 1/Gun Hand.tscn" id="1_gh"]
+[ext_resource type="PackedScene" uid="uid://xfofnhaseaea" path="res://assets/enemies/Stage 1/CircleNose.tscn" id="2_cn"]
+[ext_resource type="PackedScene" uid="uid://ctw1nsp1t0014" path="res://assets/enemies/Stage 1/Twin Spitter.tscn" id="3_tw"]
+[ext_resource type="PackedScene" uid="uid://cl0bb3r000015" path="res://assets/enemies/FaceNuke 1.tscn" id="5_lob"]
+[ext_resource type="Script" uid="uid://co2yygdrwkshm" path="res://assets/scripts/EnemyGroup.cs" id="6_group"]
 
 [resource]
 script = ExtResource("6_group")
-Enemies = Array[PackedScene]([ExtResource("1_gh"), ExtResource("1_gh"), ExtResource("2_cn"), ExtResource("2_cn"), ExtResource("3_tw"), ExtResource("4_orb"), ExtResource("5_lob")])
-SpawnLocations = PackedVector2Array(700, -83, 1200, -83, 850, -83, 1050, -83, 950, -83, 750, -83, 1150, -83)
-PostSpawnDestination = PackedVector2Array(700, 300, 1200, 300, 850, 430, 1050, 430, 950, 560, 750, 650, 1150, 650)
+Enemies = Array[PackedScene]([ExtResource("1_gh"), ExtResource("1_gh"), ExtResource("2_cn"), ExtResource("2_cn"), ExtResource("3_tw"), ExtResource("5_lob")])
+SpawnLocations = PackedVector2Array(700, -83, 1200, -83, 850, -83, 1050, -83, 950, -83, 1150, -83)
+PostSpawnDestination = PackedVector2Array(700, 300, 1200, 300, 850, 430, 1050, 430, 950, 560, 1150, 650)
 TimeBetweenSpawns = 0.3
 TimeBeforeNextGroup = 2.5

@@ -9,5 +9,5 @@ Type = 11
 UpgradeImage = ExtResource("1_xxibp")
 UpgradeName = "Magnetic Rounds"
 UpgradeDescription = "Bullets gain a large amount of heat seeking property, and will follow enemies."
-Value = 10.0
+Value = 5.0
 Rarity = 2

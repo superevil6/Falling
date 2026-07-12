@@ -11,6 +11,7 @@ script = ExtResource("2")
 Type = 1
 Duration = 0.8
 SummonScenes = null
+RainLaserDamage = 8
 
 [sub_resource type="Resource" id="fire_sniper"]
 script = ExtResource("2")

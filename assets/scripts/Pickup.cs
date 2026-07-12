@@ -42,8 +42,10 @@ public partial class Pickup : Area2D
 		// Scale the whole node so the sprite and its collision shape grow/shrink together.
 		Scale = new Vector2(PickupScale, PickupScale);
 		sprite = GetNodeOrNull<AnimatedSprite2D>("AnimatedSprite2D");
-		if (sprite != null && sprite.SpriteFrames != null && sprite.SpriteFrames.HasAnimation("Idle")) {
-			sprite.Animation = "Idle";
+		if (sprite != null && sprite.SpriteFrames != null) {
+			// Prefer an "Idle" loop if the scene has one, otherwise fall back to whatever
+			// animation the scene defaults to — then keep it playing for the pickup's life.
+			if (sprite.SpriteFrames.HasAnimation("Idle")) sprite.Animation = "Idle";
 			sprite.Play();
 		}
 	}

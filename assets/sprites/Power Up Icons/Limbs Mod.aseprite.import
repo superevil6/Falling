@@ -1,0 +1,16 @@
+[remap]
+
+importer="aseprite_wizard.plugin.static-texture"
+type="AtlasTexture"
+uid="uid://oes67x6cqv1h"
+path="res://.godot/imported/Limbs Mod.aseprite-a9f3ad94b06af18e8f18fdaad62e4dc9.res"
+
+[deps]
+
+source_file="res://assets/sprites/Power Up Icons/Limbs Mod.aseprite"
+dest_files=["res://.godot/imported/Limbs Mod.aseprite-a9f3ad94b06af18e8f18fdaad62e4dc9.res"]
+
+[params]
+
+exclude_layers_pattern=""
+only_visible_layers=false

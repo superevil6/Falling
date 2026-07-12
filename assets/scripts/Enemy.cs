@@ -46,27 +46,24 @@ public partial class Enemy : Area2D
 	// Sound played once when this enemy dies/explodes.
 	[Export]
 	public AudioStream DeathSound {get;set;}
-	// Spawned over the enemy on death (the scene handles its own random variation).
-	// Null = nothing.
+	// Was spawned over the enemy on death, but the explosion obscured each enemy's own
+	// death animation, so it is no longer instantiated. Kept as an export because the
+	// enemy scenes still assign it; leave it here so those references stay valid.
 	[Export]
 	public PackedScene DeathExplosions {get;set;}
 	// Number of small debris pieces that shoot out when this enemy is killed.
-	// 0 (or a null DebrisSprite) means no debris.
+	// 0 (or an empty DebrisSprites) means no debris.
 	[Export]
 	public int DebrisReleased {get;set;} = 0;
+	// Each debris piece picks one of these textures at random on spawn.
 	[Export]
-	public Texture2D DebrisSprite {get;set;}
+	public Texture2D[] DebrisSprites {get;set;}
 	[Export]
 	public AttackDirection AttackDirection {get; set;}
-	// Pickup scenes this enemy can drop. Each pickup's own DropChance decides whether it
-	// spawns on a given roll — no separate drop resource is needed.
+	// Pickup scenes this enemy can drop. Each is rolled once at its own DropChance; list a
+	// pickup multiple times to give it multiple independent chances to drop.
 	[Export]
 	public PackedScene[] ItemDrops {get;set;}
-	// Upper bound on how many items drop from this enemy. Each death rolls a shared
-	// count in [0, MaxDrops]; every drop type is then rolled that many times at its
-	// own chance, so several items of the same type can drop from one kill.
-	[Export]
-	public int MaxDrops {get;set;} = 1;
 	[Export]
 	public bool IsBoss { get; set; }
 	[Export]
@@ -163,6 +160,9 @@ public partial class Enemy : Area2D
 	public bool SpawnComplete => spawnComplete;
 	public float HealthFraction => scaledMaxHealth > 0 ? (float)CurrentHealth / scaledMaxHealth : 0f;
 	private Player player;
+	// Demo-loop colour wash for this enemy's sprite, read once from Main. White = no wash.
+	// Multiplied into SelfModulate each frame so it layers with the status-effect tint.
+	private Color loopTint = Colors.White;
 	public StatusEffectController StatusEffects = new StatusEffectController();
 
 	// Called when the node enters the scene tree for the first time.
@@ -170,6 +170,8 @@ public partial class Enemy : Area2D
 	{
 		animatedSprite2D = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
 		ForceOneShotAnimations(animatedSprite2D?.SpriteFrames);
+		loopTint = (GetParent() as Main)?.LoopTint ?? Colors.White;
+		if (animatedSprite2D != null) animatedSprite2D.SelfModulate = loopTint;
 		float scale = ComputeStageScale();
 		scaledMaxHealth = Mathf.RoundToInt(this.MaxHealth * scale);
 		currentArmor = Mathf.RoundToInt(this.Armor * scale);
@@ -252,7 +254,7 @@ public partial class Enemy : Area2D
 		}
 		int dotDamage = StatusEffects.Tick((float)delta);
 		if (dotDamage > 0) TakeDamage(dotDamage, ElementType.NonElemental);
-		if (animatedSprite2D != null) animatedSprite2D.SelfModulate = StatusEffects.GetTint();
+		if (animatedSprite2D != null) animatedSprite2D.SelfModulate = StatusEffects.GetTint() * loopTint;
 		if ((this.DropsBombs || this.UsesMines) && CurrentHealth > 0) {
 			activeDeployables.RemoveAll(d => !IsInstanceValid(d));
 			bombCooldownRemaining -= (float)delta;
@@ -626,8 +628,10 @@ public partial class Enemy : Area2D
 		if (isDying) return;
 		isDying = true;
 		Sfx.Play(this, DeathSound);
-		SpawnDeathExplosion();
-		Debris.Burst(this, GlobalPosition, this.DebrisReleased, this.DebrisSprite);
+		Texture2D debrisSprite = (DebrisSprites != null && DebrisSprites.Length > 0)
+			? DebrisSprites[rng.RandiRange(0, DebrisSprites.Length - 1)]
+			: null;
+		Debris.Burst(this, GlobalPosition, this.DebrisReleased, debrisSprite);
 		PlayDeathAnimation(animatedSprite2D);
 		var frames = animatedSprite2D?.SpriteFrames;
 		string anim = animatedSprite2D?.Animation;
@@ -637,18 +641,6 @@ public partial class Enemy : Area2D
 			if (fps > 0f) deathAnimTimer = frameCount / fps;
 		}
 		if (deathAnimTimer <= 0f) deathAnimTimer = 0.5f;
-	}
-
-	// Spawns the DeathExplosions scene over the enemy (the scene handles its own random
-	// variation). Parented to the enemy's parent so it outlives the enemy being freed.
-	private void SpawnDeathExplosion()
-	{
-		if (DeathExplosions == null) return;
-		Vector2 pos = GlobalPosition;
-		var explosion = DeathExplosions.Instantiate<Node2D>();
-		explosion.ZIndex = 20; // over the enemy
-		GetParent().AddChild(explosion);
-		explosion.GlobalPosition = pos;
 	}
 
 	private void HandleDeathFinished()
@@ -675,7 +667,7 @@ public partial class Enemy : Area2D
 	{
 		var main = GetParent() as Main;
 		int stage = main?.CurrentStage ?? 0;
-		return 1f + stage * 0.1f;
+		return 1f + stage * 0.2f;
 	}
 
 	private void PlaceBomb()
@@ -824,22 +816,18 @@ public partial class Enemy : Area2D
 	private void DropItems() {
 		if (this.ItemDrops == null) return;
 		float dropMult = GetParent()?.GetNodeOrNull<Player>("Player")?.ItemDropChanceMultiplier ?? 1f;
-		// Roll a single shared count for this kill, then give every drop type that many
-		// chances so multiple copies of the same item can fall from one enemy.
-		int rolls = this.MaxDrops > 0 ? rng.RandiRange(0, this.MaxDrops) : 0;
-		if (rolls <= 0) return;
+		// Roll each listed pickup once at its own DropChance. To drop several of the same
+		// item, list it multiple times in ItemDrops.
 		foreach (var scene in this.ItemDrops) {
 			if (scene == null) continue;
-			for (int i = 0; i < rolls; i++) {
-				// Instantiate up front so the pickup's own DropChance drives the roll,
-				// then drop it into the world on success or discard it on a miss.
-				var item = scene.Instantiate<Node2D>();
-				float chance = item is Pickup pickup ? pickup.DropChance : 1f;
-				if (GD.Randf() < chance * dropMult) {
-					PlaceDrop(item);
-				} else {
-					item.Free();
-				}
+			// Instantiate up front so the pickup's own DropChance drives the roll,
+			// then drop it into the world on success or discard it on a miss.
+			var item = scene.Instantiate<Node2D>();
+			float chance = item is Pickup pickup ? pickup.DropChance : 1f;
+			if (GD.Randf() < chance * dropMult) {
+				PlaceDrop(item);
+			} else {
+				item.Free();
 			}
 		}
 	}

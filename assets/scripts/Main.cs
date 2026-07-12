@@ -88,6 +88,27 @@ public partial class Main : Node2D
 		return ((stage % Stages.Length) + Stages.Length) % Stages.Length;
 	}
 
+	// Demo mode replays the same stages once CurrentStage climbs past the array, so each
+	// loop gets a distinct colour wash to make the repeat read as fresh content. The hue
+	// is derived deterministically from the loop count (CurrentStage / Stages.Length) so
+	// every wall and enemy in a loop agrees on it with no shared random state — walls and
+	// enemies read this in their own _Ready. Loop 0 (the canonical first playthrough) and
+	// non-demo runs stay untinted.
+	public Color LoopTint
+	{
+		get
+		{
+			if (!DemoLoop || Stages == null || Stages.Length == 0) return Colors.White;
+			int loop = CurrentStage / Stages.Length;
+			if (loop <= 0) return Colors.White;
+			// Golden-ratio hue stepping spreads successive loops far apart on the wheel.
+			float hue = loop * 0.61803398875f % 1f;
+			// Low saturation / full value keeps it a wash that tints the art rather than
+			// masking it (near-black pixels stay black through the PixelArt shader).
+			return Color.FromHsv(hue, 0.35f, 1f);
+		}
+	}
+
 	public Stage CurrentStageData()
 	{
 		if (Stages == null || Stages.Length == 0 || CurrentStage < 0) return null;
@@ -108,12 +129,66 @@ public partial class Main : Node2D
 	}
 
 	// Fired when the player confirms a boss-reward pick (or immediately if no menu
-	// opened). Advances to the next stage when a boss fight has just been cleared.
+	// opened). Plays the stage's level-end flash/fade, then advances to the next stage.
 	private void OnBossRewardSelected(int index)
 	{
 		if (!awaitingStageAdvance) return;
 		awaitingStageAdvance = false;
+		PlayLevelEndThenAdvance();
+	}
+
+	// Flashes the stage's LevelEndText in large red text and fades the whole screen
+	// (gameplay, HUD and player) to LevelEndColor, then advances to the next stage.
+	private async void PlayLevelEndThenAdvance()
+	{
+		// The selection menu paused the game; let it run so the fade/flash animate.
+		GetTree().Paused = false;
+		Engine.TimeScale = 1f;
+		var stage = CurrentStageData();
+		string text = stage?.LevelEndText;
+		Color endColor = stage?.LevelEndColor ?? new Color(0f, 0f, 0f, 1f);
+		ShowLevelEnd(text, endColor);
+		// Hold on the fully-faded screen briefly; the overlay stays up (it is torn down
+		// with the scene) so there is no flash before the next stage loads.
+		await ToSignal(GetTree().CreateTimer(3.5f), "timeout");
 		AdvanceToNextStage();
+	}
+
+	private CanvasLayer ShowLevelEnd(string text, Color endColor)
+	{
+		var layer = new CanvasLayer { Layer = 200 }; // above HUD, player and all menus
+		layer.ProcessMode = ProcessModeEnum.Always;
+
+		// Full-screen fill that fades from transparent up to the stage's end colour,
+		// dimming gameplay, HUD and player together.
+		var fade = new ColorRect();
+		fade.Color = new Color(endColor.R, endColor.G, endColor.B, 0f);
+		fade.SetAnchorsPreset(Control.LayoutPreset.FullRect);
+		fade.MouseFilter = Control.MouseFilterEnum.Ignore;
+		layer.AddChild(fade);
+		Tween fadeTween = fade.CreateTween();
+		fadeTween.TweenProperty(fade, "color", endColor, 2.5f);
+
+		if (!string.IsNullOrEmpty(text)) {
+			// Added after the fill so it stays legible on top as the screen darkens.
+			var label = new Label { Text = text };
+			label.SetAnchorsPreset(Control.LayoutPreset.FullRect);
+			label.HorizontalAlignment = HorizontalAlignment.Center;
+			label.VerticalAlignment = VerticalAlignment.Center;
+			label.AddThemeColorOverride("font_color", new Color(1f, 0f, 0f));
+			label.AddThemeColorOverride("font_outline_color", new Color(0f, 0f, 0f));
+			label.AddThemeConstantOverride("outline_size", 12);
+			label.AddThemeFontSizeOverride("font_size", 140);
+			layer.AddChild(label);
+			// Blink the text for the duration of the sequence.
+			Tween blink = label.CreateTween();
+			blink.SetLoops();
+			blink.TweenProperty(label, "modulate:a", 0.15f, 0.35f);
+			blink.TweenProperty(label, "modulate:a", 1.0f, 0.35f);
+		}
+
+		AddChild(layer);
+		return layer;
 	}
 
 	private void AdvanceToNextStage()
@@ -128,6 +203,7 @@ public partial class Main : Node2D
 			// Carry the player's loadout/upgrades across the reload, and persist progress.
 			var player = GetNodeOrNull<Player>("Player");
 			if (player != null) {
+				player.Heal(10); // Reward for clearing the stage; captured below so it survives the reload.
 				global::Player.CarriedState = player.CaptureState();
 				SaveSystem.Save(next, GameSession.Mode, player);
 			}

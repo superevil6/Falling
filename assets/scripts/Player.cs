@@ -49,6 +49,7 @@ public partial class Player : CharacterBody2D
 	public float MeleeRangeBonus = 0f;
 	public float MeleeArcBonus = 0f;
 	public float MeleeSwingSpeedMultiplier = 1f;
+	public float MeleeCooldownMultiplier = 1f;
 	public float MeleeLifeSteal = 0f;
 	// Status resistances (0..0.95); mirrored into StatusEffects via SyncResistances().
 	public float BlindResistance = 0f;
@@ -63,6 +64,11 @@ public partial class Player : CharacterBody2D
 	[Export]
 	public float ShieldRegenPerSecond {get;set;} = 5f;
 	private float shieldRegenTimer = 0f;
+	[Export]
+	// Seconds of invincibility granted after taking a hit. Set to 0 to disable i-frames.
+	public float InvincibilityTimer {get;set;} = 0.5f;
+	// Remaining i-frame time; ticks down each physics frame. Hits are ignored while > 0.
+	private float invincibilityRemaining = 0f;
 	// Permanent MaxHealth gained per enemy killed (MaxHealthOnKill upgrade).
 	public int MaxHealthPerKill = 0;
 	public float ExperienceMultiplier = 1f;
@@ -72,6 +78,7 @@ public partial class Player : CharacterBody2D
 	public StatusEffectController StatusEffects = new StatusEffectController();
 	private float wallTouchTickTimer = 0f;
 	private float gunCoolDown;
+	private float meleeCoolDown;
 	[Export]
 	public int Speed { get;set;} = 400;
 	// Fixed loadout capacity: 4 gun slots (the Top/Right/Bottom/Left rack and the
@@ -150,7 +157,15 @@ public partial class Player : CharacterBody2D
 		if (Guns != null) {
 			for (int i = 0; i < Guns.Length; i++) {
 				if (Guns[i] != null) {
-					string srcName = System.IO.Path.GetFileNameWithoutExtension(Guns[i].ResourcePath);
+					// Prefer a name the gun already carries (e.g. restored from a save); only
+					// fall back to the source .tres filename for fresh scene-defined guns.
+					// Deriving from ResourcePath unconditionally renames every gun after a
+					// load, because saved guns are embedded sub-resources whose ResourcePath
+					// is the save file itself (e.g. "savegame_Story").
+					string existing = Guns[i].SourceName;
+					string srcName = !string.IsNullOrEmpty(existing)
+						? existing
+						: System.IO.Path.GetFileNameWithoutExtension(Guns[i].ResourcePath);
 					Guns[i] = (Gun)Guns[i].Duplicate();
 					Guns[i].SourceName = srcName;
 				}
@@ -236,8 +251,11 @@ public partial class Player : CharacterBody2D
 		}
 		#endregion
 		#region Sword
-		if (Input.IsActionJustPressed("sword") && aimDirection.Normalized() != Vector2.Zero) {
+		if (Input.IsActionJustPressed("sword") && meleeCoolDown <= 0 && aimDirection.Normalized() != Vector2.Zero) {
 			MeleeAttack(aimDirection);
+		}
+		if (meleeCoolDown > 0) {
+			meleeCoolDown -= (float)delta;
 		}
 		#endregion
 		if (Input.IsActionJustPressed("bomb")) {
@@ -248,7 +266,9 @@ public partial class Player : CharacterBody2D
 			y: Mathf.Clamp(Position.Y, ScreenSize.Y * 0.1f, ScreenSize.Y * 0.9f)
 		);
 		int dotDamage = StatusEffects.Tick((float)delta);
-		if (dotDamage > 0) TakeDamage(dotDamage, playHitAnimation: false); // DoT shouldn't flinch each tick
+		// DoT shouldn't flinch each tick, and it bypasses i-frames so it keeps ticking
+		// on its own schedule even right after a bullet hit granted invincibility.
+		if (dotDamage > 0) TakeDamage(dotDamage, playHitAnimation: false, triggersInvincibility: false);
 		animatedSprite2D.SelfModulate = StatusEffects.GetTint();
 		if (orbitalShields.Count > 0) {
 			orbitalAngle += OrbitalRotationSpeed * (float)delta;
@@ -273,6 +293,7 @@ public partial class Player : CharacterBody2D
 				CurrentShield = Mathf.Min(MaxShield, CurrentShield + ShieldRegenPerSecond * (float)delta);
 			}
 		}
+		if (invincibilityRemaining > 0f) invincibilityRemaining -= (float)delta;
 		TimeSinceLastAfterImage += (float)delta;
 		bool shouldTrail = (Input.IsActionPressed("move_down") || RemainingDashTime > 0) && !IsTouchingWall;
 		if (shouldTrail && TimeSinceLastAfterImage >= AfterImageInterval) {
@@ -384,6 +405,9 @@ public partial class Player : CharacterBody2D
 			case BodyUpgradeType.MeleeAttackSpeed:
 				MeleeSwingSpeedMultiplier += upgrade.Value / 100f;
 				break;
+			case BodyUpgradeType.MeleeCooldownReduction:
+				MeleeCooldownMultiplier = Mathf.Max(0.1f, MeleeCooldownMultiplier * (1f - upgrade.Value / 100f));
+				break;
 			case BodyUpgradeType.MeleeLifeSteal:
 				MeleeLifeSteal += upgrade.Value;
 				break;
@@ -479,6 +503,7 @@ public partial class Player : CharacterBody2D
 		MeleeRangeBonus = MeleeRangeBonus,
 		MeleeArcBonus = MeleeArcBonus,
 		MeleeSwingSpeedMultiplier = MeleeSwingSpeedMultiplier,
+		MeleeCooldownMultiplier = MeleeCooldownMultiplier,
 		MeleeLifeSteal = MeleeLifeSteal,
 		BlindResistance = BlindResistance,
 		CorrosionResistance = CorrosionResistance,
@@ -523,6 +548,7 @@ public partial class Player : CharacterBody2D
 		MeleeRangeBonus = s.MeleeRangeBonus;
 		MeleeArcBonus = s.MeleeArcBonus;
 		MeleeSwingSpeedMultiplier = s.MeleeSwingSpeedMultiplier > 0f ? s.MeleeSwingSpeedMultiplier : 1f;
+		MeleeCooldownMultiplier = s.MeleeCooldownMultiplier > 0f ? s.MeleeCooldownMultiplier : 1f;
 		MeleeLifeSteal = s.MeleeLifeSteal;
 		BlindResistance = s.BlindResistance;
 		CorrosionResistance = s.CorrosionResistance;
@@ -616,15 +642,22 @@ public partial class Player : CharacterBody2D
 	}
 
 	private void _on_area_2d_area_entered(Node2D node2D){
-		if (node2D.Name == "Bullet") {
+		// Match on type, not name: Godot auto-renames colliding siblings ("Bullet" ->
+		// "@Bullet@2", ...), so only one bullet at a time is literally named "Bullet".
+		// A name check would silently ignore every other bullet's hit.
+		if (node2D is Attack attack) {
 			var elem = (node2D is Bullet b) ? b.Element : ElementType.NonElemental;
-			TakeDamage((node2D as Attack).Damage, elem);
+			TakeDamage(attack.Damage, elem);
 		}
 	}
 
-	public void TakeDamage(int amount, ElementType element = ElementType.NonElemental, bool playHitAnimation = true)
+	public void TakeDamage(int amount, ElementType element = ElementType.NonElemental, bool playHitAnimation = true, bool triggersInvincibility = true)
 	{
 		if (CurrentHealth <= 0) return;
+		if (triggersInvincibility) {
+			if (invincibilityRemaining > 0f) return;
+			invincibilityRemaining = InvincibilityTimer;
+		}
 		int stacks = element switch {
 			ElementType.Corrosive => CorrosiveDefenseStacks,
 			ElementType.Ice => IceDefenseStacks,
@@ -1010,7 +1043,7 @@ public partial class Player : CharacterBody2D
 	private void ApplyGunHit(Enemy e, int baseDamage, Gun gun) {
 		if (e == null || gun == null) return;
 		RollCrit(gun, out int damage, baseDamage);
-		e.TakeDamage(damage, gun.Element, gun.AcidRoundsCount);
+		e.TakeDamage(damage, gun.Element, gun.AcidRoundsCount, gun.ArmorPierce);
 		if (gun.DotStacksPerHit > 0) e.StatusEffects.AddStacks(StatusEffectType.DamageOverTime, gun.DotStacksPerHit);
 		if (gun.SlowStacksPerHit > 0) e.StatusEffects.AddStacks(StatusEffectType.Slow, gun.SlowStacksPerHit);
 		if (gun.FireRateStacksPerHit > 0) e.StatusEffects.AddStacks(StatusEffectType.ReducedFireRate, gun.FireRateStacksPerHit);
@@ -1019,6 +1052,28 @@ public partial class Player : CharacterBody2D
 			int heal = Mathf.RoundToInt(gun.LifeSteal);
 			if (heal > 0) Heal(heal);
 		}
+	}
+
+	// Player-attack bullet collision, matching SpawnBulletSpread: layer bit 4, mask bits 1 and 3.
+	private const uint PlayerBulletLayer = 1u << 3;
+	private const uint PlayerBulletMask = (1u << 0) | (1u << 2);
+
+	// Beam weapons (laser) have no travelling projectile, so the on-impact bullet mods
+	// (Explode/Gas/Split) never fire on their own. This reuses the Bullet's own spawn logic
+	// at each beam impact point so lasers inherit those mods just like bullets do. A detached
+	// bullet instance (never added to the tree) supplies the Explosion/GasCloud scenes wired
+	// on the gun's BulletType; Split is enemy-hit only, matching Bullet.HandleHit.
+	private void SpawnBeamImpact(Vector2 point, bool hitEnemy) {
+		if (Gun?.BulletType == null) return;
+		if (!Gun.Explode && !Gun.Gas && !(hitEnemy && Gun.Split > 0)) return;
+		var template = Gun.BulletType.Instantiate<Bullet>();
+		template.Gun = Gun;
+		var parent = GetParent();
+		if (Gun.Explode) template.SpawnExplosionAt(parent, point, Gun.Damage);
+		if (Gun.Gas) template.SpawnGasCloudAt(parent, point, Gun.Damage, Gun.Element, damagesEnemies: true);
+		if (hitEnemy && Gun.Split > 0)
+			template.SpawnSplitBulletsAt(parent, point, Gun.Damage, Gun.Element, PlayerBulletLayer, PlayerBulletMask);
+		template.Free();
 	}
 
 	private float BeamThickness(Gun gun) {
@@ -1097,8 +1152,8 @@ public partial class Player : CharacterBody2D
 		float effectiveSpread = Gun.MultiBulletAngle;
 		float halfSpread = effectiveSpread / 2f;
 		var allPaths = new List<List<Vector2>>();
-		var hitEnemies = new List<Enemy>();
-		var hitObstacles = new List<DestructibleObstacle>();
+		var hitEnemies = new List<(Enemy enemy, Vector2 point)>();
+		var hitObstacles = new List<(DestructibleObstacle obstacle, Vector2 point)>();
 		for (int beam = 0; beam < beamCount; beam++) {
 			float beamAngle = beamCount == 1 ? 0f : -halfSpread + beam * (effectiveSpread / (beamCount - 1));
 			Vector2 beamDir = aimDirection.Normalized().Rotated(beamAngle);
@@ -1139,8 +1194,8 @@ public partial class Player : CharacterBody2D
 						break;
 					}
 					path.Add(endPoint);
-					if (hitEnemy != null) hitEnemies.Add(hitEnemy);
-					if (hitObstacle != null) hitObstacles.Add(hitObstacle);
+					if (hitEnemy != null) hitEnemies.Add((hitEnemy, endPoint));
+					if (hitObstacle != null) hitObstacles.Add((hitObstacle, endPoint));
 					if (bouncesLeft <= 0 || hitNormal == Vector2.Zero || endPoint.DistanceSquaredTo(currentFrom) < 1f) break;
 					currentDir = (currentDir - 2f * currentDir.Dot(hitNormal) * hitNormal).Normalized();
 					currentFrom = endPoint + currentDir * 1f;
@@ -1210,8 +1265,14 @@ public partial class Player : CharacterBody2D
 			}
 		}
 		if (gunCoolDown <= 0 && (hitEnemies.Count > 0 || hitObstacles.Count > 0)) {
-			foreach (var e in hitEnemies) ApplyGunHit(e, Gun.Damage, Gun);
-			foreach (var o in hitObstacles) o.TakeDamage(Gun.Damage);
+			foreach (var (e, point) in hitEnemies) {
+				ApplyGunHit(e, Gun.Damage, Gun);
+				SpawnBeamImpact(point, hitEnemy: true);
+			}
+			foreach (var (o, point) in hitObstacles) {
+				o.TakeDamage(Gun.Damage);
+				SpawnBeamImpact(point, hitEnemy: false);
+			}
 			gunCoolDown = Gun.FireRate * StatusEffects.GetFireRateMultiplier();
 		}
 	}
@@ -1221,7 +1282,7 @@ public partial class Player : CharacterBody2D
 	// records the hit enemy/obstacle. Frequency of the curve scales with Gun.HeatSeeking.
 	private System.Collections.Generic.List<Vector2> BuildHeatSeekBeam(
 		Vector2 from, Vector2 dir, PhysicsDirectSpaceState2D spaceState,
-		List<Enemy> hitEnemies, List<DestructibleObstacle> hitObstacles)
+		List<(Enemy enemy, Vector2 point)> hitEnemies, List<(DestructibleObstacle obstacle, Vector2 point)> hitObstacles)
 	{
 		var path = new System.Collections.Generic.List<Vector2> { from };
 		var noVisited = new HashSet<Enemy>();
@@ -1254,8 +1315,8 @@ public partial class Player : CharacterBody2D
 				var collider = result["collider"].As<Node>();
 				if (collider is Pickup pickup) { excluded.Add(pickup.GetRid()); continue; }
 				endPoint = (Vector2)result["position"];
-				if (collider is Enemy e) hitEnemies.Add(e);
-				else if (collider is DestructibleObstacle d) hitObstacles.Add(d);
+				if (collider is Enemy e) hitEnemies.Add((e, endPoint));
+				else if (collider is DestructibleObstacle d) hitObstacles.Add((d, endPoint));
 				hit = true;
 				break;
 			}
@@ -1473,10 +1534,12 @@ public partial class Player : CharacterBody2D
 	private void MeleeAttack(Vector2 aimDirection) {
 		if (Melee?.Attack == null) return;
 		PlayActionAnimation("Swording");
+		float swingDuration = Melee.SwingDuration / Mathf.Max(0.1f, MeleeSwingSpeedMultiplier);
+		meleeCoolDown = Melee.SwingCooldown * MeleeCooldownMultiplier / Mathf.Max(0.1f, MeleeSwingSpeedMultiplier);
 		MeleeAttack a = Melee.Attack.Instantiate<MeleeAttack>();
 		a.Direction = aimDirection.Normalized();
 		a.Damage = Melee.Damage + MeleeDamageBonus;
-		a.SwingDuration = Melee.SwingDuration / Mathf.Max(0.1f, MeleeSwingSpeedMultiplier);
+		a.SwingDuration = swingDuration;
 		a.SwingArc = Melee.SwingArc + MeleeArcBonus;
 		a.OffsetDistance = Melee.OffsetDistance + MeleeRangeBonus;
 		a.LifeSteal = MeleeLifeSteal;
@@ -1492,6 +1555,13 @@ public partial class Player : CharacterBody2D
 			break;
 			case "Damage":
 			playingDamageAnim = false;
+			animatedSprite2D.Animation = "Idle";
+			animatedSprite2D.Play();
+			break;
+			case "Fire":
+			// Only drop back to idle once the player has released fire; while it's held
+			// the next shot replays "Fire", so returning to idle here would flicker.
+			if (Input.IsActionPressed("gun")) break;
 			animatedSprite2D.Animation = "Idle";
 			animatedSprite2D.Play();
 			break;

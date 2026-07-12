@@ -4,9 +4,11 @@
 [ext_resource type="SpriteFrames" uid="uid://nxppgi30gm11" path="res://assets/sprites/Weapons/Charge Bullet.aseprite" id="1_b2m23"]
 [ext_resource type="Script" uid="uid://cvu57cdie1j01" path="res://assets/scripts/Gun.cs" id="2"]
 [ext_resource type="AudioStream" uid="uid://dvijwtqha2lcw" path="res://assets/SFX/Gun Shot.mp3" id="2_1wy5s"]
+[ext_resource type="Texture2D" uid="uid://dbs0qkf0xrt1b" path="res://assets/sprites/Weapons/Swarm Canon.aseprite" id="4_dvsfd"]
 
 [resource]
 script = ExtResource("2")
+GunImage = ExtResource("4_dvsfd")
 GunDescription = "Fires a slow carrier round that sprays half-damage sub-bullets in a rotating spiral while it travels. Does not explode."
 FireRate = 0.8
 Damage = 10

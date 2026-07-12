@@ -1,10 +1,11 @@
-[gd_resource type="Resource" load_steps=2 format=3 uid="uid://dgdydgnsl0p2n"]
+[gd_resource type="Resource" format=3 uid="uid://dgdydgnsl0p2n"]
 
+[ext_resource type="Texture2D" uid="uid://oes67x6cqv1h" path="res://assets/sprites/Power Up Icons/Limbs Mod.aseprite" id="1_1mubi"]
 [ext_resource type="Script" uid="uid://1j6fi2jij0hu" path="res://assets/scripts/BodyMod.cs" id="1_iukvx"]
 
 [resource]
 script = ExtResource("1_iukvx")
 type = 2
+ModImage = ExtResource("1_1mubi")
+ModDescription = "Gain stength and speed."
 Name = "Limbs"
-ExperiencePerLevel = 1
-ExperienceCurveStep = 1

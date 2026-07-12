@@ -4,8 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://cf1pg2x8l8lpf" path="res://assets/objects/bullet.tscn" id="2_34ecl"]
 [ext_resource type="Resource" uid="uid://t4f5lqyn51u2" path="res://assets/weapons/Simple Sword.tres" id="3_idqgg"]
 [ext_resource type="Resource" uid="uid://cc5s5y6gpiagm" path="res://assets/weapons/Pistol.tres" id="3_nqkij"]
-[ext_resource type="Resource" uid="uid://chpqx3ssxn3se" path="res://assets/weapons/Gas Gun.tres" id="4_fh75e"]
-[ext_resource type="Resource" uid="uid://c8b2ycj85fkc5" path="res://assets/weapons/Slicer.tres" id="5_bkysh"]
+[ext_resource type="Resource" uid="uid://wbajl8smb0i2" path="res://assets/weapons/Charge Blast.tres" id="4_xvjlw"]
 [ext_resource type="SpriteFrames" uid="uid://jrumw1swp6rs" path="res://assets/sprites/Player.aseprite" id="6_nqkij"]
 [ext_resource type="Shader" uid="uid://nej1tvi1ocse" path="res://assets/shaders/PixelArt.gdshader" id="7_fh75e"]
 
@@ -17,10 +16,10 @@ shader_parameter/hue_shift = 0.0
 shader_parameter/darkness = 0.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_eevfn"]
-size = Vector2(133, 187)
+size = Vector2(136.80127, 201.09381)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_asm2o"]
-size = Vector2(66.5639, 187.5)
+size = Vector2(54.341183, 200.63571)
 
 [node name="Player" type="CharacterBody2D" unique_id=431171586]
 position = Vector2(0, -2)
@@ -30,7 +29,7 @@ collision_mask = 17
 script = ExtResource("1_l4bou")
 MaxHealth = 100
 MinionBullet = ExtResource("2_34ecl")
-Guns = [ExtResource("3_nqkij"), ExtResource("4_fh75e"), ExtResource("5_bkysh")]
+Guns = [ExtResource("3_nqkij"), ExtResource("4_xvjlw")]
 BodyMods = []
 Melee = ExtResource("3_idqgg")
 WallKickPriorityTime = 0.5
@@ -59,8 +58,8 @@ metadata/_aseprite_wizard_interface_config_ = {
 metadata/_aseprite_wizard_source_file_hash_ = "8ec8c1d577a51456f697d5231e2d25c2"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2089939790]
-position = Vector2(3.80202, -10.5)
-scale = Vector2(0.506937, 1)
+position = Vector2(-3.3023624, 1.9073486e-06)
+scale = Vector2(0.506937, 0.9999999)
 shape = SubResource("RectangleShape2D_eevfn")
 
 [node name="Area2D" type="Area2D" parent="." unique_id=699907666]
@@ -69,7 +68,7 @@ collision_layer = 2
 collision_mask = 16
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=1419025172]
-position = Vector2(3.698, -11.25)
+position = Vector2(-1.6511822, 3.1349325)
 scale = Vector2(1.00272, 1)
 shape = SubResource("RectangleShape2D_asm2o")
 

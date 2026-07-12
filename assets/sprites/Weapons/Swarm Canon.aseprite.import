@@ -1,0 +1,16 @@
+[remap]
+
+importer="aseprite_wizard.plugin.static-texture"
+type="AtlasTexture"
+uid="uid://dbs0qkf0xrt1b"
+path="res://.godot/imported/Swarm Canon.aseprite-8a70231e1c3b74119a24e88934663ecf.res"
+
+[deps]
+
+source_file="res://assets/sprites/Weapons/Swarm Canon.aseprite"
+dest_files=["res://.godot/imported/Swarm Canon.aseprite-8a70231e1c3b74119a24e88934663ecf.res"]
+
+[params]
+
+exclude_layers_pattern=""
+only_visible_layers=false

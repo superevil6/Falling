@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=3 format=3 uid="uid://bos7amq7p8sva"]
+[gd_resource type="Resource" format=3 uid="uid://bos7amq7p8sva"]
 
 [ext_resource type="Script" uid="uid://c16jiuasboxwv" path="res://assets/scripts/BodyUpgrade.cs" id="1_q2exu"]
 [ext_resource type="Texture2D" uid="uid://dpq82uj4ylamy" path="res://assets/sprites/Power Up Icons/Big Health Boost.png" id="1_xi8t4"]
@@ -8,5 +8,6 @@ script = ExtResource("1_q2exu")
 BodyModType = 1
 UpgradeImage = ExtResource("1_xi8t4")
 UpgradeName = "Big Health Boost"
-Value = 50.0
+UpgradeDescription = "Adds a whopping 25 health worth of mercurial mass."
+Value = 25.0
 Rarity = 2

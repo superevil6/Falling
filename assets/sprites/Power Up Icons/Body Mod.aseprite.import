@@ -1,0 +1,16 @@
+[remap]
+
+importer="aseprite_wizard.plugin.static-texture"
+type="AtlasTexture"
+uid="uid://puyr7nekrdu3"
+path="res://.godot/imported/Body Mod.aseprite-ffdd99bd7cfdb981ddf9259b22c7732b.res"
+
+[deps]
+
+source_file="res://assets/sprites/Power Up Icons/Body Mod.aseprite"
+dest_files=["res://.godot/imported/Body Mod.aseprite-ffdd99bd7cfdb981ddf9259b22c7732b.res"]
+
+[params]
+
+exclude_layers_pattern=""
+only_visible_layers=false

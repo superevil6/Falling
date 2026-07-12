@@ -14,7 +14,7 @@ radius = 40.0
 collision_layer = 4
 collision_mask = 8
 script = ExtResource("1")
-MaxHealth = 300
+MaxHealth = 450
 Gun = ExtResource("2_1a4dq")
 CanMelee = false
 MovementType = 1
@@ -24,9 +24,11 @@ Size = 4.0
 IsBoss = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1313650051]
+scale = Vector2(1.3, 1.3)
 shape = SubResource("CircleShape2D_boss")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1097997562]
+scale = Vector2(1.3, 1.3)
 texture_filter = 1
 sprite_frames = ExtResource("4")
 animation = &"PreSpawn"

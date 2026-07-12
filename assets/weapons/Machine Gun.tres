@@ -10,7 +10,7 @@
 script = ExtResource("2_iogci")
 GunImage = ExtResource("2_rmikx")
 GunType = 5
-FireRate = 0.02
+FireRate = 0.05
 Damage = 1
 BulletCount = 1
 MultiBulletAngle = 0.1
