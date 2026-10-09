@@ -1,0 +1,16 @@
+[remap]
+
+importer="aseprite_wizard.plugin.static-texture"
+type="AtlasTexture"
+uid="uid://rosu2a1t8i1w"
+path="res://.godot/imported/Debris 3.aseprite-e59782a67a19bf1a08ca7e7f9455ef45.res"
+
+[deps]
+
+source_file="res://assets/sprites/Debris 3.aseprite"
+dest_files=["res://.godot/imported/Debris 3.aseprite-e59782a67a19bf1a08ca7e7f9455ef45.res"]
+
+[params]
+
+exclude_layers_pattern=""
+only_visible_layers=false

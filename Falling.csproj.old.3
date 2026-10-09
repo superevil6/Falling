@@ -1,0 +1,16 @@
+<Project Sdk="Godot.NET.Sdk/4.7.0">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <!-- Emit the XML doc file so Godot shows /// <summary> comments as inspector
+         tooltips. CS1591 (missing doc on a public member) is suppressed so we only
+         document what's useful, not every public member in the game. -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+  <!-- The Godot.NET.Sdk globs **/*.cs, which would otherwise pull the unit-test sources
+       (and their xunit references) into the game assembly. Keep tests out of the game. -->
+  <ItemGroup>
+    <Compile Remove="tests/**/*.cs" />
+  </ItemGroup>
+</Project>

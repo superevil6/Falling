@@ -12,6 +12,9 @@ public class StatusEffectController
 	public float BlindSpreadDegreesPerStack = 6f;
 	public float MaxBlindSpreadDegrees = 170f;
 	public float BlindDarknessPerStack = 0.1f;
+	// Grease: each stack reduces the affected entity's own outgoing damage (bullets, gun,
+	// melee) by this fraction. Clamped so damage can never drop to zero.
+	public float DamageDealtReductionPerStack = 0.03f;
 
 	private Dictionary<StatusEffectType, List<float>> stackExpiries = new Dictionary<StatusEffectType, List<float>>();
 	// Per-type resistance in [0, 0.95]; shortens the duration of newly-applied stacks.
@@ -59,6 +62,13 @@ public class StatusEffectController
 		return 1f + GetStackCount(StatusEffectType.ReducedFireRate) * FireRateReductionPerStack;
 	}
 
+	// Multiplier applied to the affected entity's outgoing damage. 1 = unaffected;
+	// each Grease stack shaves off DamageDealtReductionPerStack, floored at 10%.
+	public float GetOutgoingDamageMultiplier()
+	{
+		return Mathf.Max(0.1f, 1f - GetStackCount(StatusEffectType.DamageDealt) * DamageDealtReductionPerStack);
+	}
+
 	// Full width (degrees) of the random cone that a blinded shooter's aim is deviated
 	// within. 0 when not blinded. Callers roll a symmetric angle in [-half, +half].
 	public float GetBlindSpreadDegrees()
@@ -83,6 +93,7 @@ public class StatusEffectController
 				StatusEffectType.DamageOverTime => new Color(1f, 0.15f, 0.15f),
 				StatusEffectType.Slow => new Color(0.3f, 0.5f, 1f),
 				StatusEffectType.ReducedFireRate => new Color(1f, 0.95f, 0.2f),
+				StatusEffectType.DamageDealt => new Color(0.55f, 0.45f, 0.2f),
 				_ => Colors.White,
 			};
 			accum += new Vector3(c.R, c.G, c.B) * ratio;

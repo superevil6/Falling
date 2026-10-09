@@ -1,0 +1,16 @@
+[remap]
+
+importer="aseprite_wizard.plugin.static-texture"
+type="AtlasTexture"
+uid="uid://jyxmhuts6h2b"
+path="res://.godot/imported/Debris Mercury 2.aseprite-b4e19c02cdbe65fc97698b100da9ad0d.res"
+
+[deps]
+
+source_file="res://assets/sprites/Debris Mercury 2.aseprite"
+dest_files=["res://.godot/imported/Debris Mercury 2.aseprite-b4e19c02cdbe65fc97698b100da9ad0d.res"]
+
+[params]
+
+exclude_layers_pattern=""
+only_visible_layers=false

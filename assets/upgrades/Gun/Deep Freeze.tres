@@ -1,0 +1,14 @@
+[gd_resource type="Resource" format=3 uid="uid://3eb00pc5q5u2"]
+
+[ext_resource type="Texture2D" uid="uid://diayf4atbt0jw" path="res://assets/sprites/Power Up Icons/Cold Bullet.png" id="1_2mr1d"]
+[ext_resource type="Script" uid="uid://cjvebtbs1ft7k" path="res://assets/scripts/GunUpgrade.cs" id="1_bh2c7"]
+
+[resource]
+script = ExtResource("1_bh2c7")
+Type = 25
+Element = 2
+UpgradeImage = ExtResource("1_2mr1d")
+UpgradeName = "Deep Freeze"
+UpgradeDescription = "Your ice rounds bite harder, applying an extra stack of Slow with every hit."
+Value = 1.0
+Rarity = 0

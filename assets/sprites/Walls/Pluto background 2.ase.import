@@ -1,7 +1,7 @@
 [remap]
 
-importer="aseprite_wizard.plugin.noop"
-type="PackedDataContainer"
+importer="aseprite_wizard.plugin.static-texture"
+type="AtlasTexture"
 uid="uid://bnliiiok4alxy"
 path="res://.godot/imported/Pluto background 2.ase-3c9ccbc802f504da7fcb53d89bcbd1db.res"
 
@@ -12,3 +12,5 @@ dest_files=["res://.godot/imported/Pluto background 2.ase-3c9ccbc802f504da7fcb53
 
 [params]
 
+exclude_layers_pattern=""
+only_visible_layers=false

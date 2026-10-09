@@ -145,6 +145,10 @@ public partial class LevelUpMenu : CanvasLayer
 			if (up.Type == GunUpgradeType.Explode && gun.Explode) continue;
 			if (up.Type == GunUpgradeType.ExplosionRadius && !gun.Explode) continue;
 			if (up.Type == GunUpgradeType.Element && gun.Element != ElementType.NonElemental) continue;
+			// Elemental enhancement upgrades only appear once the gun carries their element,
+			// and stay repeatable so their status stacks can keep climbing (+1 → +2 → +4).
+			if (up.Type == GunUpgradeType.ElementEnhance
+				&& (gun.Element == ElementType.NonElemental || up.Element != gun.Element)) continue;
 			if (up.Type == GunUpgradeType.AcidRounds && gun.AcidRoundsCount > 0) continue;
 			if (up.Type == GunUpgradeType.AuraBullets && gun.AuraDamages) continue;
 			applicable.Add(up);

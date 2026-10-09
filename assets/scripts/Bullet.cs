@@ -294,6 +294,10 @@ public partial class Bullet : Attack
 				e.StatusEffects.AddStacks(StatusEffectType.Blind, Gun.BlindStacksPerHit);
 				GD.Print($"Bullet → {e.Name}: +{Gun.BlindStacksPerHit} Blind (total {e.StatusEffects.GetStackCount(StatusEffectType.Blind)})");
 			}
+			if (Gun.GreaseStacksPerHit > 0) {
+				e.StatusEffects.AddStacks(StatusEffectType.DamageDealt, Gun.GreaseStacksPerHit);
+				GD.Print($"Bullet → {e.Name}: +{Gun.GreaseStacksPerHit} Grease (total {e.StatusEffects.GetStackCount(StatusEffectType.DamageDealt)})");
+			}
 		}
 		if (IsBoomerang) return;
 		HandleHit(true);

@@ -14,6 +14,21 @@ public partial class Mine : Area2D
 	private static PackedScene explosionScene;
 	private bool detonated = false;
 
+	// When launched, the mine slides toward TargetPosition at LaunchSpeed and only
+	// arms (becomes able to detonate) once it lands and comes to rest.
+	private bool launching = false;
+	private Vector2 targetPosition;
+	private float launchSpeed = 500f;
+
+	// Launches the mine toward a target position; it travels there before stopping
+	// and staying stationary. It will not detonate while in flight.
+	public void LaunchTo(Vector2 target, float speed = 500f)
+	{
+		targetPosition = target;
+		launchSpeed = speed;
+		launching = true;
+	}
+
 	public override void _Ready()
 	{
 		if (explosionScene == null) {
@@ -23,15 +38,28 @@ public partial class Mine : Area2D
 		BodyEntered += OnBodyEntered;
 	}
 
+	public override void _PhysicsProcess(double delta)
+	{
+		if (!launching) return;
+		Vector2 toTarget = targetPosition - GlobalPosition;
+		float step = launchSpeed * (float)delta;
+		if (toTarget.Length() <= step) {
+			GlobalPosition = targetPosition;
+			launching = false;
+		} else {
+			GlobalPosition += toTarget.Normalized() * step;
+		}
+	}
+
 	private void OnAreaEntered(Area2D area)
 	{
-		if (detonated) return;
+		if (detonated || launching) return;
 		if (area.GetParent() is Player) Detonate();
 	}
 
 	private void OnBodyEntered(Node body)
 	{
-		if (detonated) return;
+		if (detonated || launching) return;
 		if (body is Player) Detonate();
 	}
 

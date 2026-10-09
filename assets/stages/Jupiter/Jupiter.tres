@@ -1,0 +1,46 @@
+[gd_resource type="Resource" format=3 uid="uid://dg3mm6kue3kay"]
+
+[ext_resource type="Script" uid="uid://byqq3mnl0fxbu" path="res://assets/scripts/Stage.cs" id="1_stage"]
+[ext_resource type="PackedScene" uid="uid://dcvcpghmdw5l0" path="res://assets/stages/Jupiter/Walls/Jupiter Wall 1.tscn" id="w1"]
+[ext_resource type="PackedScene" uid="uid://bqpuvvq6kvnok" path="res://assets/stages/Jupiter/Walls/Jupiter Wall 2.tscn" id="w2"]
+[ext_resource type="PackedScene" uid="uid://dj4dpcyqgvp77" path="res://assets/stages/Jupiter/Walls/Jupiter Wall 3.tscn" id="w3"]
+[ext_resource type="PackedScene" uid="uid://byl14vnfag0jo" path="res://assets/stages/Jupiter/Walls/Jupiter Wall 4.tscn" id="w4"]
+[ext_resource type="Texture2D" path="res://assets/stages/Jupiter/jupiter-storm-wall/fill-1.png" id="f1"]
+[ext_resource type="Texture2D" path="res://assets/stages/Jupiter/jupiter-storm-wall/fill-2.png" id="f2"]
+[ext_resource type="Texture2D" path="res://assets/stages/Jupiter/jupiter-storm-wall/fill-3.png" id="f3"]
+[ext_resource type="Texture2D" path="res://assets/stages/Jupiter/jupiter-storm-wall/fill-4.png" id="f4"]
+[ext_resource type="Texture2D" path="res://assets/stages/Jupiter/jupiter-depths/layer-1/tile-1.png" id="b1_1"]
+[ext_resource type="Texture2D" path="res://assets/stages/Jupiter/jupiter-depths/layer-1/tile-2.png" id="b1_2"]
+[ext_resource type="Texture2D" path="res://assets/stages/Jupiter/jupiter-depths/layer-1/tile-3.png" id="b1_3"]
+[ext_resource type="Texture2D" path="res://assets/stages/Jupiter/jupiter-depths/layer-1/tile-4.png" id="b1_4"]
+[ext_resource type="Texture2D" path="res://assets/stages/Jupiter/jupiter-depths/layer-2/tile-1.png" id="b2_1"]
+[ext_resource type="Texture2D" path="res://assets/stages/Jupiter/jupiter-depths/layer-2/tile-2.png" id="b2_2"]
+[ext_resource type="Texture2D" path="res://assets/stages/Jupiter/jupiter-depths/layer-2/tile-3.png" id="b2_3"]
+[ext_resource type="Texture2D" path="res://assets/stages/Jupiter/jupiter-depths/layer-2/tile-4.png" id="b2_4"]
+[ext_resource type="Resource" uid="uid://cjdgwmdwlob5u" path="res://assets/stage event/Both Wall Contract 30.tres" id="e0"]
+[ext_resource type="Resource" uid="uid://cgjm6phgjv7pg" path="res://assets/stage event/Left Wall Contract 30.tres" id="e1"]
+[ext_resource type="Resource" uid="uid://cn22x3e8ni2jj" path="res://assets/stage event/Right Wall Contract 30.tres" id="e2"]
+
+[resource]
+script = ExtResource("1_stage")
+Name = "Jupiter"
+EnemyGroup = Array[Resource]([])
+LevelEndText = ""
+LevelEndColor = Color(1, 1, 1, 1)
+Hazards = Array[PackedScene]([])
+LeftWallChunks = Array[PackedScene]([ExtResource("w1"), ExtResource("w2"), ExtResource("w3"), ExtResource("w4")])
+RightWallChunks = Array[PackedScene]([ExtResource("w1"), ExtResource("w2"), ExtResource("w3"), ExtResource("w4")])
+WallFillTiles = Array[Texture2D]([ExtResource("f1"), ExtResource("f2"), ExtResource("f3"), ExtResource("f4")])
+WallFillTileSize = 256.0
+WallFillTileDarkness = 0.4
+WallDecorations = Array[Texture2D]([])
+AmbientLight = Color(1, 1, 1, 1)
+ScrollSpeed = 300.0
+BackgroundImages = Array[Texture2D]([ExtResource("b1_1"), ExtResource("b1_2"), ExtResource("b1_3"), ExtResource("b1_4")])
+BackgroundDarkness = PackedFloat32Array(0.5, 0.5, 0.5, 0.5)
+Background2Images = Array[Texture2D]([ExtResource("b2_1"), ExtResource("b2_2"), ExtResource("b2_3"), ExtResource("b2_4")])
+Background2Darkness = PackedFloat32Array(0.6, 0.6, 0.6, 0.6)
+StageEvents = Array[Resource]([ExtResource("e0"), ExtResource("e1"), ExtResource("e2")])
+EventInterval = 5.0
+RandomEventOrder = true
+DisableEventsDuringBoss = false

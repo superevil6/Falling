@@ -1,0 +1,22 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" path="crystal-2.png" id="1_tex"]
+
+[node name="crystal_2" type="Area2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(60, 0)
+texture = ExtResource("1_tex")
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
+polygon = PackedVector2Array(-5.7, 9.6, 31.8, -16.7, 47.1, -40.8, 19.2, -34.7, -18.3, -8.4)
+
+[node name="CollisionPolygon2D2" type="CollisionPolygon2D" parent="."]
+polygon = PackedVector2Array(-17.4, 24, 5.1, 36.2, 33, 38.5, 16, 16.2, -6.6, 4)
+
+[node name="CollisionPolygon2D3" type="CollisionPolygon2D" parent="."]
+polygon = PackedVector2Array(-5, 9.1, 36.1, -24, 49.8, -49.3, 22.2, -41.2, -19, -8.1)
+
+[node name="CollisionPolygon2D4" type="CollisionPolygon2D" parent="."]
+polygon = PackedVector2Array(-9.5, 23.4, 66.3, 11.8, 102.9, -10.5, 61.3, -20.8, -14.5, -9.2)

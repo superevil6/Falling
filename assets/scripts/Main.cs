@@ -53,6 +53,13 @@ public partial class Main : Node2D
 		GameSession.Mode = data.Mode;
 	}
 
+	// Debug level select: the next Main scene starts a fresh run at this stage index.
+	public static void PrepareDebugStart(int stage)
+	{
+		pendingStage = stage;
+		global::Player.CarriedState = null;
+	}
+
 	public override void _Ready()
 	{
 		music = new MusicPlayer();
@@ -62,6 +69,11 @@ public partial class Main : Node2D
 		AddChild(music);
 		var stage = CurrentStageData();
 		if (stage != null) music.PlayMusic(stage.StageIntroMusic, stage.StageMusic);
+		// Ambient dimming so decoration lights read as glow. White is a no-op (full
+		// brightness); a dark tint dims the whole stage for the lights to punch through.
+		if (stage != null && stage.AmbientLight != Colors.White) {
+			AddChild(new CanvasModulate { Color = stage.AmbientLight });
+		}
 		AddChild(new StageDirector());
 		var selectionMenu = GetNodeOrNull<SelectionMenu>("Selection Menu");
 		if (selectionMenu != null) selectionMenu.SelectionMade += OnBossRewardSelected;

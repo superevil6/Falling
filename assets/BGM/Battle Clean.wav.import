@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://243x7aq4akdy"
+path="res://.godot/imported/Battle Clean.wav-242465525c67f16d213c29e0aefd5b4a.sample"
+
+[deps]
+
+source_file="res://assets/BGM/Battle Clean.wav"
+dest_files=["res://.godot/imported/Battle Clean.wav-242465525c67f16d213c29e0aefd5b4a.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

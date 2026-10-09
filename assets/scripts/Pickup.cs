@@ -34,6 +34,24 @@ public partial class Pickup : Area2D
 	[Export]
 	public AudioStream PickupSound {get;set;}
 
+	// --- Glow ---
+	// On-screen reach (pixels) of the pickup's emitted light. 0 disables the glow.
+	[Export]
+	public float LightRadius {get;set;} = 40f;
+	// Brightness of the emitted light.
+	[Export]
+	public float LightEnergy {get;set;} = 0.8f;
+	// Tint of the emitted light. Leave fully transparent (default) to auto-pick a colour
+	// from the pickup Type — greenish for Experience, reddish for Health.
+	[Export]
+	public Color LightColor {get;set;} = new Color(0f, 0f, 0f, 0f);
+
+	// A soft radial gradient (opaque centre -> transparent edge) shared by every pickup
+	// light, built on first use. Radius is driven by each light's TextureScale, so one
+	// texture serves all sizes. Mirrors the wall-decoration lights in WallQueue.
+	private const float LightGradientRadius = 128f;
+	private static Texture2D lightGradient;
+
 	private Player player;
 
 	public override void _Ready()
@@ -41,6 +59,7 @@ public partial class Pickup : Area2D
 		AreaEntered += OnAreaEntered;
 		// Scale the whole node so the sprite and its collision shape grow/shrink together.
 		Scale = new Vector2(PickupScale, PickupScale);
+		AttachLight();
 		sprite = GetNodeOrNull<AnimatedSprite2D>("AnimatedSprite2D");
 		if (sprite != null && sprite.SpriteFrames != null) {
 			// Prefer an "Idle" loop if the scene has one, otherwise fall back to whatever
@@ -48,6 +67,49 @@ public partial class Pickup : Area2D
 			if (sprite.SpriteFrames.HasAnimation("Idle")) sprite.Animation = "Idle";
 			sprite.Play();
 		}
+	}
+
+	// Gives the pickup a PointLight2D so it glows against the ambient-dimmed stage, the
+	// same technique the wall decorations use (see WallQueue.AttachLight).
+	private void AttachLight()
+	{
+		if (LightRadius <= 0f) return;
+
+		// A fully-transparent LightColor means "auto": tint by what the pickup grants.
+		Color color = LightColor.A > 0f
+			? LightColor
+			: Type switch {
+				PickupType.Health => new Color(1f, 0.4f, 0.4f),
+				_ => new Color(0.5f, 1f, 0.6f),
+			};
+
+		var light = new PointLight2D {
+			Texture = GetLightGradient(),
+			Color = color,
+			Energy = LightEnergy,
+			// The gradient disc spans LightGradientRadius px; divide out the node's scale
+			// (this child inherits it) so the on-screen reach stays `LightRadius` px
+			// whatever the PickupScale.
+			TextureScale = LightRadius / (LightGradientRadius * Mathf.Max(PickupScale, 0.0001f)),
+		};
+		AddChild(light);
+	}
+
+	private static Texture2D GetLightGradient()
+	{
+		if (lightGradient != null) return lightGradient;
+		var gradient = new Gradient();
+		gradient.SetColor(0, Colors.White);
+		gradient.SetColor(1, new Color(1f, 1f, 1f, 0f));
+		lightGradient = new GradientTexture2D {
+			Gradient = gradient,
+			Width = 256,
+			Height = 256,
+			Fill = GradientTexture2D.FillEnum.Radial,
+			FillFrom = new Vector2(0.5f, 0.5f),
+			FillTo = new Vector2(1f, 0.5f),
+		};
+		return lightGradient;
 	}
 
 	public override void _Process(double delta)

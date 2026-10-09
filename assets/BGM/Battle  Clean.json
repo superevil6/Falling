@@ -1,0 +1,41 @@
+{
+  "format": "crunchybgm-loop",
+  "v": 1,
+  "name": "crunchybgm-BHar-180bpm",
+  "sampleRate": 44100,
+  "frames": 1881600,
+  "seconds": 42.6667,
+  "tempo": 180,
+  "beatsPerBar": 4,
+  "key": 11,
+  "mode": 6,
+  "loopStartFrame": 0,
+  "loopStartSeconds": 0,
+  "loopEndFrame": 1881600,
+  "sections": [
+    {
+      "name": "A",
+      "bars": 8,
+      "startFrame": 0,
+      "startSeconds": 0
+    },
+    {
+      "name": "B",
+      "bars": 8,
+      "startFrame": 470400,
+      "startSeconds": 10.6667
+    },
+    {
+      "name": "A",
+      "bars": 8,
+      "startFrame": 940800,
+      "startSeconds": 21.3333
+    },
+    {
+      "name": "C",
+      "bars": 8,
+      "startFrame": 1411200,
+      "startSeconds": 32
+    }
+  ]
+}

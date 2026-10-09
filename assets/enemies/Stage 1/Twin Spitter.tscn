@@ -10,6 +10,8 @@
 [ext_resource type="PackedScene" uid="uid://bo6exbho5e01u" path="res://assets/pickups/1exp 50.tscn" id="7_exp"]
 [ext_resource type="PackedScene" uid="uid://xavg5hqw8ck3" path="res://assets/pickups/1exp 100.tscn" id="8_4dadh"]
 [ext_resource type="Texture2D" uid="uid://6edh5g64j6wd" path="res://assets/sprites/Debris 2.aseprite" id="8_j5muv"]
+[ext_resource type="Texture2D" uid="uid://rosu2a1t8i1w" path="res://assets/sprites/Debris 3.aseprite" id="d3new"]
+[ext_resource type="Texture2D" uid="uid://bh0j2slp0q1ds" path="res://assets/sprites/Debris 4.aseprite" id="d4new"]
 [ext_resource type="Shader" uid="uid://nej1tvi1ocse" path="res://assets/shaders/PixelArt.gdshader" id="8_shader"]
 [ext_resource type="Texture2D" uid="uid://1jbmpoxoute5" path="res://assets/sprites/Enemies/Split Face.png" id="9_png"]
 [ext_resource type="SpriteFrames" uid="uid://xuti13rygkjs" path="res://assets/sprites/Enemies/Split Face.ase" id="10_frames"]
@@ -43,7 +45,7 @@ EnemySprite = ExtResource("9_png")
 DeathSound = ExtResource("4_death")
 DeathExplosions = ExtResource("5_boom")
 DebrisReleased = 2
-DebrisSprites = Array[Texture2D]([ExtResource("7_52owe"), ExtResource("8_j5muv")])
+DebrisSprites = Array[Texture2D]([ExtResource("7_52owe"), ExtResource("8_j5muv"), ExtResource("d3new"), ExtResource("d4new")])
 ItemDrops = Array[PackedScene]([ExtResource("8_4dadh"), ExtResource("7_exp"), ExtResource("6_hp")])
 TeleportHesitationTime = 2.0
 metadata/Enemy = false

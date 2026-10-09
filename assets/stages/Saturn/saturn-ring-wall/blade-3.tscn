@@ -1,0 +1,13 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" path="blade-3.png" id="1_tex"]
+
+[node name="blade_3" type="Area2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(76, 0)
+texture = ExtResource("1_tex")
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
+polygon = PackedVector2Array(-12, 44.8, 3, 44.3, 17.8, 41.8, 32.2, 37.5, 45.9, 31.4, 58.8, 23.6, 70.5, 14.2, 80.9, 3.4, 89.8, -8.7, 97.2, -21.8, 102.8, -35.8, 106.5, -50.3, 108.4, -65.2, 93.5, -52.8, 84.3, -41.8, 75.3, -32.3, 66, -24.1, 56.4, -17.4, 46.5, -12, 36.6, -8, 26.6, -5.4, 16.8, -4.1, 7.2, -4, -1.9, -5, -10.5, -7.2)

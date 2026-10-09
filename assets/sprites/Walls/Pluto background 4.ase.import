@@ -1,0 +1,16 @@
+[remap]
+
+importer="aseprite_wizard.plugin.static-texture"
+type="AtlasTexture"
+uid="uid://c86kq6uqoi8pr"
+path="res://.godot/imported/Pluto background 4.ase-62f8cbf5110aae45b46c88c7f22f8ab6.res"
+
+[deps]
+
+source_file="res://assets/sprites/Walls/Pluto background 4.ase"
+dest_files=["res://.godot/imported/Pluto background 4.ase-62f8cbf5110aae45b46c88c7f22f8ab6.res"]
+
+[params]
+
+exclude_layers_pattern=""
+only_visible_layers=false

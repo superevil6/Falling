@@ -1,0 +1,14 @@
+[gd_resource type="Resource" format=3 uid="uid://cat4s5iwku6nc"]
+
+[ext_resource type="Texture2D" uid="uid://bj18couc0u5po" path="res://assets/sprites/Power Up Icons/Fire Bullet.png" id="1_2mr1d"]
+[ext_resource type="Script" uid="uid://cjvebtbs1ft7k" path="res://assets/scripts/GunUpgrade.cs" id="1_bh2c7"]
+
+[resource]
+script = ExtResource("1_bh2c7")
+Type = 25
+Element = 1
+UpgradeImage = ExtResource("1_2mr1d")
+UpgradeName = "Concentrated Acid"
+UpgradeDescription = "Your corrosive rounds eat deeper, applying an extra stack of damage-over-time with every hit."
+Value = 1.0
+Rarity = 0

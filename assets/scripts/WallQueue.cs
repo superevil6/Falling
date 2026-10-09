@@ -23,6 +23,29 @@ public partial class WallQueue : Node2D
 	private List<Node2D> activeChunks = new List<Node2D>();
 	private float viewportHeight;
 
+	// --- Wall decorations ---
+	// Pool of decoration textures for this stage (null/empty leaves the wall bare) and
+	// the tuning copied over from the Stage resource in _Ready.
+	private Texture2D[] decorations;
+	private WallSide decorationSide;
+	private float decorationMinInterval;
+	private float decorationMaxInterval;
+	private float decorationInset;
+	private float decorationScale;
+	private int decorationZIndex;
+	// Countdown to the next decoration spawn; reset to a fresh random gap after each one.
+	private float decorationTimer;
+	// Live decoration sprites, scrolled and despawned alongside the wall chunks.
+	private List<Node2D> activeDecorations = new List<Node2D>();
+	// Per-decoration light config, index-aligned with `decorations`, plus a lazily-built
+	// radial gradient shared by every light this queue spawns.
+	private Color[] decorationLightColors;
+	private float[] decorationLightRadii;
+	private float[] decorationLightEnergies;
+	private Texture2D lightGradient;
+	// On-screen radius (px) of the shared gradient disc; a light's reach scales from this.
+	private const float LightGradientRadius = 128f;
+
 	public override void _Ready()
 	{
 		var viewport = GetViewportRect().Size;
@@ -39,6 +62,19 @@ public partial class WallQueue : Node2D
 		var stageChunks = IsRightSide ? stage.RightWallChunks : stage.LeftWallChunks;
 		if (stageChunks != null && stageChunks.Length > 0) {
 			chunks = stageChunks;
+		}
+		if (stage.WallDecorations != null && stage.WallDecorations.Length > 0) {
+			decorations = stage.WallDecorations;
+			decorationSide = stage.DecorationSide;
+			decorationMinInterval = stage.DecorationMinInterval;
+			decorationMaxInterval = stage.DecorationMaxInterval;
+			decorationInset = stage.DecorationInset;
+			decorationScale = stage.DecorationScale;
+			decorationZIndex = stage.DecorationZIndex;
+			decorationLightColors = stage.DecorationLightColors;
+			decorationLightRadii = stage.DecorationLightRadii;
+			decorationLightEnergies = stage.DecorationLightEnergies;
+			decorationTimer = NextDecorationDelay();
 		}
 		if (stage.WallFillTiles != null && stage.WallFillTiles.Length > 0) {
 			var fill = new WallFill();
@@ -130,6 +166,139 @@ public partial class WallQueue : Node2D
 		while (NeedSpawn()) {
 			SpawnChunk();
 		}
+
+		UpdateDecorations(delta, movement);
+	}
+
+	// Scrolls live decorations with the walls, frees ones that have left the top of the
+	// screen, and spawns a new one when the random timer elapses.
+	private void UpdateDecorations(double delta, Vector2 movement)
+	{
+		if (decorations == null || decorations.Length == 0) return;
+
+		for (int i = activeDecorations.Count - 1; i >= 0; i--) {
+			var deco = activeDecorations[i];
+			deco.Position += movement;
+			float topEdge = deco.GlobalPosition.Y + GetDecorationHeight(deco) / 2f;
+			if (topEdge < 0) {
+				deco.QueueFree();
+				activeDecorations.RemoveAt(i);
+			}
+		}
+
+		decorationTimer -= (float)delta;
+		if (decorationTimer <= 0f) {
+			SpawnDecoration();
+			decorationTimer = NextDecorationDelay();
+		}
+	}
+
+	private void SpawnDecoration()
+	{
+		// Honour the configured side: Random rolls a coin per spawn so a decoration lands
+		// on either wall at random; the fixed sides only spawn on their own queue.
+		switch (decorationSide) {
+			case WallSide.Left:   if (IsRightSide) return; break;
+			case WallSide.Right:  if (!IsRightSide) return; break;
+			case WallSide.Random: if (GD.Randf() < 0.5f) return; break;
+		}
+
+		int index = (int)(GD.Randi() % (uint)decorations.Length);
+		var texture = decorations[index];
+		if (texture == null) return;
+
+		var deco = new Sprite2D {
+			Texture = texture,
+			TextureFilter = CanvasItem.TextureFilterEnum.Nearest,
+			Scale = new Vector2(decorationScale, decorationScale),
+			// Art is authored anchored to its left edge, so flip it on the right wall to
+			// face into the corridor.
+			FlipH = IsRightSide,
+			ZIndex = decorationZIndex,
+		};
+		// Anchor by the art's attachment edge rather than its centre: the left wall pins
+		// the texture's left edge to the inner wall and extends right into the corridor;
+		// the right wall mirrors this (flipped art, pinned at the right edge, extends
+		// left). Offset is in unscaled texture pixels (applied before Scale).
+		deco.Offset = new Vector2((IsRightSide ? -1f : 1f) * texture.GetWidth() / 2f, 0f);
+		// The wall texture is centred on the queue and its visible inner (corridor-facing)
+		// edge sits right around that centre line, so the queue's own X is the attach line.
+		// DecorationInset nudges from there: positive pushes into the corridor, negative
+		// pulls back onto the wall. Mirrored for the right wall, whose corridor is left.
+		float innerEdgeX = (IsRightSide ? -1f : 1f) * decorationInset;
+		// Spawn just below the viewport so it scrolls up into view like the wall chunks.
+		float spawnY = viewportHeight + GetDecorationHeight(deco) / 2f;
+		deco.Position = new Vector2(innerEdgeX, spawnY);
+		AttachLight(deco, index);
+		AddChild(deco);
+		activeDecorations.Add(deco);
+	}
+
+	// Gives a decoration a PointLight2D child when its index carries a positive radius.
+	// The light rides along as a child, so it scrolls and frees with the sprite.
+	private void AttachLight(Sprite2D deco, int index)
+	{
+		if (decorationLightRadii == null || index >= decorationLightRadii.Length) return;
+		float radius = decorationLightRadii[index];
+		if (radius <= 0f) return;
+
+		Color color = (decorationLightColors != null && index < decorationLightColors.Length)
+			? decorationLightColors[index]
+			: Colors.White;
+		float energy = (decorationLightEnergies != null && index < decorationLightEnergies.Length)
+			? decorationLightEnergies[index]
+			: 1f;
+
+		var light = new PointLight2D {
+			Texture = GetLightGradient(),
+			Color = color,
+			Energy = energy,
+			// The gradient disc spans LightGradientRadius px; divide out the sprite's scale
+			// (this child inherits it) so the on-screen reach is `radius` px whatever the
+			// DecorationScale.
+			TextureScale = radius / (LightGradientRadius * Mathf.Max(decorationScale, 0.0001f)),
+			// Centre on the art's midpoint — the sprite is anchored by its edge via Offset,
+			// which is the art's centre in the sprite's local (pre-scale) space.
+			Position = deco.Offset,
+		};
+		deco.AddChild(light);
+	}
+
+	// A soft radial gradient (opaque centre → transparent edge) shared by every light this
+	// queue spawns, built on first use. Radius is driven entirely by each light's
+	// TextureScale, so one texture serves all sizes.
+	private Texture2D GetLightGradient()
+	{
+		if (lightGradient != null) return lightGradient;
+		var gradient = new Gradient();
+		gradient.SetColor(0, Colors.White);
+		gradient.SetColor(1, new Color(1f, 1f, 1f, 0f));
+		lightGradient = new GradientTexture2D {
+			Gradient = gradient,
+			Width = 256,
+			Height = 256,
+			Fill = GradientTexture2D.FillEnum.Radial,
+			FillFrom = new Vector2(0.5f, 0.5f),
+			FillTo = new Vector2(1f, 0.5f),
+		};
+		return lightGradient;
+	}
+
+	// A fresh random gap until the next decoration, clamped so a min above the max can't
+	// stall spawns entirely.
+	private float NextDecorationDelay()
+	{
+		float min = Mathf.Min(decorationMinInterval, decorationMaxInterval);
+		float max = Mathf.Max(decorationMinInterval, decorationMaxInterval);
+		return (float)GD.RandRange(min, max);
+	}
+
+	private float GetDecorationHeight(Node2D deco)
+	{
+		if (deco is Sprite2D sprite && sprite.Texture != null) {
+			return sprite.GetRect().Size.Y * sprite.GlobalScale.Y;
+		}
+		return 0f;
 	}
 
 	private bool NeedSpawn()

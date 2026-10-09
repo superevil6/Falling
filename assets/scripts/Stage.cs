@@ -64,6 +64,54 @@ public partial class Stage : Resource
 	// Set this to half the wall sprite's width.
 	[Export]
 	public float WallSpriteHalfWidth {get;set;} = 128f;
+	// --- Wall decorations ---
+	// Decorative sprites that hang off the inner edge of the walls and scroll down with
+	// them, appearing at random intervals. Drop plain textures here for static decor, or
+	// AnimatedTexture resources for animated ones (a Sprite2D plays an AnimatedTexture
+	// automatically). An empty pool leaves the walls bare. One is picked at random each
+	// time, so duplicates in the pool make that decoration more common.
+	[Export]
+	public Texture2D[] WallDecorations {get;set;}
+	// Random gap (seconds) between decoration spawns, rolled fresh after each one. Rolled
+	// independently per wall side.
+	[Export]
+	public float DecorationMinInterval {get;set;} = 5f;
+	[Export]
+	public float DecorationMaxInterval {get;set;} = 12f;
+	// Which walls decorations hang off. Random rolls a coin per spawn on each side, so
+	// decorations show up on either wall at random.
+	[Export]
+	public WallSide DecorationSide {get;set;} = WallSide.Both;
+	// Horizontal nudge from the wall's inner edge (the queue's centre line, where the
+	// visible wall meets the corridor). 0 hangs the decoration right at that edge;
+	// positive pushes it further into the corridor, negative overlaps it onto the wall.
+	// Mirrored on the right wall.
+	[Export]
+	public float DecorationInset {get;set;} = 0f;
+	// Uniform scale applied to each decoration sprite.
+	[Export]
+	public float DecorationScale {get;set;} = 1f;
+	// Draw order for decorations relative to the wall chunks (0) and gameplay actors.
+	// A small positive value keeps them in front of the wall graphic they hang on.
+	[Export]
+	public int DecorationZIndex {get;set;} = 1;
+	// Per-decoration light, index-aligned with WallDecorations (like BackgroundImages /
+	// BackgroundDarkness). An entry gives that decoration a PointLight2D child; a radius
+	// of 0 (or a missing entry) means no light. A generated radial gradient shapes the
+	// glow, so radius is the light's on-screen reach in pixels. Lights read best against
+	// a dim AmbientLight below.
+	[Export]
+	public Color[] DecorationLightColors {get;set;}
+	[Export]
+	public float[] DecorationLightRadii {get;set;}
+	// Optional brightness per decoration light; missing entries default to 1.
+	[Export]
+	public float[] DecorationLightEnergies {get;set;}
+	// Scene-wide ambient tint applied via a CanvasModulate. White (the default) leaves the
+	// stage at full brightness; a dark blue-grey dims the corridor so decoration lights
+	// pop as pools of glow. Alpha is ignored by CanvasModulate.
+	[Export]
+	public Color AmbientLight {get;set;} = Colors.White;
 	[Export]
 	public float ScrollSpeed {get;set;} = 200f;
 	[Export]

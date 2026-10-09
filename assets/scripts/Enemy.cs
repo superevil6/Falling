@@ -571,6 +571,9 @@ public partial class Enemy : Area2D
 		if (finalDamage > 0) FloatingDamageText.Spawn(this, GlobalPosition, finalDamage, FloatingDamageText.ElementColor(element, new Color(1f, 0.95f, 0.85f)));
 		if (CurrentHealth > 0) FlashRed();
 		if (finalDamage > 0 && CurrentHealth > 0) Sfx.PlayHit(this); // death sound covers lethal hits
+		// Shed a single debris piece on non-lethal hits; StartDying covers the death burst.
+		if (finalDamage > 0 && CurrentHealth > 0 && DebrisSprites != null && DebrisSprites.Length > 0)
+			Debris.Burst(this, GlobalPosition, 1, DebrisSprites[rng.RandiRange(0, DebrisSprites.Length - 1)]);
 		hasBeenHit = true;
 		QueueRedraw();
 		if (this.IsCore == true && CurrentHealth <= 0 && !coreDeathTriggered) {
@@ -670,6 +673,13 @@ public partial class Enemy : Area2D
 		return 1f + stage * 0.2f;
 	}
 
+	// Applies the Grease outgoing-damage debuff to a computed damage value. A greased
+	// enemy deals less damage with every attack it makes (bullets, gun, melee, deployables).
+	private int ApplyGreaseReduction(int damage)
+	{
+		return Mathf.Max(1, Mathf.RoundToInt(damage * StatusEffects.GetOutgoingDamageMultiplier()));
+	}
+
 	private void PlaceBomb()
 	{
 		if (bombScene == null) {
@@ -678,7 +688,7 @@ public partial class Enemy : Area2D
 		if (bombScene == null) return;
 		var bomb = bombScene.Instantiate<Bomb>();
 		bomb.GlobalPosition = GlobalPosition;
-		bomb.Damage = this.BombDamage;
+		bomb.Damage = ApplyGreaseReduction(this.BombDamage);
 		bomb.Radius = this.BombRadius;
 		bomb.FuseTime = this.BombFuseTime;
 		bomb.TargetsEnemy = false;
@@ -695,7 +705,7 @@ public partial class Enemy : Area2D
 		if (mineScene == null) return;
 		var mine = mineScene.Instantiate<Mine>();
 		mine.GlobalPosition = GlobalPosition;
-		mine.Damage = this.BombDamage;
+		mine.Damage = ApplyGreaseReduction(this.BombDamage);
 		mine.Radius = this.BombRadius;
 		mine.TargetsEnemy = false;
 		mine.TargetsPlayer = true;
@@ -715,11 +725,22 @@ public partial class Enemy : Area2D
 		if (toUse == null) return;
 		var mine = toUse.Instantiate<Mine>();
 		mine.GlobalPosition = GlobalPosition;
-		mine.Damage = Mathf.Max(1, Mathf.RoundToInt(damage * ComputeStageScale()));
+		// Double the mine's visual sprite and collider.
+		mine.Scale = new Vector2(2f, 2f);
+		mine.Damage = ApplyGreaseReduction(Mathf.Max(1, Mathf.RoundToInt(damage * ComputeStageScale())));
 		mine.Radius = radius;
 		mine.TargetsEnemy = false;
 		mine.TargetsPlayer = true;
 		GetParent().AddChild(mine);
+		// Launch the mine out to a random spot on the screen instead of dropping it in
+		// place; it travels there then stops and stays stationary.
+		var screen = GetViewportRect().Size;
+		float margin = 80f;
+		Vector2 landing = new(
+			rng.RandfRange(LeftWallX + WallMargin, RightWallX - WallMargin),
+			rng.RandfRange(margin, screen.Y - margin)
+		);
+		mine.LaunchTo(landing);
 		PlayAttackAnimation(attackNumber);
 		animatedSprite2D?.Play();
 	}
@@ -861,7 +882,7 @@ public partial class Enemy : Area2D
 		if (toPlayer.Length() > this.MeleeRange) return;
 		MeleeAttack a = this.Melee.Attack.Instantiate<MeleeAttack>();
 		a.Direction = toPlayer.Normalized();
-		a.Damage = Mathf.Max(1, Mathf.RoundToInt(this.Melee.Damage * ComputeStageScale()));
+		a.Damage = ApplyGreaseReduction(Mathf.Max(1, Mathf.RoundToInt(this.Melee.Damage * ComputeStageScale())));
 		a.SwingDuration = this.Melee.SwingDuration;
 		a.SwingArc = this.Melee.SwingArc;
 		a.OffsetDistance = this.Melee.OffsetDistance;
@@ -900,7 +921,7 @@ public partial class Enemy : Area2D
 			if (p != null) {
 				float hitRadius = Mathf.Max(this.Size, 30f) + 20f;
 				if (GlobalPosition.DistanceTo(p.GlobalPosition) <= hitRadius) {
-					int dmg = Mathf.Max(1, Mathf.RoundToInt(this.DashAttackDamage * ComputeStageScale()));
+					int dmg = ApplyGreaseReduction(Mathf.Max(1, Mathf.RoundToInt(this.DashAttackDamage * ComputeStageScale())));
 					p.TakeDamage(dmg);
 					dashHitPlayer = true;
 				}
@@ -965,8 +986,9 @@ public partial class Enemy : Area2D
 		}
 		baseDir = baseDir.Rotated(Mathf.DegToRad(aimOffsetDegrees));
 		Sfx.Play(this, gun.FireSound);
+		MuzzleFlash.Spawn(this, gun, baseDir);
 		int baseDamage = Mathf.RoundToInt(gun.Damage * ComputeStageScale());
-		int boostedDamage = Mathf.RoundToInt(baseDamage * (1f + GetLeaderBoost(LeaderType.Attack)));
+		int boostedDamage = ApplyGreaseReduction(Mathf.RoundToInt(baseDamage * (1f + GetLeaderBoost(LeaderType.Attack))));
 		PlayAttackAnimation(gun.AttackNumber);
 		animatedSprite2D.LookAt(baseDir);
 		animatedSprite2D.Play();

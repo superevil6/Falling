@@ -1,0 +1,16 @@
+[remap]
+
+importer="aseprite_wizard.plugin.static-texture"
+type="AtlasTexture"
+uid="uid://djemq6hmnclsm"
+path="res://.godot/imported/Pluto Decoration 3.aseprite-6f18e4666aa06749f4736e4a4496a976.res"
+
+[deps]
+
+source_file="res://assets/sprites/Walls/Pluto Decoration 3.aseprite"
+dest_files=["res://.godot/imported/Pluto Decoration 3.aseprite-6f18e4666aa06749f4736e4a4496a976.res"]
+
+[params]
+
+exclude_layers_pattern=""
+only_visible_layers=false

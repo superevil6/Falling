@@ -1,0 +1,25 @@
+{
+  "name": "explosion",
+  "frames": 19,
+  "fps": 24,
+  "frameW": 128,
+  "frameH": 128,
+  "cols": 5,
+  "rows": 4,
+  "sheetW": 640,
+  "sheetH": 512,
+  "trimmed": false,
+  "sourceSize": {
+    "w": 128,
+    "h": 128
+  },
+  "trimOffset": {
+    "x": 0,
+    "y": 0
+  },
+  "pivot": {
+    "x": 0.5,
+    "y": 0.5
+  },
+  "loop": true
+}

@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://dfgxl44eiupwo"
+path="res://.godot/imported/Metal Mega Boss Fight.wav-af1421d3d45834d8f4dd1667969ebb46.sample"
+
+[deps]
+
+source_file="res://assets/BGM/Metal Mega Boss Fight.wav"
+dest_files=["res://.godot/imported/Metal Mega Boss Fight.wav-af1421d3d45834d8f4dd1667969ebb46.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

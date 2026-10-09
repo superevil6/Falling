@@ -1,0 +1,65 @@
+{
+  "format": "crunchybgm-loop",
+  "v": 1,
+  "name": "crunchybgm-CMin-201bpm",
+  "sampleRate": 44100,
+  "frames": 3580657,
+  "seconds": 81.194,
+  "tempo": 201,
+  "beatsPerBar": 4,
+  "key": 1,
+  "mode": 1,
+  "loopStartFrame": 210627,
+  "loopStartSeconds": 4.7761,
+  "loopEndFrame": 3580657,
+  "sections": [
+    {
+      "name": "Intro",
+      "bars": 4,
+      "startFrame": 0,
+      "startSeconds": 0
+    },
+    {
+      "name": "A",
+      "bars": 8,
+      "startFrame": 210627,
+      "startSeconds": 4.7761
+    },
+    {
+      "name": "B",
+      "bars": 8,
+      "startFrame": 631881,
+      "startSeconds": 14.3284
+    },
+    {
+      "name": "C",
+      "bars": 4,
+      "startFrame": 1053135,
+      "startSeconds": 23.8806
+    },
+    {
+      "name": "D",
+      "bars": 16,
+      "startFrame": 1263762,
+      "startSeconds": 28.6567
+    },
+    {
+      "name": "E",
+      "bars": 16,
+      "startFrame": 2106269,
+      "startSeconds": 47.7612
+    },
+    {
+      "name": "F",
+      "bars": 4,
+      "startFrame": 2948776,
+      "startSeconds": 66.8657
+    },
+    {
+      "name": "B",
+      "bars": 8,
+      "startFrame": 3159403,
+      "startSeconds": 71.6418
+    }
+  ]
+}

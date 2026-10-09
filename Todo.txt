@@ -1,2 +1,3 @@
-TO DO: Getting critical increase on things that don't have any critical doesn't seem to enable critical hits.
 TODO: Boomerang weapon sucks, either kill it or make it faster and shoot further.
+Minion boosting upgrades on head.
+Lucky dodge ability

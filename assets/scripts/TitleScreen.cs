@@ -46,12 +46,83 @@ public partial class TitleScreen : Control
 			vbox.AddChild(wipe);
 		}
 
+		// Temporary testing aid; only shown in debug builds (editor / debug exports).
+		if (OS.IsDebugBuild()) {
+			var levelSelect = MakeButton("Level Select (Debug)");
+			levelSelect.Pressed += () => ShowLevelSelect(true);
+			vbox.AddChild(levelSelect);
+			levelSelectButton = levelSelect;
+			BuildLevelSelect(center);
+		}
+
 		var exit = MakeButton("Exit Game");
 		exit.Pressed += () => GetTree().Quit();
 		vbox.AddChild(exit);
 		exitButton = exit;
+		mainMenu = vbox;
 
 		story.GrabFocus();
+	}
+
+	private VBoxContainer mainMenu;
+	private VBoxContainer levelSelectMenu;
+	private Button levelSelectButton;
+
+	// Lists every stage in Main.tscn's Stages array. Read from the scene's saved state so
+	// Main doesn't have to be instantiated just to get the names.
+	private void BuildLevelSelect(Control parent)
+	{
+		levelSelectMenu = new VBoxContainer { Alignment = BoxContainer.AlignmentMode.Center, Visible = false };
+		levelSelectMenu.AddThemeConstantOverride("separation", 16);
+		parent.AddChild(levelSelectMenu);
+
+		var heading = new Label { Text = "Level Select", HorizontalAlignment = HorizontalAlignment.Center };
+		heading.AddThemeFontSizeOverride("font_size", 60);
+		levelSelectMenu.AddChild(heading);
+
+		var stages = LoadStageList();
+		for (int i = 0; i < stages.Count; i++) {
+			int index = i;
+			var stage = stages[i].As<Stage>();
+			var name = string.IsNullOrEmpty(stage?.Name) ? $"Stage {i + 1}" : stage.Name;
+			var b = MakeButton($"{i + 1}. {name}");
+			b.Pressed += () => StartAtStage(index);
+			levelSelectMenu.AddChild(b);
+		}
+
+		var back = MakeButton("Back");
+		back.Pressed += () => ShowLevelSelect(false);
+		levelSelectMenu.AddChild(back);
+	}
+
+	private static Godot.Collections.Array LoadStageList()
+	{
+		var state = GD.Load<PackedScene>(MainScenePath)?.GetState();
+		if (state == null) return [];
+		for (int i = 0; i < state.GetNodePropertyCount(0); i++) {
+			if (state.GetNodePropertyName(0, i) == "Stages")
+				return state.GetNodePropertyValue(0, i).AsGodotArray();
+		}
+		return [];
+	}
+
+	private void ShowLevelSelect(bool show)
+	{
+		mainMenu.Visible = !show;
+		levelSelectMenu.Visible = show;
+		if (show) {
+			(levelSelectMenu.GetChildCount() > 1 ? levelSelectMenu.GetChild<Button>(1) : null)?.GrabFocus();
+		} else {
+			levelSelectButton?.GrabFocus();
+		}
+	}
+
+	// Fresh run (no carried loadout) straight into the chosen stage, skipping its cutscene.
+	private void StartAtStage(int index)
+	{
+		GameSession.Mode = GameMode.Story;
+		Main.PrepareDebugStart(index);
+		GetTree().ChangeSceneToFile(MainScenePath);
 	}
 
 	// Testing aid: wipes both modes' saves and refreshes the menu.
@@ -69,7 +140,8 @@ public partial class TitleScreen : Control
 	public override void _UnhandledInput(InputEvent @event)
 	{
 		if (@event.IsActionPressed("ui_cancel") || @event.IsActionPressed("menu_cancel")) {
-			exitButton?.GrabFocus();
+			if (levelSelectMenu != null && levelSelectMenu.Visible) ShowLevelSelect(false);
+			else exitButton?.GrabFocus();
 			AcceptEvent();
 		}
 	}

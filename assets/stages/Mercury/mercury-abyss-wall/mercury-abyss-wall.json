@@ -1,0 +1,59 @@
+{
+  "app": "CrunchyTile",
+  "license": "CC0-1.0",
+  "kind": "wall-strip",
+  "hazards": [],
+  "decorations": [],
+  "scale": 4,
+  "triggers": [],
+  "facing": "left wall",
+  "chunk": {
+    "w": 256,
+    "h": 256,
+    "artW": 64,
+    "artH": 64
+  },
+  "chunks": [
+    "wall-1.png",
+    "wall-2.png",
+    "wall-3.png",
+    "wall-4.png"
+  ],
+  "fill": {
+    "size": 256,
+    "tiles": [
+      "fill-1.png",
+      "fill-2.png",
+      "fill-3.png",
+      "fill-4.png"
+    ]
+  },
+  "edge": {
+    "mean": 96,
+    "min": 84,
+    "max": 108
+  },
+  "orientation": "The surface is a wall on the LEFT, open to the right. Mirror the image for a right-hand wall.",
+  "palette": [
+    "#ffffff",
+    "#dff2f6",
+    "#b0cdd8",
+    "#7c9aa8",
+    "#4c6270",
+    "#2a3742",
+    "#111820",
+    "#d8a8c8",
+    "#9c3a62",
+    "#6e1f42",
+    "#4a1a52",
+    "#2c1036",
+    "#14071a",
+    "#f4e9ff",
+    "#c9a4ee",
+    "#9450d4",
+    "#5f2eb0",
+    "#3c1a78",
+    "#231048",
+    "#0f0620"
+  ]
+}

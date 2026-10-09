@@ -21,7 +21,7 @@ script = ExtResource("1_dmhv6")
 Type = 1
 Amount = 3
 DropChance = 0.5
-PickupScale = 0.65
+PickupScale = 0.975
 ExpireTime = 10.0
 PickupSound = ExtResource("2_lx5us")
 

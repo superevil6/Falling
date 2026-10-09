@@ -1,0 +1,14 @@
+[gd_resource type="Resource" format=3 uid="uid://da28lqx3sn548"]
+
+[ext_resource type="Texture2D" uid="uid://dtfripqcp8eb3" path="res://assets/sprites/Power Up Icons/Electric Bullet.png" id="1_2mr1d"]
+[ext_resource type="Script" uid="uid://cjvebtbs1ft7k" path="res://assets/scripts/GunUpgrade.cs" id="1_bh2c7"]
+
+[resource]
+script = ExtResource("1_bh2c7")
+Type = 25
+Element = 3
+UpgradeImage = ExtResource("1_2mr1d")
+UpgradeName = "Overcharge"
+UpgradeDescription = "Your charged rounds hit harder, applying an extra stack of attack-disrupting shock with every hit."
+Value = 1.0
+Rarity = 0

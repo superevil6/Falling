@@ -23,5 +23,6 @@ public enum GunUpgradeType
     MultiDirectionalShot = 21,
     KnockBack = 22,
     ExplosionRadius = 23,
-    AuraBullets = 24
+    AuraBullets = 24,
+    ElementEnhance = 25
 }

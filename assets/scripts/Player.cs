@@ -26,6 +26,10 @@ public partial class Player : CharacterBody2D
 	public float OrbitalMinionRadius {get;set;} = 130f;
 	[Export]
 	public float OrbitalMinionRotationSpeed {get;set;} = 1.8f;
+	// Debris pieces shed when the player takes a non-lethal hit; one texture is
+	// picked at random per piece. Leave empty for no debris. Same system as Enemy.
+	[Export]
+	public Texture2D[] DebrisSprites {get;set;}
 	[Export]
 	public PackedScene MinionBullet {get;set;}
 	[Export]
@@ -680,6 +684,9 @@ public partial class Player : CharacterBody2D
 			return;
 		}
 		if (finalDamage > 0 && playHitAnimation) PlayDamageAnimation();
+		// Shed a single debris piece on the hit (we've already returned above if lethal).
+		if (finalDamage > 0 && DebrisSprites != null && DebrisSprites.Length > 0)
+			Debris.Burst(this, GlobalPosition, 1, DebrisSprites[rng.RandiRange(0, DebrisSprites.Length - 1)]);
 		FlashRed();
 	}
 
@@ -993,33 +1000,42 @@ public partial class Player : CharacterBody2D
 
 	private void FireCharged(Vector2 aimDirection) {
 		PlayActionAnimation("Fire", aimDirection);
+		MuzzleFlash.Spawn(this, Gun, aimDirection);
 		float ratio = Gun.ChargeTime > 0f ? Mathf.Clamp(chargeAmount / Gun.ChargeTime, 0f, 1f) : 1f;
 		int baseDamage = Combat.ChargedBaseDamage(Gun.MinDamage, Gun.MaxDamage, ratio);
 		float sizeMult = Mathf.Lerp(Gun.MinSize, Gun.MaxSize, ratio);
 		int dirCount = Mathf.Max(1, Gun.DirectionalCount);
 		float dirStep = Mathf.DegToRad(Gun.DirectionalAngle);
+		// Extra bullets from a BulletCount (bullet-plus) mod fan out across MultiBulletAngle.
+		int n = Mathf.Max(1, Gun.BulletCount);
+		float effectiveSpread = Gun.MultiBulletAngle;
+		float halfSpread = effectiveSpread / 2f;
 		for (int d = 0; d < dirCount; d++) {
-			Vector2 dir = aimDirection.Rotated(dirStep * d).Normalized();
-			if (Gun.BulletSpread > 0f) {
-				dir = dir.Rotated(Mathf.DegToRad(rng.RandfRange(0f, Gun.BulletSpread)));
+			Vector2 dirBase = aimDirection.Rotated(dirStep * d).Normalized();
+			for (int i = 0; i < n; i++) {
+				float spreadAngle = n == 1 ? 0f : -halfSpread + i * (effectiveSpread / (n - 1));
+				Vector2 dir = dirBase.Rotated(spreadAngle);
+				if (Gun.BulletSpread > 0f) {
+					dir = dir.Rotated(Mathf.DegToRad(rng.RandfRange(0f, Gun.BulletSpread)));
+				}
+				dir = ApplyBlindSpread(dir);
+				bool crit = RollCrit(Gun, out int damage, baseDamage);
+				Bullet b = Gun.BulletType.Instantiate<Bullet>();
+				b.Set("Direction", dir);
+				b.Set("Damage", damage);
+				b.Set("BulletLifetime", Gun.BulletLifetime);
+				b.Gun = Gun;
+				if (Gun.BulletSpeed > 0) b.BulletSpeed = Gun.BulletSpeed;
+				if (Gun.Element != ElementType.NonElemental) b.Element = Gun.Element;
+				b.AuraColor = crit ? CritAuraColor : new Color(0.3f, 0.6f, 1f, 0.8f);
+				b.Position = Position;
+				b.Rotation = dir.Angle();
+				b.SetCollisionLayerValue(4, true);
+				b.SetCollisionMaskValue(3, true);
+				b.SetCollisionMaskValue(1, true);
+				GetParent().AddChild(b);
+				b.Scale *= sizeMult;
 			}
-			dir = ApplyBlindSpread(dir);
-			bool crit = RollCrit(Gun, out int damage, baseDamage);
-			Bullet b = Gun.BulletType.Instantiate<Bullet>();
-			b.Set("Direction", dir);
-			b.Set("Damage", damage);
-			b.Set("BulletLifetime", Gun.BulletLifetime);
-			b.Gun = Gun;
-			if (Gun.BulletSpeed > 0) b.BulletSpeed = Gun.BulletSpeed;
-			if (Gun.Element != ElementType.NonElemental) b.Element = Gun.Element;
-			b.AuraColor = crit ? CritAuraColor : new Color(0.3f, 0.6f, 1f, 0.8f);
-			b.Position = Position;
-			b.Rotation = dir.Angle();
-			b.SetCollisionLayerValue(4, true);
-			b.SetCollisionMaskValue(3, true);
-			b.SetCollisionMaskValue(1, true);
-			GetParent().AddChild(b);
-			b.Scale *= sizeMult;
 		}
 	}
 
@@ -1048,6 +1064,7 @@ public partial class Player : CharacterBody2D
 		if (gun.SlowStacksPerHit > 0) e.StatusEffects.AddStacks(StatusEffectType.Slow, gun.SlowStacksPerHit);
 		if (gun.FireRateStacksPerHit > 0) e.StatusEffects.AddStacks(StatusEffectType.ReducedFireRate, gun.FireRateStacksPerHit);
 		if (gun.BlindStacksPerHit > 0) e.StatusEffects.AddStacks(StatusEffectType.Blind, gun.BlindStacksPerHit);
+		if (gun.GreaseStacksPerHit > 0) e.StatusEffects.AddStacks(StatusEffectType.DamageDealt, gun.GreaseStacksPerHit);
 		if (gun.LifeSteal > 0f) {
 			int heal = Mathf.RoundToInt(gun.LifeSteal);
 			if (heal > 0) Heal(heal);
@@ -1085,6 +1102,7 @@ public partial class Player : CharacterBody2D
 	private void Shoot(Vector2 aimDirection) {
 		PlayActionAnimation("Fire", aimDirection);
 		Sfx.Play(this, Gun.FireSound);
+		MuzzleFlash.Spawn(this, Gun, aimDirection);
 		int dirCount = Mathf.Max(1, Gun.DirectionalCount);
 		float dirStep = Mathf.DegToRad(Gun.DirectionalAngle);
 		for (int d = 0; d < dirCount; d++) {

@@ -17,6 +17,7 @@ public static class StatusEffectVisuals
 		StatusEffectType.Slow,
 		StatusEffectType.ReducedFireRate,
 		StatusEffectType.Blind,
+		StatusEffectType.DamageDealt,
 	};
 
 	// Returns the icon for a status, or null if no art has been supplied for it yet.
@@ -36,6 +37,7 @@ public static class StatusEffectVisuals
 		StatusEffectType.Slow => new Color(0.4f, 0.6f, 1f),
 		StatusEffectType.ReducedFireRate => new Color(1f, 0.9f, 0.25f),
 		StatusEffectType.Blind => new Color(0.55f, 0.35f, 0.75f),
+		StatusEffectType.DamageDealt => new Color(0.55f, 0.45f, 0.2f),
 		_ => Colors.White,
 	};
 }

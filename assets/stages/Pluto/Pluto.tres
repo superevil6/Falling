@@ -1,8 +1,10 @@
 [gd_resource type="Resource" format=3 uid="uid://blj7cvw1dm7qh"]
 
-[ext_resource type="Texture2D" uid="uid://c2cdk30xq4fxe" path="res://assets/stages/Pluto/Backgrounds/Pluto background 2.png" id="1_f0cpc"]
-[ext_resource type="Texture2D" uid="uid://cl2nkxtp62xup" path="res://assets/stages/Pluto/Backgrounds/Pluto background 1.png" id="1_tfj1p"]
+[ext_resource type="Texture2D" uid="uid://bnliiiok4alxy" path="res://assets/sprites/Walls/Pluto background 2.ase" id="2_il1gn"]
+[ext_resource type="Texture2D" uid="uid://1vls52ameqjq" path="res://assets/sprites/Walls/Pluto background 3.ase" id="2_k3tgq"]
 [ext_resource type="AudioStream" uid="uid://bmxihk5k1s1n4" path="res://assets/Test Music/Final of Puyo Puyo.mp3" id="3_f0cpc"]
+[ext_resource type="Texture2D" uid="uid://c86kq6uqoi8pr" path="res://assets/sprites/Walls/Pluto background 4.ase" id="4_il1gn"]
+[ext_resource type="Texture2D" uid="uid://djl4aynwgan3c" path="res://assets/sprites/Walls/Pluto background 1.ase" id="4_uou2l"]
 [ext_resource type="Resource" uid="uid://7uoknla1fxr" path="res://assets/enemy groups/S1 01 Orb Line.tres" id="4_up1nm"]
 [ext_resource type="Resource" uid="uid://2woivoc063x3" path="res://assets/enemy groups/S1 02 Pea Wedge.tres" id="5_ixtjs"]
 [ext_resource type="Resource" uid="uid://duma5ymjmblkg" path="res://assets/enemy groups/S1 03 Twin Pincer.tres" id="6_f50kp"]
@@ -12,7 +14,6 @@
 [ext_resource type="Resource" uid="uid://bwffdxn674ic6" path="res://assets/enemy groups/S1 06 CircleNose Ring.tres" id="9_k3tgq"]
 [ext_resource type="PackedScene" uid="uid://b2b1iguvcpy" path="res://assets/stages/Pluto/Walls/Pluto Wall 2.tscn" id="9_tfj1p"]
 [ext_resource type="PackedScene" uid="uid://c27bw8m2b5dvc" path="res://assets/stages/Pluto/Walls/Pluto Wall 3.tscn" id="10_3wwq1"]
-[ext_resource type="AudioStream" uid="uid://dslbshgdy5r1j" path="res://assets/Test Music/Blaze Heatnix.mp3" id="10_e7417"]
 [ext_resource type="Resource" uid="uid://3capava47r5q" path="res://assets/enemy groups/S1 07 Staggered Rush.tres" id="10_il1gn"]
 [ext_resource type="Script" uid="uid://byqq3mnl0fxbu" path="res://assets/scripts/Stage.cs" id="11_fyero"]
 [ext_resource type="PackedScene" uid="uid://bpeh656wmwak3" path="res://assets/stages/Pluto/Walls/Pluto Wall 4.tscn" id="11_kfmdv"]
@@ -24,6 +25,10 @@
 [ext_resource type="Resource" uid="uid://dexsr5xuuf8fi" path="res://assets/enemy groups/S1 10 Full Mix Assault.tres" id="13_sna1t"]
 [ext_resource type="Resource" uid="uid://dctl74u585md3" path="res://assets/enemy groups/S1 BOSS Dichotomyoptic.tres" id="14_a7hkr"]
 [ext_resource type="Texture2D" uid="uid://drlx4i6ih2mp2" path="res://assets/sprites/Walls/Pluto Inner Wall.aseprite" id="15_r76eu"]
+[ext_resource type="Texture2D" uid="uid://dctgukjxhggm6" path="res://assets/sprites/Walls/Pluto decoration 1.aseprite" id="23_n7s2n"]
+[ext_resource type="Texture2D" uid="uid://b0nhfphlnvqcx" path="res://assets/sprites/Walls/Pluto Decoration 2.aseprite" id="24_a2xyd"]
+[ext_resource type="AudioStream" uid="uid://bd1pbvel1u11a" path="res://assets/BGM/Metal Mega demo.wav" id="24_k3tgq"]
+[ext_resource type="Texture2D" uid="uid://djemq6hmnclsm" path="res://assets/sprites/Walls/Pluto Decoration 3.aseprite" id="25_k3tgq"]
 
 [resource]
 script = ExtResource("11_fyero")
@@ -36,13 +41,20 @@ LeftWallChunks = Array[PackedScene]([ExtResource("8_e7417"), ExtResource("9_tfj1
 RightWallChunks = Array[PackedScene]([ExtResource("8_e7417"), ExtResource("9_tfj1p"), ExtResource("10_3wwq1"), ExtResource("11_kfmdv")])
 WallFillTiles = Array[Texture2D]([ExtResource("15_r76eu")])
 WallFillTileDarkness = 0.4
+WallDecorations = Array[Texture2D]([ExtResource("23_n7s2n"), ExtResource("24_a2xyd"), ExtResource("25_k3tgq")])
+DecorationInset = 15.0
+DecorationLightColors = PackedColorArray(0.22352941, 0, 0, 1)
+DecorationLightRadii = PackedFloat32Array(400)
+DecorationLightEnergies = PackedFloat32Array(50)
+AmbientLight = Color(0.69135684, 0.6913568, 0.69135684, 1)
 ScrollSpeed = 300.0
-BackgroundImages = Array[Texture2D]([ExtResource("1_tfj1p")])
+BackgroundImages = Array[Texture2D]([ExtResource("4_il1gn"), ExtResource("4_uou2l")])
 BackgroundDarkness = PackedFloat32Array(0.643)
-Background2Images = Array[Texture2D]([ExtResource("1_f0cpc")])
+Background2Images = Array[Texture2D]([ExtResource("2_k3tgq"), ExtResource("2_il1gn")])
 Background2Darkness = PackedFloat32Array(0.593)
 StageEvents = Array[Resource]([ExtResource("11_tfj1p"), ExtResource("12_kfmdv"), ExtResource("13_r76eu")])
 EventInterval = 5.0
+RandomEventOrder = true
 DisableEventsDuringBoss = false
-StageMusic = ExtResource("10_e7417")
+StageMusic = ExtResource("24_k3tgq")
 BossMusic = ExtResource("3_f0cpc")

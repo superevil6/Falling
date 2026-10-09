@@ -18,7 +18,7 @@ shader_parameter/darkness = 0.0
 [node name="Area2D" type="Area2D" unique_id=1094738497]
 collision_mask = 3
 script = ExtResource("1_2psqe")
-PickupScale = 0.5
+PickupScale = 0.75
 ExpireTime = 10.0
 PickupSound = ExtResource("2_1kbgi")
 

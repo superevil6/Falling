@@ -1,0 +1,50 @@
+{
+  "app": "CrunchyTile",
+  "license": "CC0-1.0",
+  "kind": "parallax",
+  "axis": "vertical",
+  "tileSize": 256,
+  "artSize": 64,
+  "scale": 4,
+  "layers": [
+    {
+      "dir": "layer-1",
+      "depth": 0,
+      "scroll": 1,
+      "tiles": [
+        "tile-1.png",
+        "tile-2.png",
+        "tile-3.png",
+        "tile-4.png"
+      ]
+    },
+    {
+      "dir": "layer-2",
+      "depth": 1,
+      "scroll": 0.4,
+      "tiles": [
+        "tile-1.png",
+        "tile-2.png",
+        "tile-3.png",
+        "tile-4.png"
+      ]
+    }
+  ],
+  "rules": "Each tile repeats SIDEWAYS with itself; tiles of a layer STACK VERTICALLY in any order.",
+  "palette": [
+    "#f0d8b8",
+    "#d99a5b",
+    "#b3592c",
+    "#7d3418",
+    "#4e2412",
+    "#2c1710",
+    "#150b08",
+    "#f0d8b8",
+    "#d99a5b",
+    "#b3592c",
+    "#7d3418",
+    "#4e2412",
+    "#2c1710",
+    "#150b08"
+  ]
+}

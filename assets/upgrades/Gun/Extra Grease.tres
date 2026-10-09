@@ -1,0 +1,14 @@
+[gd_resource type="Resource" format=3 uid="uid://c2o3uxmjvxyrs"]
+
+[ext_resource type="Texture2D" uid="uid://dh88hh5upnsfc" path="res://assets/sprites/Power Up Icons/Poison Bullet.png" id="1_2mr1d"]
+[ext_resource type="Script" uid="uid://cjvebtbs1ft7k" path="res://assets/scripts/GunUpgrade.cs" id="1_bh2c7"]
+
+[resource]
+script = ExtResource("1_bh2c7")
+Type = 25
+Element = 4
+UpgradeImage = ExtResource("1_2mr1d")
+UpgradeName = "Extra Grease"
+UpgradeDescription = "Your grease rounds coat thicker, applying an extra stack that further weakens enemy attacks with every hit."
+Value = 1.0
+Rarity = 0

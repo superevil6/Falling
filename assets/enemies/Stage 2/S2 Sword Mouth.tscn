@@ -11,6 +11,8 @@
 [ext_resource type="PackedScene" uid="uid://bo6exbho5e01u" path="res://assets/pickups/1exp 50.tscn" id="7_p5q0g"]
 [ext_resource type="Shader" uid="uid://nej1tvi1ocse" path="res://assets/shaders/PixelArt.gdshader" id="8_mgan0"]
 [ext_resource type="SpriteFrames" uid="uid://d072v2a1vc3mg" path="res://assets/sprites/Enemies/Sword Mouth.ase" id="9_0027k"]
+[ext_resource type="Texture2D" uid="uid://rosu2a1t8i1w" path="res://assets/sprites/Debris 3.aseprite" id="d3new"]
+[ext_resource type="Texture2D" uid="uid://bh0j2slp0q1ds" path="res://assets/sprites/Debris 4.aseprite" id="d4new"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_kihfr"]
 radius = 6.50781
@@ -43,7 +45,7 @@ EnemySprite = ExtResource("3_m86y6")
 DeathSound = ExtResource("4_lajqt")
 DeathExplosions = ExtResource("5_dwubv")
 DebrisReleased = 2
-DebrisSprites = Array[Texture2D]([ExtResource("6_m86y6"), ExtResource("7_lajqt")])
+DebrisSprites = Array[Texture2D]([ExtResource("6_m86y6"), ExtResource("7_lajqt"), ExtResource("d3new"), ExtResource("d4new")])
 ItemDrops = Array[PackedScene]([ExtResource("6_gg3m7"), ExtResource("7_p5q0g")])
 TeleportHesitationTime = 2.0
 metadata/Enemy = false
@@ -54,10 +56,10 @@ scale = Vector2(14.58249, 10.553166)
 shape = SubResource("CapsuleShape2D_kihfr")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=198878853]
-scale = Vector2(1.3, 1.3)
 texture_filter = 1
 material = SubResource("ShaderMaterial_58uc7")
 position = Vector2(-3.309352, 0)
+scale = Vector2(1.3, 1.3)
 sprite_frames = ExtResource("9_0027k")
 animation = &"Death"
 metadata/_aseprite_wizard_config_ = {

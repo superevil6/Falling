@@ -1,0 +1,53 @@
+{
+  "app": "CrunchyTile",
+  "license": "CC0-1.0",
+  "kind": "wall-strip",
+  "hazards": [],
+  "decorations": [],
+  "scale": 4,
+  "triggers": [],
+  "facing": "floor",
+  "chunk": {
+    "w": 256,
+    "h": 256,
+    "artW": 64,
+    "artH": 64
+  },
+  "chunks": [
+    "wall-1.png",
+    "wall-2.png",
+    "wall-3.png",
+    "wall-4.png"
+  ],
+  "fill": {
+    "size": 256,
+    "tiles": [
+      "fill-1.png",
+      "fill-2.png",
+      "fill-3.png",
+      "fill-4.png"
+    ]
+  },
+  "edge": {
+    "mean": 88,
+    "min": 76,
+    "max": 100
+  },
+  "orientation": "The surface is a FLOOR: solid below, open above. Flip the image vertically for a ceiling.",
+  "palette": [
+    "#fff6d5",
+    "#ffd24a",
+    "#ff9520",
+    "#e8541c",
+    "#a32814",
+    "#5c150e",
+    "#25080a",
+    "#fffbf0",
+    "#ffe792",
+    "#ffb52e",
+    "#ef6d14",
+    "#bf3708",
+    "#791d05",
+    "#280902"
+  ]
+}

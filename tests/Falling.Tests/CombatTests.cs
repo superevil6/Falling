@@ -224,4 +224,32 @@ public class CombatTests
 		sec.AddStacks(StatusEffectType.Blind, 10);
 		Assert.Equal(Colors.Black, sec.GetTint());
 	}
+
+	// ---- Grease (DamageDealt) outgoing-damage debuff -------------------------------
+
+	[Fact]
+	public void OutgoingDamage_UnaffectedWhenNotGreased()
+	{
+		var sec = new StatusEffectController();
+		Assert.Equal(1f, sec.GetOutgoingDamageMultiplier());
+	}
+
+	[Theory]
+	[InlineData(1, 0.97f)]
+	[InlineData(3, 0.91f)]
+	[InlineData(10, 0.70f)]
+	public void OutgoingDamage_DropsPerGreaseStack(int stacks, float expected)
+	{
+		var sec = new StatusEffectController();
+		sec.AddStacks(StatusEffectType.DamageDealt, stacks);
+		Assert.Equal(expected, sec.GetOutgoingDamageMultiplier(), 3);
+	}
+
+	[Fact]
+	public void OutgoingDamage_FlooredAtTenPercent()
+	{
+		var sec = new StatusEffectController();
+		sec.AddStacks(StatusEffectType.DamageDealt, 1000);
+		Assert.Equal(0.1f, sec.GetOutgoingDamageMultiplier(), 3);
+	}
 }
