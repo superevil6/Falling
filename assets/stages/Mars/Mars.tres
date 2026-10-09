@@ -1,0 +1,50 @@
+[gd_resource type="Resource" format=3 uid="uid://d2xk1wmgciac5"]
+
+[ext_resource type="Script" uid="uid://byqq3mnl0fxbu" path="res://assets/scripts/Stage.cs" id="1_stage"]
+[ext_resource type="PackedScene" uid="uid://bki0m873n8eiv" path="res://assets/stages/Mars/Walls/Mars Wall 1.tscn" id="lw0"]
+[ext_resource type="PackedScene" uid="uid://bl25ospidl75d" path="res://assets/stages/Mars/Walls/Mars Wall 2.tscn" id="lw1"]
+[ext_resource type="PackedScene" uid="uid://cwo1xhua8h0b" path="res://assets/stages/Mars/Walls/Mars Wall 3.tscn" id="lw2"]
+[ext_resource type="PackedScene" uid="uid://b81hskyrl7d8l" path="res://assets/stages/Mars/Walls/Mars Wall 4.tscn" id="lw3"]
+[ext_resource type="Texture2D" path="res://assets/stages/Mars/mars-cliff-wall/fill-1.png" id="f0"]
+[ext_resource type="Texture2D" path="res://assets/stages/Mars/mars-cliff-wall/fill-2.png" id="f1"]
+[ext_resource type="Texture2D" path="res://assets/stages/Mars/mars-cliff-wall/fill-3.png" id="f2"]
+[ext_resource type="Texture2D" path="res://assets/stages/Mars/mars-cliff-wall/fill-4.png" id="f3"]
+[ext_resource type="Texture2D" path="res://assets/stages/Mars/mars-cliff-wall/decoration-1.png" id="d0"]
+[ext_resource type="Texture2D" path="res://assets/stages/Mars/mars-cliff-wall/decoration-2.png" id="d1"]
+[ext_resource type="Texture2D" path="res://assets/stages/Mars/mars-cliff-wall/decoration-3.png" id="d2"]
+[ext_resource type="Texture2D" path="res://assets/stages/Mars/mars-depths/layer-1/tile-1.png" id="b1_0"]
+[ext_resource type="Texture2D" path="res://assets/stages/Mars/mars-depths/layer-1/tile-2.png" id="b1_1"]
+[ext_resource type="Texture2D" path="res://assets/stages/Mars/mars-depths/layer-1/tile-3.png" id="b1_2"]
+[ext_resource type="Texture2D" path="res://assets/stages/Mars/mars-depths/layer-1/tile-4.png" id="b1_3"]
+[ext_resource type="Texture2D" path="res://assets/stages/Mars/mars-depths/layer-2/tile-1.png" id="b2_0"]
+[ext_resource type="Texture2D" path="res://assets/stages/Mars/mars-depths/layer-2/tile-2.png" id="b2_1"]
+[ext_resource type="Texture2D" path="res://assets/stages/Mars/mars-depths/layer-2/tile-3.png" id="b2_2"]
+[ext_resource type="Texture2D" path="res://assets/stages/Mars/mars-depths/layer-2/tile-4.png" id="b2_3"]
+[ext_resource type="Resource" uid="uid://cjdgwmdwlob5u" path="res://assets/stage event/Both Wall Contract 30.tres" id="e0"]
+[ext_resource type="Resource" uid="uid://cgjm6phgjv7pg" path="res://assets/stage event/Left Wall Contract 30.tres" id="e1"]
+[ext_resource type="Resource" uid="uid://cn22x3e8ni2jj" path="res://assets/stage event/Right Wall Contract 30.tres" id="e2"]
+
+[resource]
+script = ExtResource("1_stage")
+Name = "Mars"
+EnemyGroup = Array[Resource]([])
+LevelEndText = ""
+LevelEndColor = Color(1, 1, 1, 1)
+Hazards = Array[PackedScene]([])
+LeftWallChunks = Array[PackedScene]([ExtResource("lw0"), ExtResource("lw1"), ExtResource("lw2"), ExtResource("lw3")])
+RightWallChunks = Array[PackedScene]([ExtResource("lw0"), ExtResource("lw1"), ExtResource("lw2"), ExtResource("lw3")])
+WallFillTiles = Array[Texture2D]([ExtResource("f0"), ExtResource("f1"), ExtResource("f2"), ExtResource("f3")])
+WallFillTileSize = 256.0
+WallFillTileDarkness = 0.4
+WallDecorations = Array[Texture2D]([ExtResource("d0"), ExtResource("d1"), ExtResource("d2")])
+DecorationInset = -56.0
+AmbientLight = Color(1, 1, 1, 1)
+ScrollSpeed = 300.0
+BackgroundImages = Array[Texture2D]([ExtResource("b1_0"), ExtResource("b1_1"), ExtResource("b1_2"), ExtResource("b1_3")])
+BackgroundDarkness = PackedFloat32Array(0.5, 0.5, 0.5, 0.5)
+Background2Images = Array[Texture2D]([ExtResource("b2_0"), ExtResource("b2_1"), ExtResource("b2_2"), ExtResource("b2_3")])
+Background2Darkness = PackedFloat32Array(0.6, 0.6, 0.6, 0.6)
+StageEvents = Array[Resource]([ExtResource("e0"), ExtResource("e1"), ExtResource("e2")])
+EventInterval = 5.0
+RandomEventOrder = true
+DisableEventsDuringBoss = false

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" format=3 uid="uid://bsc4yng2d0xly"]
+
+[ext_resource type="Texture2D" path="res://assets/stages/Earth II/earth-ii-garden-wall/wall-1.png" id="1_tex"]
+[ext_resource type="Script" uid="uid://bna4yt1fh0nl1" path="res://assets/scripts/Wall.cs" id="2_wall"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_n43am"]
+size = Vector2(20, 200)
+
+[resource]
+script = ExtResource("2_wall")
+CollisionShape = SubResource("RectangleShape2D_n43am")
+Graphics = [ExtResource("1_tex")]
+Height = 200.0
+StatusTickInterval = 0.0

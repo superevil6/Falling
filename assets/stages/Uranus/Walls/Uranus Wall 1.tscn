@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://3634c826p0v7"]
+
+[ext_resource type="Script" uid="uid://tu36bfp3p2rn" path="res://assets/scripts/WallBody.cs" id="1_body"]
+[ext_resource type="Resource" uid="uid://dytbmlgnxwkxk" path="res://assets/stages/Uranus/Walls/Uranus Wall 1.tres" id="2_data"]
+[ext_resource type="Shader" uid="uid://nej1tvi1ocse" path="res://assets/shaders/PixelArt.gdshader" id="3_shader"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ylusg"]
+shader = ExtResource("3_shader")
+shader_parameter/pixel_size = 4.0
+shader_parameter/color_steps = 8
+shader_parameter/hue_shift = 0.0
+shader_parameter/darkness = 0.0
+
+[node name="UranusWall1" type="StaticBody2D" groups=["Wall"]]
+script = ExtResource("1_body")
+WallData = ExtResource("2_data")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_ylusg")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]

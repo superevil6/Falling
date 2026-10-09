@@ -2,6 +2,13 @@
 
 [ext_resource type="Script" uid="uid://hfchjcen7ado" path="res://assets/scripts/Main.cs" id="1_yeolr"]
 [ext_resource type="Resource" uid="uid://dg3mm6kue3kay" path="res://assets/stages/Jupiter/Jupiter.tres" id="2_jupiter"]
+[ext_resource type="Resource" uid="uid://drixwbi6yylye" path="res://assets/stages/Sun/Sun.tres" id="2_sun"]
+[ext_resource type="Resource" uid="uid://b37ngqcgksx7i" path="res://assets/stages/Mercury/Mercury.tres" id="2_mercury"]
+[ext_resource type="Resource" uid="uid://dvwqrpsbk0l3t" path="res://assets/stages/Earth/Earth.tres" id="2_earth"]
+[ext_resource type="Resource" uid="uid://56alfd1lxuqw" path="res://assets/stages/Earth II/Earth II.tres" id="2_earthii"]
+[ext_resource type="Resource" uid="uid://d2xk1wmgciac5" path="res://assets/stages/Mars/Mars.tres" id="2_mars"]
+[ext_resource type="Resource" uid="uid://c30n20oubw43s" path="res://assets/stages/Saturn/Saturn.tres" id="2_saturn"]
+[ext_resource type="Resource" uid="uid://cyycjfwxvoanf" path="res://assets/stages/Uranus/Uranus.tres" id="2_uranus"]
 [ext_resource type="Resource" uid="uid://drxdwiakxfced" path="res://assets/stages/Stage One/Test Stage.tres" id="2_0q0aj"]
 [ext_resource type="PackedScene" uid="uid://cfanc3brtl3ux" path="res://assets/objects/player.tscn" id="2_s1fia"]
 [ext_resource type="Resource" uid="uid://blj7cvw1dm7qh" path="res://assets/stages/Pluto/Pluto.tres" id="3_fqi5e"]
@@ -102,7 +109,7 @@
 
 [node name="Main" type="Node2D" unique_id=1790341003]
 script = ExtResource("1_yeolr")
-Stages = Array[Resource]([ExtResource("2_jupiter"), ExtResource("2_0q0aj"), ExtResource("3_fqi5e"), ExtResource("4_kdnkw")])
+Stages = Array[Resource]([ExtResource("3_fqi5e"), ExtResource("4_kdnkw"), ExtResource("2_uranus"), ExtResource("2_saturn"), ExtResource("2_jupiter"), ExtResource("2_mars"), ExtResource("2_earth"), ExtResource("2_mercury"), ExtResource("2_sun"), ExtResource("2_earthii")])
 CurrentStage = 1
 DemoLoop = true
 EnemyInputDriftSpeed = 500.0

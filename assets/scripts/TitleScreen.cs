@@ -67,6 +67,7 @@ public partial class TitleScreen : Control
 	private VBoxContainer mainMenu;
 	private VBoxContainer levelSelectMenu;
 	private Button levelSelectButton;
+	private GridContainer levelSelectGrid;
 
 	// Lists every stage in Main.tscn's Stages array. Read from the scene's saved state so
 	// Main doesn't have to be instantiated just to get the names.
@@ -80,6 +81,13 @@ public partial class TitleScreen : Control
 		heading.AddThemeFontSizeOverride("font_size", 60);
 		levelSelectMenu.AddChild(heading);
 
+		// Two columns so a long stage list still fits on screen.
+		var grid = new GridContainer { Columns = 2 };
+		grid.AddThemeConstantOverride("h_separation", 16);
+		grid.AddThemeConstantOverride("v_separation", 16);
+		levelSelectMenu.AddChild(grid);
+		levelSelectGrid = grid;
+
 		var stages = LoadStageList();
 		for (int i = 0; i < stages.Count; i++) {
 			int index = i;
@@ -87,11 +95,12 @@ public partial class TitleScreen : Control
 			var name = string.IsNullOrEmpty(stage?.Name) ? $"Stage {i + 1}" : stage.Name;
 			var b = MakeButton($"{i + 1}. {name}");
 			b.Pressed += () => StartAtStage(index);
-			levelSelectMenu.AddChild(b);
+			grid.AddChild(b);
 		}
 
 		var back = MakeButton("Back");
 		back.Pressed += () => ShowLevelSelect(false);
+		back.SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
 		levelSelectMenu.AddChild(back);
 	}
 
@@ -111,7 +120,7 @@ public partial class TitleScreen : Control
 		mainMenu.Visible = !show;
 		levelSelectMenu.Visible = show;
 		if (show) {
-			(levelSelectMenu.GetChildCount() > 1 ? levelSelectMenu.GetChild<Button>(1) : null)?.GrabFocus();
+			(levelSelectGrid.GetChildCount() > 0 ? levelSelectGrid.GetChild<Button>(0) : null)?.GrabFocus();
 		} else {
 			levelSelectButton?.GrabFocus();
 		}
